@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 03:53:55 by eli               #+#    #+#             */
-/*   Updated: 2023/04/06 16:17:14 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/06 18:12:43 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,12 @@
 #include <cstdlib>
 #include <vector>
 #include <cstring>
+
+/**
+ * Un/comment to toggle NDEBUG mode and enable validation layers.
+*/
+#define NDEBUG
+#include <cassert>
 
 #include "utils.hpp"
 
@@ -39,8 +45,15 @@ private:
 		"VK_LAYER_KHRONOS_validation"
 	};
 
+	#ifdef NDEBUG
+	const bool						enable_validation_layers = false;
+	#else
+	const bool						enable_validation_layers = true;
+	#endif
+
 	GLFWwindow*						window;
 	VkInstance						vk_instance;
+	VkPhysicalDevice				physical_device = VK_NULL_HANDLE;
 
 	void	initWindow() {
 		// initialize glfw
@@ -58,6 +71,7 @@ private:
 
 	void	initVulkan() {
 		createInstance();
+		pickPhysicalDevice();
 	}
 
 	void	mainLoop() {
@@ -78,6 +92,10 @@ private:
 	}
 
 	void	createInstance() {
+		// Check if validation layers are available
+		if (enable_validation_layers && !checkValidationLayerSupport())
+			throw std::runtime_error("validation layers requested but not availalbe");
+
 		// Provides information to driver
 		VkApplicationInfo	app_info{};
 
@@ -93,6 +111,13 @@ private:
 
 		create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 		create_info.pApplicationInfo = &app_info;
+
+		if (enable_validation_layers) {
+			create_info.enabledLayerCount = static_cast<uint32_t>(validation_layers.size());
+			create_info.ppEnabledLayerNames = validation_layers.data();
+		} else {
+			create_info.enabledLayerCount = 0;
+		}
 
 		// Explicit which global extensions to use
 		uint32_t		glfw_extension_count = 0;
@@ -131,16 +156,77 @@ private:
 			std::cout << NL;
 		}
 	}
+
+	bool	checkValidationLayerSupport() {
+		uint32_t						layer_count;
+		vkEnumerateInstanceLayerProperties(&layer_count, nullptr);
+
+		std::vector<VkLayerProperties>	available_layers(layer_count);
+		vkEnumerateInstanceLayerProperties(&layer_count, available_layers.data());
+
+		for (const char* layer_name: validation_layers) {
+			bool	found = false;
+			for (const VkLayerProperties& layer_properties: available_layers) {
+				if (!strcmp(layer_name, layer_properties.layerName)) {
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+				return false;
+		}
+		return true;
+	}
+
+	void	pickPhysicalDevice() {
+		// Select best suited GPU device
+		uint32_t	device_count = 0;
+		vkEnumeratePhysicalDevices(vk_instance, &device_count, nullptr);
+
+		if (!device_count)
+			throw std::runtime_error("failed to find GPUs with vulkan support");
+
+		std::vector<VkPhysicalDevice>	devices(device_count);
+		vkEnumeratePhysicalDevices(vk_instance, &device_count, devices.data());
+
+		for (const VkPhysicalDevice& device: devices) {
+			if (isDeviceSuitable(device)) {
+				physical_device = device;
+				break;
+			}
+		}
+
+		if (physical_device == VK_NULL_HANDLE)
+			throw std::runtime_error("failed to find suitable GPU");
+	}
+
+	bool	isDeviceSuitable(VkPhysicalDevice device) {
+		// Select the best one. Doesn't work on my laptop, settle for any GPU.
+		// VkPhysicalDeviceProperties	device_properties;
+		// VkPhysicalDeviceFeatures	device_features;
+
+		// vkGetPhysicalDeviceProperties(device, &device_properties);
+		// vkGetPhysicalDeviceFeatures(device, &device_features);
+		
+		// return device_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
+		// && device_features.geometryShader;
+		(void) device;
+		return true;
+	}
 };	// class App
 
 
 int main() {
 	App		app;
 
+	#ifdef NDEBUG
+	std::cout << "In debug mode" << NL;
+	#endif
+
 	try {
 		app.run();
 	} catch (const std::exception& e) {
-		std::cerr << e.what() << std::endl;
+		std::cerr << e.what() << NL;
 		return EXIT_FAILURE;
 	}
 	
