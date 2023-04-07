@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 03:53:55 by eli               #+#    #+#             */
-/*   Updated: 2023/04/07 01:28:55 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/07 02:27:11 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -380,6 +380,41 @@ private:
 		}
 
 		return details;
+	}
+
+	VkSurfaceFormatKHR	chooseSwapSurfaceFormat(
+		const std::vector<VkSurfaceFormatKHR>& available_formats
+	) {
+		// check if surface format is adequate
+		// Prevalent: sRGB format for non linear color representation
+		for (const auto& available_format: available_formats) {
+			if (available_format.format == VK_FORMAT_B8G8R8A8_SRGB
+			&& available_format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+				return available_format;
+		}
+
+		// Default case (no wanted format)
+		return available_formats[0];
+	}
+
+	VkPresentModeKHR	chooseSwapPresentMode(
+		const std::vector<VkPresentModeKHR>& available_present_modes
+	) {
+		// Prevalent: fifo mailbox mode, expansive on energy but efficient
+		for (const auto& available_present_mode: available_present_modes) {
+			if (available_present_mode == VK_PRESENT_MODE_MAILBOX_KHR) {
+				return available_present_mode;
+			}
+		}
+
+		// Default case, doesn't strain on battery
+		return VK_PRESENT_MODE_FIFO_KHR;
+	}
+
+	VkExtent2D	chooseSwapExtent(
+		const VkSurfaceCapabilitiesKHR& capabilities
+	) {
+		
 	}
 
 };	// class App
