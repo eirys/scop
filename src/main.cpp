@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 03:53:55 by eli               #+#    #+#             */
-/*   Updated: 2023/04/10 16:17:45 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/10 18:04:31 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,13 +28,17 @@
 /**
  * Un/comment to toggle NDEBUG mode and enable validation layers.
 */
-#define NDEBUG
+#define NDEBUG 1
 #include <cassert>
 
 #include "utils.hpp"
 
 class App {
 public:
+	/* ========================================================================= */
+	/*                               HELPER OBJECT                               */
+	/* ========================================================================= */
+
 	struct QueueFamilyIndices {
 		std::optional<uint32_t>	graphics_family;
 		std::optional<uint32_t>	present_family;
@@ -53,8 +57,6 @@ public:
 	/* ========================================================================= */
 	/*                                   PUBLIC                                  */
 	/* ========================================================================= */
-
-	/* Main Function ----------------------------------------------------------- */
 
 	void	run() {
 		initWindow();
@@ -91,10 +93,16 @@ private:
 	VkInstance						vk_instance;
 	VkPhysicalDevice				physical_device = VK_NULL_HANDLE;
 	VkDevice						logical_device;
+	
 	VkSurfaceKHR					vk_surface;
 	VkQueue							graphics_queue;
 	VkQueue							present_queue;
+	
 	VkSwapchainKHR					swap_chain;
+	std::vector<VkImage>			swap_chain_images;
+	VkFormat						swap_chain_image_format;
+	VkExtent2D						swap_chain_extent;
+	std::vector<VkImageView>		swap_chain_image_views;
 
 	/* ========================================================================= */
 	/*                                  PRIVATE                                  */
@@ -116,10 +124,12 @@ private:
 
 	void	initVulkan() {
 		createInstance();
+		// setupDebugMessenger(); TODO
 		createSurface();
 		pickPhysicalDevice();
 		createLogicalDevice();
 		createSwapChain();
+		createImageViews();
 	}
 
 	void	mainLoop() {
@@ -130,9 +140,14 @@ private:
 	}
 
 	void	cleanup() {
+		// Destroy image view instances
+		for (auto& image_view: swap_chain_image_views) {
+			vkDestroyImageView(logical_device, image_view, nullptr);
+		}
+		
 		// Remove swap chain handler
 		vkDestroySwapchainKHR(logical_device, swap_chain, nullptr);
-		
+
 		// Remove device
 		vkDestroyDevice(logical_device, nullptr);
 
@@ -493,7 +508,7 @@ private:
 
 		// Setup the creation of the swap chain object, tied to the vk_surface
 		VkSwapchainCreateInfoKHR	create_info{};
-		
+
 		create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 		create_info.surface = vk_surface;
 		create_info.minImageCount = image_count;
@@ -530,14 +545,42 @@ private:
 		create_info.clipped = VK_TRUE;
 		create_info.oldSwapchain = VK_NULL_HANDLE;
 
-		// Create the object
-		if (vkCreateSwapchainKHR(
-			logical_device,
-			&create_info,
-			nullptr,
-			&swap_chain
-		) != VK_SUCCESS) {
+		// Create the object and images
+		if (vkCreateSwapchainKHR(logical_device, &create_info, nullptr, &swap_chain) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create swap chain");
+		}
+
+		// Retrieve image handles
+		vkGetSwapchainImagesKHR(logical_device, swap_chain, &image_count, nullptr);
+		swap_chain_images.resize(image_count);
+		vkGetSwapchainImagesKHR(logical_device, swap_chain, &image_count, swap_chain_images.data());
+
+		swap_chain_image_format = surface_format.format;
+		swap_chain_extent = swap_extent;
+	}
+
+	void	createImageViews() {
+		// Create image view for each images
+		swap_chain_image_views.resize(swap_chain_images.size());
+
+		for (size_t i = 0; i < swap_chain_images.size(); ++i) {
+			VkImageViewCreateInfo	create_info{};
+			create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+			create_info.image = swap_chain_images[i];
+			create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+			create_info.format = swap_chain_image_format;
+			create_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+			create_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+			create_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+			create_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+			create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			create_info.subresourceRange.baseMipLevel = 0;
+			create_info.subresourceRange.levelCount = 1;
+			create_info.subresourceRange.baseArrayLayer = 0;
+			create_info.subresourceRange.layerCount = 1;
+			if (vkCreateImageView(logical_device, &create_info, nullptr, &swap_chain_image_views[i]) != VK_SUCCESS) {
+				throw std::runtime_error("failed to create image views");
+			}
 		}
 	}
 
