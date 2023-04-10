@@ -6,7 +6,7 @@
 #    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/04/06 14:24:39 by eli              ###   ########.fr        #
+#    Updated: 2023/04/10 18:24:23 by eli              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@
 
 NAME	=	scop
 
-INC_F	=	utils.hpp
+INC_F	=	utils.hpp app.hpp
 INC		=	$(addprefix	inc/,$(INC_F))
 
 SRC_F	=	main.cpp
@@ -48,7 +48,7 @@ obj/%.o: src/%.cpp $(INC)
 
 .PHONY: test
 test: all
-	./$(NAME)
+	valgrind -s ./$(NAME)
 
 .PHONY: clean
 clean:
