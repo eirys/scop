@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/10 21:22:47 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/10 23:36:22 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,6 +111,8 @@ private:
 	VkExtent2D						swap_chain_extent;
 	std::vector<VkImageView>		swap_chain_image_views;
 
+	VkPipelineLayout				pipeline_layout;
+
 	/* ========================================================================= */
 	/*                                 CORE SETUP                                */
 	/* ========================================================================= */
@@ -148,6 +150,8 @@ private:
 	}
 
 	void	cleanup() {
+		vkDestroyPipelineLayout(logical_device, pipeline_layout, nullptr);
+
 		// Destroy image view instances
 		for (auto& image_view: swap_chain_image_views) {
 			vkDestroyImageView(logical_device, image_view, nullptr);
@@ -597,7 +601,7 @@ private:
 		std::vector<char>	vert_shader_code = readFile(SCOP_VERTEX_SHADER_BINARY);
 		std::vector<char>	frag_shader_code = readFile(SCOP_FRAGMENT_SHADER_BINARY);
 
-		// Create shader modules
+		// Create shader modules to be used for shader stages
 		VkShaderModule		vert_shader_module = createShaderModule(vert_shader_code);
 		VkShaderModule		frag_shader_module = createShaderModule(frag_shader_code);
 
@@ -617,6 +621,99 @@ private:
 			vert_stage_info,
 			frag_stage_info
 		};
+
+		// Fixed function state
+		// Vertex data input handler
+		VkPipelineVertexInputStateCreateInfo	vertex_input_info{};
+		vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+		vertex_input_info.vertexBindingDescriptionCount = 0;
+		vertex_input_info.pVertexBindingDescriptions = nullptr;
+		vertex_input_info.vertexAttributeDescriptionCount = 0;
+		vertex_input_info.pVertexAttributeDescriptions = nullptr;
+
+		// Vertex input assembly descriptor: regular triangles here
+		VkPipelineInputAssemblyStateCreateInfo	input_assembly_info{};
+		input_assembly_info.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+		input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+		input_assembly_info.primitiveRestartEnable = VK_FALSE;
+
+		// Rasterizer setup
+		VkPipelineRasterizationStateCreateInfo	rasterizer{};
+		rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+		rasterizer.depthClampEnable = VK_FALSE;
+		rasterizer.rasterizerDiscardEnable = VK_FALSE;
+		rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
+		rasterizer.lineWidth = 1.0f;
+		rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+		rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+		rasterizer.depthBiasEnable = VK_FALSE;
+		rasterizer.depthBiasConstantFactor = 0.0f;
+		rasterizer.depthBiasClamp = 0.0f;
+		rasterizer.depthBiasSlopeFactor = 0.0f;
+
+		// Disable multisampling
+		VkPipelineMultisampleStateCreateInfo	multisampling{};
+		multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+		multisampling.sampleShadingEnable = VK_FALSE;
+		multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+		multisampling.minSampleShading = 1.0f;
+		multisampling.pSampleMask = nullptr;
+		multisampling.alphaToCoverageEnable = VK_FALSE;
+		multisampling.alphaToOneEnable = VK_FALSE;
+
+		// Color blending for a single framebuffer setup
+		VkPipelineColorBlendAttachmentState	color_blend_attachment{};
+		color_blend_attachment.colorWriteMask =
+			VK_COLOR_COMPONENT_R_BIT |
+			VK_COLOR_COMPONENT_G_BIT |
+			VK_COLOR_COMPONENT_B_BIT |
+			VK_COLOR_COMPONENT_A_BIT;
+		color_blend_attachment.blendEnable = VK_FALSE;
+		color_blend_attachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+		color_blend_attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+		color_blend_attachment.colorBlendOp = VK_BLEND_OP_ADD;
+		color_blend_attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+		color_blend_attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+		color_blend_attachment.alphaBlendOp = VK_BLEND_OP_ADD;
+
+		VkPipelineColorBlendStateCreateInfo	color_blending{};
+		color_blending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+		color_blending.logicOpEnable = VK_FALSE;
+		color_blending.logicOp = VK_LOGIC_OP_COPY;
+		color_blending.attachmentCount = 1;
+		color_blending.pAttachments = &color_blend_attachment;
+		color_blending.blendConstants[0] = 0.0f;
+		color_blending.blendConstants[1] = 0.0f;
+		color_blending.blendConstants[2] = 0.0f;
+		color_blending.blendConstants[3] = 0.0f;
+
+		// Pipeline layout setup
+		VkPipelineLayoutCreateInfo	pipeline_layout_info{};
+		pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+		pipeline_layout_info.setLayoutCount = 0;
+		pipeline_layout_info.pSetLayouts = nullptr;
+		pipeline_layout_info.pushConstantRangeCount = 0;
+		pipeline_layout_info.pPushConstantRanges = nullptr;
+
+		if (vkCreatePipelineLayout(logical_device, &pipeline_layout_info, nullptr, &pipeline_layout) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create pipeline layout");
+		}
+
+		// Enable dynamic states
+		std::vector<VkDynamicState>	dynamic_states = {
+			VK_DYNAMIC_STATE_VIEWPORT,
+			VK_DYNAMIC_STATE_SCISSOR
+		};
+
+		VkPipelineDynamicStateCreateInfo	dynamic_state{};
+		dynamic_state.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+		dynamic_state.dynamicStateCount = static_cast<uint32_t>(dynamic_states.size());
+		dynamic_state.pDynamicStates = dynamic_states.data();
+
+		VkPipelineViewportStateCreateInfo	viewport_state{};
+		viewport_state.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+		viewport_state.viewportCount = 1;
+		viewport_state.scissorCount = 1;
 
 		vkDestroyShaderModule(logical_device, frag_shader_module, nullptr);
 		vkDestroyShaderModule(logical_device, vert_shader_module, nullptr);

@@ -6,7 +6,7 @@
 #    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/04/10 20:54:38 by eli              ###   ########.fr        #
+#    Updated: 2023/04/10 23:27:56 by eli              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -38,6 +38,8 @@ SH_BIN	=	$(addsuffix .spv,$(SHADERS))
 
 GLSLC	=	glslc
 
+RM		= rm -rf
+
 # ============================================================================ #
 #                                     RULES                                    #
 # ============================================================================ #
@@ -63,12 +65,12 @@ test: all
 
 .PHONY: clean
 clean:
-	rm -rf obj
-	rm -rf $(SH_BIN)
+	${RM} obj
+	${RM} $(SH_BIN)
 
 .PHONY: fclean
 fclean: clean
-	rm -f $(NAME)
+	${RM} $(NAME)
 
 .PHONY: re
 re: fclean all
