@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 03:53:55 by eli               #+#    #+#             */
-/*   Updated: 2023/04/07 02:27:11 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/10 16:17:45 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,8 @@
 #include <cstring>
 #include <optional>
 #include <set>
+#include <limits>
+#include <algorithm>
 
 /**
  * Un/comment to toggle NDEBUG mode and enable validation layers.
@@ -33,7 +35,6 @@
 
 class App {
 public:
-
 	struct QueueFamilyIndices {
 		std::optional<uint32_t>	graphics_family;
 		std::optional<uint32_t>	present_family;
@@ -49,6 +50,10 @@ public:
 		std::vector<VkPresentModeKHR>	present_modes;
 	};
 
+	/* ========================================================================= */
+	/*                                   PUBLIC                                  */
+	/* ========================================================================= */
+
 	/* Main Function ----------------------------------------------------------- */
 
 	void	run() {
@@ -59,6 +64,10 @@ public:
 	}
 
 private:
+	/* ========================================================================= */
+	/*                               CONST MEMBERS                               */
+	/* ========================================================================= */
+
 	const uint32_t					width = 800;
 	const uint32_t					height = 600;
 	const std::vector<const char*>	validation_layers = {
@@ -74,6 +83,10 @@ private:
 	const bool						enable_validation_layers = true;
 	#endif
 
+	/* ========================================================================= */
+	/*                               CLASS MEMBERS                               */
+	/* ========================================================================= */
+
 	GLFWwindow*						window;
 	VkInstance						vk_instance;
 	VkPhysicalDevice				physical_device = VK_NULL_HANDLE;
@@ -81,6 +94,11 @@ private:
 	VkSurfaceKHR					vk_surface;
 	VkQueue							graphics_queue;
 	VkQueue							present_queue;
+	VkSwapchainKHR					swap_chain;
+
+	/* ========================================================================= */
+	/*                                  PRIVATE                                  */
+	/* ========================================================================= */
 
 	void	initWindow() {
 		// initialize glfw
@@ -101,6 +119,7 @@ private:
 		createSurface();
 		pickPhysicalDevice();
 		createLogicalDevice();
+		createSwapChain();
 	}
 
 	void	mainLoop() {
@@ -111,6 +130,9 @@ private:
 	}
 
 	void	cleanup() {
+		// Remove swap chain handler
+		vkDestroySwapchainKHR(logical_device, swap_chain, nullptr);
+		
 		// Remove device
 		vkDestroyDevice(logical_device, nullptr);
 
@@ -376,7 +398,11 @@ private:
 
 		if (present_mode_count != 0) {
 			details.present_modes.resize(present_mode_count);
-			vkGetPhysicalDeviceSurfacePresentModesKHR(device, vk_surface, &present_mode_count, details.present_modes.data());
+			vkGetPhysicalDeviceSurfacePresentModesKHR(
+				device, vk_surface,
+				&present_mode_count,
+				details.present_modes.data()
+			);
 		}
 
 		return details;
@@ -414,7 +440,105 @@ private:
 	VkExtent2D	chooseSwapExtent(
 		const VkSurfaceCapabilitiesKHR& capabilities
 	) {
+		// Pick swap extent (~ resolution of the window, in px)
+		if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
+			return capabilities.currentExtent;
+		} else {
+			int	width, height;
+			glfwGetFramebufferSize(window, &width, &height);
+
+			VkExtent2D	actual_extent = {
+				static_cast<uint32_t>(width),
+				static_cast<uint32_t>(height)
+			};
+
+			actual_extent.width = std::clamp(
+				actual_extent.width,
+				capabilities.minImageExtent.width,
+				capabilities.maxImageExtent.width
+			);
+			actual_extent.height = std::clamp(
+				actual_extent.height,
+				capabilities.minImageExtent.height,
+				capabilities.maxImageExtent.height
+			);
+			return actual_extent;
+		}
+	}
+
+	void	createSwapChain() {
+		SwapChainSupportDetails	swap_chain_support = querySwapChainSupport(
+			physical_device
+		);
+
+		// Setup options for functionning swap chain
+		VkSurfaceFormatKHR	surface_format = chooseSwapSurfaceFormat(
+			swap_chain_support.formats
+		);
+		VkPresentModeKHR	present_mode = chooseSwapPresentMode(
+			swap_chain_support.present_modes
+		);
+		VkExtent2D			swap_extent = chooseSwapExtent(
+			swap_chain_support.capabilities
+		);
+
+		// Nb of images in the swap chain
+		uint32_t	image_count = swap_chain_support.capabilities.minImageCount + 1;
+
+		if (swap_chain_support.capabilities.maxImageCount > 0
+		&& image_count > swap_chain_support.capabilities.maxImageCount) {
+			// Avoid value exceeding max
+			image_count = swap_chain_support.capabilities.maxImageCount;
+		}
+
+		// Setup the creation of the swap chain object, tied to the vk_surface
+		VkSwapchainCreateInfoKHR	create_info{};
 		
+		create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+		create_info.surface = vk_surface;
+		create_info.minImageCount = image_count;
+		create_info.imageFormat = surface_format.format;
+		create_info.imageColorSpace = surface_format.colorSpace;
+		create_info.imageExtent = swap_extent;
+		create_info.imageArrayLayers = 1;
+		create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+		// Queue family swap handling:
+		// - graphics queue -> drawing to swap chain
+		// - present queue -> get passed the swap chain to be submitted
+		QueueFamilyIndices	indices = findQueueFamilies(physical_device);
+		uint32_t			queue_family_indices[] = {
+			indices.graphics_family.value(),
+			indices.present_family.value()
+		};
+
+		if (indices.graphics_family != indices.present_family) {
+			// No image ownership transfer
+			create_info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+			create_info.queueFamilyIndexCount = 2;
+			create_info.pQueueFamilyIndices = queue_family_indices;
+		} else {
+			// Explicit image ownership needed between queue families
+			create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+			create_info.queueFamilyIndexCount = 0;
+			create_info.pQueueFamilyIndices = nullptr;
+		}
+
+		create_info.preTransform = swap_chain_support.capabilities.currentTransform;
+		create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+		create_info.presentMode = present_mode;
+		create_info.clipped = VK_TRUE;
+		create_info.oldSwapchain = VK_NULL_HANDLE;
+
+		// Create the object
+		if (vkCreateSwapchainKHR(
+			logical_device,
+			&create_info,
+			nullptr,
+			&swap_chain
+		) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create swap chain");
+		}
 	}
 
 };	// class App
