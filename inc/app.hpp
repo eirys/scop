@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/10 18:48:39 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/10 20:42:40 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 # include <set>
 # include <limits>
 # include <algorithm>
+# include <fstream>
 
 /**
  * Un/comment to toggle NDEBUG mode and enable validation layers.
@@ -35,6 +36,9 @@
 # include <cassert>
 
 # include "utils.hpp"
+
+# define SCOP_VERTEX_SHADER_BINARY "shaders/vert.spv"
+# define SCOP_FRAGMENT_SHADER_BINARY "shaders/vert.spv"
 
 class App {
 public:
@@ -589,7 +593,24 @@ private:
 	}
 
 	void	createGraphicsPipeline() {
+		std::vector<char>	vert_shader_code = readFile(SCOP_VERTEX_SHADER_BINARY);
+		std::vector<char>	frag_shader_code = readFile(SCOP_FRAGMENT_SHADER_BINARY);
+	}
 
+	static std::vector<char>	readFile(const std::string& filename) {
+		// Read file as binary file, at the end of the file
+		std::fstream	file(filename, std::ios::ate | std::ios::binary);
+
+		if (!file.is_open()) {
+			throw std::runtime_error("failed to open file: " + filename);
+		}
+
+		size_t				file_size = static_cast<size_t>(file.tellg());
+		std::vector<char>	buffer(file_size);
+		file.seekg(0);
+		file.read(buffer.data(), file_size);
+		file.close();
+		return buffer;
 	}
 
 };	// class App

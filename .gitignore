@@ -2,3 +2,4 @@ obj
 scop
 .vscode
 img
+shaders/*.spv

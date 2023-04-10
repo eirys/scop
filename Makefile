@@ -6,7 +6,7 @@
 #    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/04/10 19:42:22 by eli              ###   ########.fr        #
+#    Updated: 2023/04/10 20:51:25 by eli              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,10 +26,15 @@ SRC		=	$(addprefix src/,$(SRC_F))
 OBJS	=	$(subst src/,obj/,$(SRC:.cpp=.o))
 
 CXX		=	c++
-EXTRA	=	-Wall -Werror -Wextra
 INCLUDE	=	./inc
+EXTRA	=	-Wall -Werror -Wextra
 CFLAGS	=	-I$(INCLUDE) -std=c++17 -O2
 LDFLAGS	=	-lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
+
+SH_NAME	=	vert \
+			frag
+SHADERS	=	$(addprefix shaders/,$(SH_NAME))
+SH_BIN	=	$(addsuffix .spv,$(SHADERS))
 
 GLSLC	=	glslc
 
@@ -38,10 +43,10 @@ GLSLC	=	glslc
 # ============================================================================ #
 
 .PHONY: all
-all: obj $(NAME)
+all: obj $(SH_BIN) $(NAME)
 
 obj:
-	mkdir -p obj
+	@mkdir -p obj
 
 $(NAME): $(OBJS)
 	$(CXX) $(CFLAGS) $(OBJS) -o $(NAME) $(LDFLAGS)
@@ -49,10 +54,8 @@ $(NAME): $(OBJS)
 obj/%.o: src/%.cpp $(INC)
 	$(CXX) $(CFLAGS) -c $< -o $@ $(LDFLAGS)
 
-.PHONY: shader
-shader:
-	$(GLSLC) shaders/shader.vert -o shaders/vert.spv
-	$(GLSLC) shaders/shader.frag -o shaders/frag.spv
+shaders/%.spv: shaders/shader.%
+	$(GLSLC) $< -o $@
 
 .PHONY: test
 test: all
@@ -61,7 +64,7 @@ test: all
 .PHONY: clean
 clean:
 	rm -rf obj
-	rm shaders/vert.spv shaders/frag.spv
+	rm -rf $(SH_BIN)
 
 .PHONY: fclean
 fclean: clean
