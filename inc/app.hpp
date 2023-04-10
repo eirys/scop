@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/10 20:57:05 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/10 21:22:47 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -586,6 +586,7 @@ private:
 			create_info.subresourceRange.levelCount = 1;
 			create_info.subresourceRange.baseArrayLayer = 0;
 			create_info.subresourceRange.layerCount = 1;
+
 			if (vkCreateImageView(logical_device, &create_info, nullptr, &swap_chain_image_views[i]) != VK_SUCCESS) {
 				throw std::runtime_error("failed to create image views");
 			}
@@ -596,8 +597,29 @@ private:
 		std::vector<char>	vert_shader_code = readFile(SCOP_VERTEX_SHADER_BINARY);
 		std::vector<char>	frag_shader_code = readFile(SCOP_FRAGMENT_SHADER_BINARY);
 
-		std::cout << "Vertex shader size: " << vert_shader_code.size() << NL;
-		std::cout << "Fragment shader size: " << vert_shader_code.size() << NL;
+		// Create shader modules
+		VkShaderModule		vert_shader_module = createShaderModule(vert_shader_code);
+		VkShaderModule		frag_shader_module = createShaderModule(frag_shader_code);
+
+		VkPipelineShaderStageCreateInfo	vert_stage_info{};
+		vert_stage_info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+		vert_stage_info.stage = VK_SHADER_STAGE_VERTEX_BIT;
+		vert_stage_info.module = vert_shader_module;
+		vert_stage_info.pName = "main";
+
+		VkPipelineShaderStageCreateInfo	frag_stage_info{};
+		frag_stage_info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+		frag_stage_info.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+		frag_stage_info.module = frag_shader_module;
+		frag_stage_info.pName = "main";
+
+		VkPipelineShaderStageCreateInfo	shader_stages[] = {
+			vert_stage_info,
+			frag_stage_info
+		};
+
+		vkDestroyShaderModule(logical_device, frag_shader_module, nullptr);
+		vkDestroyShaderModule(logical_device, vert_shader_module, nullptr);
 	}
 
 	static std::vector<char>	readFile(const std::string& filename) {
@@ -614,6 +636,21 @@ private:
 		file.read(buffer.data(), file_size);
 		file.close();
 		return buffer;
+	}
+
+	VkShaderModule	createShaderModule(const std::vector<char>& code) {
+		// Create a shader module from code
+		VkShaderModuleCreateInfo	create_info{};
+
+		create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+		create_info.codeSize = code.size();
+		create_info.pCode = reinterpret_cast<const uint32_t*>(code.data());
+
+		VkShaderModule	shader_module;
+		if (vkCreateShaderModule(logical_device, &create_info, nullptr, &shader_module) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create shader module");
+		}
+		return shader_module;
 	}
 
 };	// class App
