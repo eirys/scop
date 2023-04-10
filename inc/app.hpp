@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/10 18:24:08 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/10 18:48:39 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,7 @@ private:
 	std::vector<VkImageView>		swap_chain_image_views;
 
 	/* ========================================================================= */
-	/*                              HELPER FUNCTIONS                             */
+	/*                                 CORE SETUP                                */
 	/* ========================================================================= */
 
 	void	initWindow() {
@@ -133,6 +133,7 @@ private:
 		createLogicalDevice();
 		createSwapChain();
 		createImageViews();
+		createGraphicsPipeline();
 	}
 
 	void	mainLoop() {
@@ -585,6 +586,10 @@ private:
 				throw std::runtime_error("failed to create image views");
 			}
 		}
+	}
+
+	void	createGraphicsPipeline() {
+
 	}
 
 };	// class App
