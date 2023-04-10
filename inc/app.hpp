@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/10 20:42:40 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/10 20:57:05 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,8 @@
 
 # include "utils.hpp"
 
-# define SCOP_VERTEX_SHADER_BINARY "shaders/vert.spv"
-# define SCOP_FRAGMENT_SHADER_BINARY "shaders/vert.spv"
+# define SCOP_VERTEX_SHADER_BINARY		"shaders/vert.spv"
+# define SCOP_FRAGMENT_SHADER_BINARY	"shaders/frag.spv"
 
 class App {
 public:
@@ -100,11 +100,11 @@ private:
 	VkInstance						vk_instance;
 	VkPhysicalDevice				physical_device = VK_NULL_HANDLE;
 	VkDevice						logical_device;
-	
+
 	VkSurfaceKHR					vk_surface;
 	VkQueue							graphics_queue;
 	VkQueue							present_queue;
-	
+
 	VkSwapchainKHR					swap_chain;
 	std::vector<VkImage>			swap_chain_images;
 	VkFormat						swap_chain_image_format;
@@ -152,7 +152,7 @@ private:
 		for (auto& image_view: swap_chain_image_views) {
 			vkDestroyImageView(logical_device, image_view, nullptr);
 		}
-		
+
 		// Remove swap chain handler
 		vkDestroySwapchainKHR(logical_device, swap_chain, nullptr);
 
@@ -595,11 +595,14 @@ private:
 	void	createGraphicsPipeline() {
 		std::vector<char>	vert_shader_code = readFile(SCOP_VERTEX_SHADER_BINARY);
 		std::vector<char>	frag_shader_code = readFile(SCOP_FRAGMENT_SHADER_BINARY);
+
+		std::cout << "Vertex shader size: " << vert_shader_code.size() << NL;
+		std::cout << "Fragment shader size: " << vert_shader_code.size() << NL;
 	}
 
 	static std::vector<char>	readFile(const std::string& filename) {
 		// Read file as binary file, at the end of the file
-		std::fstream	file(filename, std::ios::ate | std::ios::binary);
+		std::ifstream	file(filename, std::ios::ate | std::ios::binary);
 
 		if (!file.is_open()) {
 			throw std::runtime_error("failed to open file: " + filename);

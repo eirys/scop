@@ -6,7 +6,7 @@
 #    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/04/10 20:51:25 by eli              ###   ########.fr        #
+#    Updated: 2023/04/10 20:54:38 by eli              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -59,7 +59,7 @@ shaders/%.spv: shaders/shader.%
 
 .PHONY: test
 test: all
-	valgrind -s ./$(NAME)
+	./$(NAME)
 
 .PHONY: clean
 clean:
