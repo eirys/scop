@@ -6,7 +6,7 @@
 #    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/04/10 23:27:56 by eli              ###   ########.fr        #
+#    Updated: 2023/04/11 14:23:21 by etran            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -36,7 +36,11 @@ SH_NAME	=	vert \
 SHADERS	=	$(addprefix shaders/,$(SH_NAME))
 SH_BIN	=	$(addsuffix .spv,$(SHADERS))
 
-GLSLC	=	glslc
+ifdef school
+	GLSLC	=	~/my_sgoinfre/glslc
+else
+	GLSLC	=	glslc
+endif
 
 RM		= rm -rf
 
