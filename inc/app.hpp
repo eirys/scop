@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/11 02:21:11 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/14 21:08:07 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,6 +111,7 @@ private:
 	VkExtent2D						swap_chain_extent;
 	std::vector<VkImageView>		swap_chain_image_views;
 
+	VkRenderPass					render_pass;
 	VkPipelineLayout				pipeline_layout;
 
 	/* ========================================================================= */
@@ -151,7 +152,11 @@ private:
 	}
 
 	void	cleanup() {
+		// Remove pipeline
 		vkDestroyPipelineLayout(logical_device, pipeline_layout, nullptr);
+
+		// Remove render pass
+		vkDestroyRenderPass(logical_device, render_pass, nullptr);
 
 		// Destroy image view instances
 		for (auto& image_view: swap_chain_image_views) {
@@ -601,7 +606,6 @@ private:
 	void	createRenderPass() {
 		// For a single framebuffer
 		VkAttachmentDescription	color_attachment{};
-
 		color_attachment.format = swap_chain_image_format;
 		color_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
 		color_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
@@ -610,6 +614,28 @@ private:
 		color_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 		color_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		color_attachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+		// Create single subpass of render pass
+		VkAttachmentReference	color_attachment_ref{};
+		color_attachment_ref.attachment = 0;
+		color_attachment_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+		VkSubpassDescription	subpass{};
+		subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+		subpass.colorAttachmentCount = 1;
+		subpass.pColorAttachments = &color_attachment_ref;
+
+		// Create render pass
+		VkRenderPassCreateInfo	create_info{};
+		create_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+		create_info.attachmentCount = 1;
+		create_info.pAttachments = &color_attachment;
+		create_info.subpassCount = 1;
+		create_info.pSubpasses = &subpass;
+
+		if (vkCreateRenderPass(logical_device, &create_info, nullptr, &render_pass) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create render pass");
+		}
 	}
 
 	void	createGraphicsPipeline() {
@@ -638,6 +664,7 @@ private:
 		};
 
 		// Fixed function state
+
 		// Vertex data input handler
 		VkPipelineVertexInputStateCreateInfo	vertex_input_info{};
 		vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -651,6 +678,12 @@ private:
 		input_assembly_info.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 		input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 		input_assembly_info.primitiveRestartEnable = VK_FALSE;
+
+		// Viewport state
+		VkPipelineViewportStateCreateInfo	viewport_state{};
+		viewport_state.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+		viewport_state.viewportCount = 1;
+		viewport_state.scissorCount = 1;
 
 		// Rasterizer setup
 		VkPipelineRasterizationStateCreateInfo	rasterizer{};
@@ -702,6 +735,17 @@ private:
 		color_blending.blendConstants[2] = 0.0f;
 		color_blending.blendConstants[3] = 0.0f;
 
+		// Enable dynamic states
+		std::vector<VkDynamicState>	dynamic_states = {
+			VK_DYNAMIC_STATE_VIEWPORT,
+			VK_DYNAMIC_STATE_SCISSOR
+		};
+
+		VkPipelineDynamicStateCreateInfo	dynamic_state{};
+		dynamic_state.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+		dynamic_state.dynamicStateCount = static_cast<uint32_t>(dynamic_states.size());
+		dynamic_state.pDynamicStates = dynamic_states.data();
+
 		// Pipeline layout setup
 		VkPipelineLayoutCreateInfo	pipeline_layout_info{};
 		pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -714,21 +758,23 @@ private:
 			throw std::runtime_error("failed to create pipeline layout");
 		}
 
-		// Enable dynamic states
-		std::vector<VkDynamicState>	dynamic_states = {
-			VK_DYNAMIC_STATE_VIEWPORT,
-			VK_DYNAMIC_STATE_SCISSOR
-		};
+		VkGraphicsPipelineCreateInfo	pipeline_info{};
+		pipeline_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+		pipeline_info.stageCount = 2;
+		pipeline_info.pStages = shader_stages;
+		pipeline_info.pVertexInputState = &vertex_input_info;
+		pipeline_info.pInputAssemblyState = &input_assembly_info;
+		pipeline_info.pViewportState = &viewport_state;
+		pipeline_info.pRasterizationState = &rasterizer;
+		pipeline_info.pMultisampleState = &multisampling;
+		pipeline_info.pDepthStencilState = nullptr;
+		pipeline_info.pColorBlendState = &color_blending;
+		pipeline_info.pDynamicState = &dynamic_state;
+		pipeline_info.layout = pipeline_layout;
+		pipeline_info.renderPass = render_pass;
+		pipeline_info.subpass = 0;
 
-		VkPipelineDynamicStateCreateInfo	dynamic_state{};
-		dynamic_state.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-		dynamic_state.dynamicStateCount = static_cast<uint32_t>(dynamic_states.size());
-		dynamic_state.pDynamicStates = dynamic_states.data();
 
-		VkPipelineViewportStateCreateInfo	viewport_state{};
-		viewport_state.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-		viewport_state.viewportCount = 1;
-		viewport_state.scissorCount = 1;
 
 		vkDestroyShaderModule(logical_device, frag_shader_module, nullptr);
 		vkDestroyShaderModule(logical_device, vert_shader_module, nullptr);
