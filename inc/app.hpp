@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/14 21:08:07 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/15 14:37:05 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@
 /**
  * Un/comment to toggle NDEBUG mode and enable validation layers.
 */
-# define NDEBUG
+# define NDEBUG 1
 # include <cassert>
 
 # include "utils.hpp"
@@ -113,6 +113,9 @@ private:
 
 	VkRenderPass					render_pass;
 	VkPipelineLayout				pipeline_layout;
+	VkPipeline						graphics_pipeline;
+
+	std::vector<VkFramebuffer>		swap_chain_frame_buffers;
 
 	/* ========================================================================= */
 	/*                                 CORE SETUP                                */
@@ -142,6 +145,7 @@ private:
 		createImageViews();
 		createRenderPass();
 		createGraphicsPipeline();
+		createFrameBuffers();
 	}
 
 	void	mainLoop() {
@@ -152,7 +156,15 @@ private:
 	}
 
 	void	cleanup() {
+		// Remove frame buffers
+		for (auto& frame_buffer: swap_chain_frame_buffers) {
+			vkDestroyFramebuffer(logical_device, frame_buffer, nullptr);
+		}
+
 		// Remove pipeline
+		vkDestroyPipeline(logical_device, graphics_pipeline, nullptr);
+		
+		// Remove pipeline layout
 		vkDestroyPipelineLayout(logical_device, pipeline_layout, nullptr);
 
 		// Remove render pass
@@ -758,6 +770,7 @@ private:
 			throw std::runtime_error("failed to create pipeline layout");
 		}
 
+		// Graphics pipeline
 		VkGraphicsPipelineCreateInfo	pipeline_info{};
 		pipeline_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 		pipeline_info.stageCount = 2;
@@ -773,8 +786,13 @@ private:
 		pipeline_info.layout = pipeline_layout;
 		pipeline_info.renderPass = render_pass;
 		pipeline_info.subpass = 0;
+		pipeline_info.basePipelineHandle = VK_NULL_HANDLE;
+		pipeline_info.basePipelineIndex = -1;
 
-
+		if (vkCreateGraphicsPipelines(logical_device, VK_NULL_HANDLE, 1, &pipeline_info,
+		nullptr, &graphics_pipeline) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create graphics pipeline");
+		}
 
 		vkDestroyShaderModule(logical_device, frag_shader_module, nullptr);
 		vkDestroyShaderModule(logical_device, vert_shader_module, nullptr);
@@ -809,6 +827,30 @@ private:
 			throw std::runtime_error("failed to create shader module");
 		}
 		return shader_module;
+	}
+
+	void	createFrameBuffers() {
+		swap_chain_frame_buffers.resize(swap_chain_image_views.size());
+		for (size_t i = 0; i < swap_chain_image_views.size(); ++i) {
+			VkImageView	attachments[] = {
+				swap_chain_image_views[i]
+			};
+
+			// Create frame buffer from image view, associate with a rend pass
+			VkFramebufferCreateInfo	create_info{};
+			create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO; 
+			create_info.renderPass = render_pass;
+			create_info.attachmentCount = 1;
+			create_info.pAttachments = attachments;
+			create_info.width = swap_chain_extent.width;
+			create_info.height = swap_chain_extent.height;
+			create_info.layers = 1;
+
+			if (vkCreateFramebuffer(logical_device, &create_info, nullptr,
+			&swap_chain_frame_buffers[i]) != VK_SUCCESS) {
+				throw std::runtime_error("failed to create frame buffer");
+			}
+		}
 	}
 
 };	// class App
