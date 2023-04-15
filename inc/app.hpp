@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/15 14:37:05 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/16 00:46:40 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,7 @@ private:
 	VkPipeline						graphics_pipeline;
 
 	std::vector<VkFramebuffer>		swap_chain_frame_buffers;
+	VkCommandPool					command_pool;
 
 	/* ========================================================================= */
 	/*                                 CORE SETUP                                */
@@ -146,6 +147,7 @@ private:
 		createRenderPass();
 		createGraphicsPipeline();
 		createFrameBuffers();
+		createCommandPool();
 	}
 
 	void	mainLoop() {
@@ -156,6 +158,9 @@ private:
 	}
 
 	void	cleanup() {
+		// Remove command pool
+		vkDestroyCommandPool(logical_device, command_pool, nullptr);
+
 		// Remove frame buffers
 		for (auto& frame_buffer: swap_chain_frame_buffers) {
 			vkDestroyFramebuffer(logical_device, frame_buffer, nullptr);
@@ -850,6 +855,20 @@ private:
 			&swap_chain_frame_buffers[i]) != VK_SUCCESS) {
 				throw std::runtime_error("failed to create frame buffer");
 			}
+		}
+	}
+
+	void	createCommandPool() {
+		// Command buffers handler
+		QueueFamilyIndices	queue_family_indices = findQueueFamilies(physical_device);
+
+		VkCommandPoolCreateInfo	pool_info{};
+		pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+		pool_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+		pool_info.queueFamilyIndex = queue_family_indices.graphics_family.value();
+
+		if (vkCreateCommandPool(logical_device, &pool_info, nullptr, &command_pool) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create command pool");
 		}
 	}
 
