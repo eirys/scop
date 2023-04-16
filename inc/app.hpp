@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/16 00:46:40 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/16 20:15:04 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,9 +114,10 @@ private:
 	VkRenderPass					render_pass;
 	VkPipelineLayout				pipeline_layout;
 	VkPipeline						graphics_pipeline;
-
 	std::vector<VkFramebuffer>		swap_chain_frame_buffers;
+
 	VkCommandPool					command_pool;
+	VkCommandBuffer					command_buffer;
 
 	/* ========================================================================= */
 	/*                                 CORE SETUP                                */
@@ -148,6 +149,7 @@ private:
 		createGraphicsPipeline();
 		createFrameBuffers();
 		createCommandPool();
+		createCommandBuffer();
 	}
 
 	void	mainLoop() {
@@ -168,7 +170,7 @@ private:
 
 		// Remove pipeline
 		vkDestroyPipeline(logical_device, graphics_pipeline, nullptr);
-		
+
 		// Remove pipeline layout
 		vkDestroyPipelineLayout(logical_device, pipeline_layout, nullptr);
 
@@ -843,7 +845,7 @@ private:
 
 			// Create frame buffer from image view, associate with a rend pass
 			VkFramebufferCreateInfo	create_info{};
-			create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO; 
+			create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 			create_info.renderPass = render_pass;
 			create_info.attachmentCount = 1;
 			create_info.pAttachments = attachments;
@@ -869,6 +871,73 @@ private:
 
 		if (vkCreateCommandPool(logical_device, &pool_info, nullptr, &command_pool) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create command pool");
+		}
+	}
+
+	void	createCommandBuffer() {
+		// Command buffers
+		VkCommandBufferAllocateInfo	alloc_info{};
+		alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		alloc_info.commandPool = command_pool;
+		alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		alloc_info.commandBufferCount = 1;
+
+		if (vkAllocateCommandBuffers(logical_device, &alloc_info, &command_buffer) != VK_SUCCESS) {
+			throw std::runtime_error("failed to allocate command buffers");
+		}
+	}
+
+	void	recordCommandBuffer(VkCommandBuffer command_buffer, uint32_t image_index) {
+		// Write commands to command buffer
+		VkCommandBufferBeginInfo	begin_info{};
+		begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		begin_info.flags = 0;
+		begin_info.pInheritanceInfo = nullptr;
+
+		if (vkBeginCommandBuffer(command_buffer, &begin_info) != VK_SUCCESS) {
+			throw std::runtime_error("failed to begin recording command buffer");
+		}
+
+		// Begin render pass to start drawing
+		VkRenderPassBeginInfo	render_pass_info{};
+		render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		render_pass_info.renderPass = render_pass;
+		render_pass_info.framebuffer = swap_chain_frame_buffers[image_index];
+		render_pass_info.renderArea.offset = {0, 0};
+		render_pass_info.renderArea.extent = swap_chain_extent;
+		// Define what corresponds to 'clear color'
+		VkClearValue	clear_color = { { { 0.0f, 0.0f, 0.0f, 1.0f } } };
+		render_pass_info.clearValueCount = 1;
+		render_pass_info.pClearValues = &clear_color;
+
+		// Begin rp and bind pipeline
+		vkCmdBeginRenderPass(command_buffer, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
+		vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphics_pipeline);
+
+		// Set viewport and scissors
+		VkViewport	viewport{};
+		viewport.x = 0.0f;
+		viewport.y = 0.0f;
+		viewport.width = static_cast<float>(swap_chain_extent.width);
+		viewport.height = static_cast<float>(swap_chain_extent.height);
+		viewport.minDepth = 0.0f;
+		viewport.maxDepth = 1.0f;
+		vkCmdSetViewport(command_buffer, 0, 1, &viewport);
+
+		VkRect2D	scissor{};
+		scissor.offset = { 0, 0 };
+		scissor.extent = swap_chain_extent;
+		vkCmdSetScissor(command_buffer, 0, 1, &scissor);
+
+		// Issue draw command for triangle
+		vkCmdDraw(command_buffer, 3, 1, 0, 0);
+
+		// End render pass
+		vkCmdEndRenderPass(command_buffer);
+
+		// Finish recording
+		if (vkEndCommandBuffer(command_buffer) != VK_SUCCESS) {
+			throw std::runtime_error("failed to record command buffer");
 		}
 	}
 
