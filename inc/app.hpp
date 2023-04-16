@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/16 20:15:04 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/16 20:16:09 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,6 +156,7 @@ private:
 		while (!glfwWindowShouldClose(window)) {
 			// Poll events while not pressing x...
 			glfwPollEvents();
+			drawFrame();
 		}
 	}
 
@@ -939,6 +940,10 @@ private:
 		if (vkEndCommandBuffer(command_buffer) != VK_SUCCESS) {
 			throw std::runtime_error("failed to record command buffer");
 		}
+	}
+
+	void	drawFrame() {
+		
 	}
 
 };	// class App
