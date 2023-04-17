@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/17 19:05:38 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/17 19:13:17 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,6 +163,9 @@ private:
 			glfwPollEvents();
 			drawFrame();
 		}
+
+		// Wait for logical device to finish executing everything before closing
+		vkDeviceWaitIdle(logical_device);
 	}
 
 	void	cleanup() {
