@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/16 20:16:09 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/17 18:52:26 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,6 +119,10 @@ private:
 	VkCommandPool					command_pool;
 	VkCommandBuffer					command_buffer;
 
+	VkSemaphore						image_available_semaphore;
+	VkSemaphore						render_finished_semaphore;
+	VkFence							in_flight_fence;
+
 	/* ========================================================================= */
 	/*                                 CORE SETUP                                */
 	/* ========================================================================= */
@@ -150,6 +154,7 @@ private:
 		createFrameBuffers();
 		createCommandPool();
 		createCommandBuffer();
+		createSyncObjects();
 	}
 
 	void	mainLoop() {
@@ -161,6 +166,11 @@ private:
 	}
 
 	void	cleanup() {
+		// Remove sync objects
+		vkDestroySemaphore(logical_device, image_available_semaphore, nullptr);
+		vkDestroySemaphore(logical_device, render_finished_semaphore, nullptr);
+		vkDestroyFence(logical_device, in_flight_fence, nullptr);
+
 		// Remove command pool
 		vkDestroyCommandPool(logical_device, command_pool, nullptr);
 
@@ -653,6 +663,18 @@ private:
 		create_info.subpassCount = 1;
 		create_info.pSubpasses = &subpass;
 
+		// Subpass dependency
+		VkSubpassDependency	dependency{};
+		dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+		dependency.dstSubpass = 0;
+		dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		dependency.srcAccessMask = 0;
+		dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+		create_info.dependencyCount = 1;
+		create_info.pDependencies = &dependency;
+
 		if (vkCreateRenderPass(logical_device, &create_info, nullptr, &render_pass) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create render pass");
 		}
@@ -943,7 +965,56 @@ private:
 	}
 
 	void	drawFrame() {
-		
+		// Wait fence, then lock it
+		vkWaitForFences(logical_device, 1, &in_flight_fence, VK_TRUE, UINT64_MAX);
+
+		// Retrieve available image
+		uint32_t	image_index;
+		vkAcquireNextImageKHR(logical_device, swap_chain, UINT64_MAX, image_available_semaphore, VK_NULL_HANDLE, &image_index);
+
+		// Record buffer
+		vkResetCommandBuffer(command_buffer, 0);
+		recordCommandBuffer(command_buffer, image_index);
+
+		// Set synchronization
+		VkSubmitInfo	submit_info{};
+		submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+		VkSemaphore	wait_semaphore[] = { image_available_semaphore };
+		VkPipelineStageFlags wait_stages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+
+		submit_info.waitSemaphoreCount = 1;
+		submit_info.pWaitSemaphores = wait_semaphore;
+		submit_info.pWaitDstStageMask = wait_stages;
+		submit_info.commandBufferCount = 1;
+		submit_info.pCommandBuffers = &command_buffer;
+
+		VkSemaphore	signal_semaphores[] = { render_finished_semaphore };
+		submit_info.signalSemaphoreCount = 1;
+		submit_info.pSignalSemaphores = signal_semaphores;
+
+		if (vkQueueSubmit(graphics_queue, 1, &submit_info, in_flight_fence) != VK_SUCCESS) {
+			throw std::runtime_error("failed to submit draw command buffer");
+		}
+
+		// Unlock fence
+		vkResetFences(logical_device, 1, &in_flight_fence);
+	}
+
+	void	createSyncObjects() {
+		// Create semaphores and fence
+		VkSemaphoreCreateInfo	semaphore_info{};
+		semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+		VkFenceCreateInfo	fence_info{};
+		fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+		fence_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+		if (vkCreateSemaphore(logical_device, &semaphore_info, nullptr, &image_available_semaphore) != VK_SUCCESS
+		|| vkCreateSemaphore(logical_device, &semaphore_info, nullptr, &render_finished_semaphore) != VK_SUCCESS
+		|| vkCreateFence(logical_device, &fence_info, nullptr, &in_flight_fence) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create semaphore");
+		}
 	}
 
 };	// class App
