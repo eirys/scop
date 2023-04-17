@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/17 18:52:26 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/17 19:05:38 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -993,9 +993,25 @@ private:
 		submit_info.signalSemaphoreCount = 1;
 		submit_info.pSignalSemaphores = signal_semaphores;
 
+		// Submit command buffer
 		if (vkQueueSubmit(graphics_queue, 1, &submit_info, in_flight_fence) != VK_SUCCESS) {
 			throw std::runtime_error("failed to submit draw command buffer");
 		}
+
+		// Set presentation (swap chain)
+		VkPresentInfoKHR	present_info{};
+		present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+		present_info.waitSemaphoreCount = 1;
+		present_info.pWaitSemaphores = signal_semaphores;
+
+		VkSwapchainKHR	swap_chains[] = { swap_chain };
+		present_info.swapchainCount = 1;
+		present_info.pSwapchains = swap_chains;
+		present_info.pImageIndices = &image_index;
+		present_info.pResults = nullptr;
+
+		// Submit to swap chain
+		vkQueuePresentKHR(present_queue, &present_info);
 
 		// Unlock fence
 		vkResetFences(logical_device, 1, &in_flight_fence);
