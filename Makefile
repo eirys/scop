@@ -6,7 +6,7 @@
 #    By: etran <etran@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/04/26 11:45:52 by etran            ###   ########.fr        #
+#    Updated: 2023/04/26 15:26:23 by etran            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,6 +17,7 @@
 NAME	=	scop
 
 INC_F	=	utils.hpp \
+			vertex.hpp \
 			app.hpp
 
 SRC_F	=	main.cpp
