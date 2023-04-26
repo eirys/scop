@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/26 13:19:46 by etran            ###   ########.fr       */
+/*   Updated: 2023/04/26 14:05:43 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,6 +165,7 @@ private:
 	std::vector<VkSemaphore>		image_available_semaphores;
 	std::vector<VkSemaphore>		render_finished_semaphores;
 	std::vector<VkFence>			in_flight_fences;
+	bool							frame_buffer_resized = false;
 
 	uint32_t						current_frame = 0;
 
@@ -179,11 +180,21 @@ private:
 		// disable OpenGL context creation
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-		// disable resizing
-		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-
 		// create a window pointer
 		window = glfwCreateWindow(width, height, "Vulkan", nullptr, nullptr);
+
+		// set pointer to window to `this` instance pointer
+		glfwSetWindowUserPointer(window, this);
+
+		// handle resizing
+		glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+	}
+
+	static void	framebufferResizeCallback(GLFWwindow* window, int width, int height) {
+		(void)width;
+		(void)height;
+		auto	app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));
+		app->frame_buffer_resized = true;
 	}
 
 	void	initVulkan() {
@@ -213,21 +224,23 @@ private:
 		vkDeviceWaitIdle(logical_device);
 	}
 
-	void	cleanup() {
-		// Remove sync objects
-		for (size_t i = 0; i < max_frames_in_flight; ++i) {
-			vkDestroySemaphore(logical_device, image_available_semaphores[i], nullptr);
-			vkDestroySemaphore(logical_device, render_finished_semaphores[i], nullptr);
-			vkDestroyFence(logical_device, in_flight_fences[i], nullptr);
-		}
-
-		// Remove command pool (and command buffers)
-		vkDestroyCommandPool(logical_device, command_pool, nullptr);
-
+	void	cleanupSwapChain() {
 		// Remove frame buffers
-		for (auto& frame_buffer: swap_chain_frame_buffers) {
-			vkDestroyFramebuffer(logical_device, frame_buffer, nullptr);
+		for (size_t i = 0; i < swap_chain_frame_buffers.size(); ++i) {
+			vkDestroyFramebuffer(logical_device, swap_chain_frame_buffers[i], nullptr);
 		}
+
+		// Destroy image view instances
+		for (size_t i = 0; i < swap_chain_image_views.size(); ++i) {
+			vkDestroyImageView(logical_device, swap_chain_image_views[i], nullptr);
+		}
+
+		// Remove swap chain handler
+		vkDestroySwapchainKHR(logical_device, swap_chain, nullptr);
+	}
+
+	void	cleanup() {
+		cleanupSwapChain();
 
 		// Remove pipeline
 		vkDestroyPipeline(logical_device, graphics_pipeline, nullptr);
@@ -238,13 +251,15 @@ private:
 		// Remove render pass
 		vkDestroyRenderPass(logical_device, render_pass, nullptr);
 
-		// Destroy image view instances
-		for (auto& image_view: swap_chain_image_views) {
-			vkDestroyImageView(logical_device, image_view, nullptr);
+		// Remove sync objects
+		for (size_t i = 0; i < max_frames_in_flight; ++i) {
+			vkDestroySemaphore(logical_device, image_available_semaphores[i], nullptr);
+			vkDestroySemaphore(logical_device, render_finished_semaphores[i], nullptr);
+			vkDestroyFence(logical_device, in_flight_fences[i], nullptr);
 		}
 
-		// Remove swap chain handler
-		vkDestroySwapchainKHR(logical_device, swap_chain, nullptr);
+		// Remove command pool (and command buffers)
+		vkDestroyCommandPool(logical_device, command_pool, nullptr);
 
 		// Remove device
 		vkDestroyDevice(logical_device, nullptr);
@@ -263,6 +278,7 @@ private:
 		// Remove window instance
 		glfwDestroyWindow(window);
 
+		// Remove glfw instance
 		glfwTerminate();
 	}
 
@@ -280,7 +296,6 @@ private:
 		app_info.pEngineName = "No engine";
 		app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
 		app_info.apiVersion = VK_API_VERSION_1_0;
-
 
 		// Pass those informations to the Vulkan driver
 		VkInstanceCreateInfo	create_info{};
@@ -304,43 +319,9 @@ private:
 			create_info.pNext = nullptr;
 		}
 
-		/*
-		// Explicit which global extensions to use
-		uint32_t		glfw_extension_count = 0;
-		const char**	glfw_extensions;
-
-		glfw_extensions = glfwGetRequiredInstanceExtensions(&glfw_extension_count);
-
-		create_info.enabledExtensionCount = glfw_extension_count;
-		create_info.ppEnabledExtensionNames = glfw_extensions;
-		*/
-
 		// Create the instance
 		if (vkCreateInstance(&create_info, nullptr, &vk_instance) != VK_SUCCESS)
 			throw std::runtime_error("failed to create vk_instance");
-
-		/*
-		// Checking for extension
-		uint32_t							extension_count = 0;
-		vkEnumerateInstanceExtensionProperties(nullptr, &extension_count, nullptr);
-
-		// Contains extensions details
-		std::vector<VkExtensionProperties>	extensions(extension_count);
-		vkEnumerateInstanceExtensionProperties(nullptr, &extension_count, extensions.data());
-
-		// Display them
-		std::cout	<< "Available extensions:\n";
-		for (const auto& extension: extensions) {
-			std::cout << '\t' << extension.extensionName;
-			for (uint32_t i = 0; i < glfw_extension_count; ++i) {
-				if (!strcmp(extension.extensionName, glfw_extensions[i])) {
-					std::cout << " (available in GLFW extensions)";
-					break;
-				}
-			}
-			std::cout << NL;
-		}
-		*/
 	}
 
 	void	setupDebugMessenger() {
@@ -1059,13 +1040,29 @@ private:
 	}
 
 	void	drawFrame() {
-		// Wait fence, then unlock it
+		// Wait fence available, lock it
 		vkWaitForFences(logical_device, 1, &in_flight_fences[current_frame], VK_TRUE, UINT64_MAX);
-		vkResetFences(logical_device, 1, &in_flight_fences[current_frame]);
 
 		// Retrieve available image
 		uint32_t	image_index;
-		vkAcquireNextImageKHR(logical_device, swap_chain, UINT64_MAX, image_available_semaphores[current_frame], VK_NULL_HANDLE, &image_index);
+		VkResult	result = vkAcquireNextImageKHR(
+			logical_device,
+			swap_chain,
+			UINT64_MAX,
+			image_available_semaphores[current_frame],
+			VK_NULL_HANDLE,
+			&image_index
+		);
+		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+			// Swap chain incompatible for rendering (resize?)
+			recreateSwapChain();
+			return;
+		} else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+			throw std::runtime_error("failed to acquire swap chain image");
+		}
+
+		// Work is done, unlock fence
+		vkResetFences(logical_device, 1, &in_flight_fences[current_frame]);
 
 		// Record buffer
 		vkResetCommandBuffer(command_buffers[current_frame], 0);
@@ -1106,8 +1103,19 @@ private:
 		present_info.pImageIndices = &image_index;
 		present_info.pResults = nullptr;
 
-		// Submit to swap chain
-		vkQueuePresentKHR(present_queue, &present_info);
+		// Submit to swap chain, check if swap chain is still compatible
+		result = vkQueuePresentKHR(present_queue, &present_info);
+
+		if (
+			result == VK_ERROR_OUT_OF_DATE_KHR ||
+			result == VK_SUBOPTIMAL_KHR ||
+			frame_buffer_resized
+		) {
+			frame_buffer_resized = false;
+			recreateSwapChain();
+		} else if (result != VK_SUCCESS) {
+			throw std::runtime_error("failed to present swapchain image");
+		}
 
 		current_frame = (current_frame + 1) % max_frames_in_flight;
 	}
@@ -1154,8 +1162,28 @@ private:
 		const VkDebugUtilsMessengerCallbackDataEXT* p_callback_data,
 		void* p_user_data
 	) {
-		std::cerr << "validation layer: " << p_callback_data->pMessage << std::endl;
+		std::cerr << "[validation layer] " << p_callback_data->pMessage << std::endl;
 		return VK_FALSE;
+	}
+
+	void	recreateSwapChain() {
+		// Handle window minimization
+		int width = 0, height = 0;
+
+		// "Pausing" frame refreshing until window is in foreground
+		glfwGetFramebufferSize(window, &width, &height);
+		while (width == 0 || height == 0) {
+			glfwGetFramebufferSize(window, &width, &height);
+			glfwWaitEvents();
+		}
+
+		vkDeviceWaitIdle(logical_device);
+
+		cleanupSwapChain();
+
+		createSwapChain();
+		createImageViews();
+		createFrameBuffers();
 	}
 
 };	// class App
