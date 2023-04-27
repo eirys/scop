@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/27 18:17:31 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/28 01:11:35 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,9 @@
 # define APP_HPP
 
 // Graphics
-# define GLFW_INCLUDE_VULKAN
+# ifndef GLFW_INCLUDE_VULKAN
+#  define GLFW_INCLUDE_VULKAN
+# endif
 # include <GLFW/glfw3.h>
 
 // Std
@@ -1208,43 +1210,61 @@ private:
 	}
 
 	void	createVertexBuffer() {
+		VkDeviceSize	buffer_size = sizeof(vertices[0]) * vertices.size();
+
+		createBuffer(
+			buffer_size,
+			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+			vertex_buffer,
+			vertex_buffer_memory
+		);
+
+		// Fill buffer
+		void*	data;
+
+		vkMapMemory(logical_device, vertex_buffer_memory, 0, buffer_size, 0, &data);
+		memcpy(data, vertices.data(), static_cast<size_t>(buffer_size));
+		vkUnmapMemory(logical_device, vertex_buffer_memory);
+	}
+
+	void	createBuffer(
+		VkDeviceSize size,
+		VkBufferUsageFlags usage,
+		VkMemoryPropertyFlags properties,
+		VkBuffer& buffer,
+		VkDeviceMemory& buffer_memory
+	) {
 		// Create buffer instance
 		VkBufferCreateInfo	buffer_info{};
 		buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		buffer_info.size = sizeof(vertices[0]) * vertices.size();
-		buffer_info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+		buffer_info.size = size;
+		buffer_info.usage = usage;
 		buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-		if (vkCreateBuffer(logical_device, &buffer_info, nullptr, &vertex_buffer) != VK_SUCCESS) {
-			throw std::runtime_error("failed to create vertex buffer");
+		if (vkCreateBuffer(logical_device, &buffer_info, nullptr, &buffer) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create buffer");
 		}
 
 		// Allocate memory for buffer
 		VkMemoryRequirements	mem_requirements;
-		vkGetBufferMemoryRequirements(logical_device, vertex_buffer, &mem_requirements);
+		vkGetBufferMemoryRequirements(logical_device, buffer, &mem_requirements);
 
 		VkMemoryAllocateInfo	alloc_info{};
 		alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		alloc_info.allocationSize = mem_requirements.size;
 		alloc_info.memoryTypeIndex = findMemoryType(
 			mem_requirements.memoryTypeBits,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+			properties
 		);
 
-		if (vkAllocateMemory(logical_device, &alloc_info, nullptr, &vertex_buffer_memory) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate vertex buffer memory");
+		if (vkAllocateMemory(logical_device, &alloc_info, nullptr, &buffer_memory) != VK_SUCCESS) {
+			throw std::runtime_error("failed to allocate buffer memory");
 		}
 
 		// Bind memory to instance
-		vkBindBufferMemory(logical_device, vertex_buffer, vertex_buffer_memory, 0);
+		vkBindBufferMemory(logical_device, buffer, buffer_memory, 0);
 
-		// Fill buffer
-		void*	data;
-
-		vkMapMemory(logical_device, vertex_buffer_memory, 0, buffer_info.size, 0, &data);
-		memcpy(data, vertices.data(), static_cast<size_t>(buffer_info.size));
-		vkUnmapMemory(logical_device, vertex_buffer_memory);
 	}
 
 	uint32_t	findMemoryType(uint32_t type_filter, VkMemoryPropertyFlags properties) {

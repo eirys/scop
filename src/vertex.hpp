@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/26 15:25:04 by etran             #+#    #+#             */
-/*   Updated: 2023/04/27 14:56:57 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/27 18:33:26 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,10 @@
 # define VERTEX_HPP
 
 // Graphics
+# ifndef GLFW_INCLUDE_VULKAN
+#  define GLFW_INCLUDE_VULKAN
+# endif
+# include <GLFW/glfw3.h>
 # include <glm/glm.hpp>
 
 // Std
