@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/27 15:23:42 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/27 18:05:29 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,6 +168,9 @@ private:
 	std::vector<VkFence>			in_flight_fences;
 	bool							frame_buffer_resized = false;
 
+	VkBuffer						vertex_buffer;
+	VkDeviceMemory					vertex_buffer_memory;
+
 	uint32_t						current_frame = 0;
 
 	/* ========================================================================= */
@@ -210,6 +213,7 @@ private:
 		createGraphicsPipeline();
 		createFrameBuffers();
 		createCommandPool();
+		createVertexBuffer();
 		createCommandBuffers();
 		createSyncObjects();
 	}
@@ -242,6 +246,10 @@ private:
 
 	void	cleanup() {
 		cleanupSwapChain();
+
+		// Remove vertex buffer
+		vkDestroyBuffer(logical_device, vertex_buffer, nullptr);
+		vkFreeMemory(logical_device, vertex_buffer_memory, nullptr);
 
 		// Remove pipeline
 		vkDestroyPipeline(logical_device, graphics_pipeline, nullptr);
@@ -1036,8 +1044,13 @@ private:
 		scissor.extent = swap_chain_extent;
 		vkCmdSetScissor(command_buffer, 0, 1, &scissor);
 
+		// Bind vertex buffer
+		VkBuffer		vertex_buffers[] = { vertex_buffer };
+		VkDeviceSize	offsets[] = { 0 };
+		vkCmdBindVertexBuffers(command_buffer, 0, 1, vertex_buffers, offsets);
+
 		// Issue draw command for triangle
-		vkCmdDraw(command_buffer, 3, 1, 0, 0);
+		vkCmdDraw(command_buffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0);
 
 		// End render pass
 		vkCmdEndRenderPass(command_buffer);
@@ -1187,13 +1200,67 @@ private:
 		}
 
 		vkDeviceWaitIdle(logical_device);
-
 		cleanupSwapChain();
-
 		createSwapChain();
 		createImageViews();
 		createFrameBuffers();
 	}
+
+	void	createVertexBuffer() {
+		// Create buffer instance
+		VkBufferCreateInfo	buffer_info{};
+		buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		buffer_info.size = sizeof(vertices[0]) * vertices.size();
+		buffer_info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+		buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+		if (vkCreateBuffer(logical_device, &buffer_info, nullptr, &vertex_buffer) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create vertex buffer");
+		}
+
+		// Allocate memory for buffer
+		VkMemoryRequirements	mem_requirements;
+		vkGetBufferMemoryRequirements(logical_device, vertex_buffer, &mem_requirements);
+
+		VkMemoryAllocateInfo	alloc_info{};
+		alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		alloc_info.allocationSize = mem_requirements.size;
+		alloc_info.memoryTypeIndex = findMemoryType(
+			mem_requirements.memoryTypeBits,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+		);
+
+		if (vkAllocateMemory(logical_device, &alloc_info, nullptr, &vertex_buffer_memory) != VK_SUCCESS) {
+			throw std::runtime_error("failed to allocate vertex buffer memory");
+		}
+
+		// Bind memory to instance
+		vkBindBufferMemory(logical_device, vertex_buffer, vertex_buffer_memory, 0);
+
+		// Fill buffer
+		void*	data;
+
+		vkMapMemory(logical_device, vertex_buffer_memory, 0, buffer_info.size, 0, &data);
+		memcpy(data, vertices.data(), static_cast<size_t>(buffer_info.size));
+		vkUnmapMemory(logical_device, vertex_buffer_memory);
+	}
+
+	uint32_t	findMemoryType(uint32_t type_filter, VkMemoryPropertyFlags properties) {
+		// Map memory and find one suitable with filter and properties
+		VkPhysicalDeviceMemoryProperties	mem_properties;
+		vkGetPhysicalDeviceMemoryProperties(physical_device, &mem_properties);
+
+		for (uint32_t i = 0; i < mem_properties.memoryTypeCount; ++i) {
+			if ((mem_properties.memoryTypes[i].propertyFlags & properties) == properties &&
+				(type_filter & (1 << i))) {
+				return i;
+			}
+		}
+		throw std::runtime_error("failed to find suitable memory type");
+	}
+
+
 
 }; // class App
 

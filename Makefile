@@ -6,7 +6,7 @@
 #    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/04/27 13:56:02 by eli              ###   ########.fr        #
+#    Updated: 2023/04/27 18:10:07 by eli              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,7 @@ NAME		:=	scop
 # directory names
 SRC_DIR		:=	src
 OBJ_DIR		:=	obj
-SHD_DIR		:=	shaders
+SH_DIR		:=	shaders
 
 # cpp files
 INC_FILES	:=	utils.hpp \
@@ -35,8 +35,8 @@ OBJ			:=	$(addprefix $(OBJ_DIR)/,$(SRC_FILES:.cpp=.o))
 # shaders
 SH_FILES	:=	vert \
 				frag
-SHADERS		:=	$(addprefix $(SHD_DIR)/,$(SH_FILES))
-SH_BIN		:=	$(addsuffix .spv,$(SHADERS))
+SHD			:=	$(addprefix $(SH_DIR)/,$(SH_FILES))
+SH_BIN		:=	$(addsuffix .spv,$(SHD))
 
 # compiler
 CXX			:=	c++
@@ -44,9 +44,9 @@ EXTRA		:=	-Wall -Werror -Wextra
 CFLAGS		:=	-std=c++17 -O2 -DNDEBUG -D__VERBOSE
 LDFLAGS		:=	-lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
 ifdef school
-	GLSLC	=	~/my_sgoinfre/glslc
+	GLSLC	:=	~/my_sgoinfre/glslc
 else
-	GLSLC	=	glslc
+	GLSLC	:=	glslc
 endif
 
 # misc
@@ -66,7 +66,7 @@ $(OBJ): $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(INC)
 	@mkdir -p $(@D)
 	$(CXX) $(CFLAGS) -c $< -o $@ $(LDFLAGS)
 
-$(SHD_DIR)/%.spv: $(SHD_DIR)/shader.%
+$(SH_DIR)/%.spv: $(SH_DIR)/shader.%
 	$(GLSLC) $< -o $@
 
 .PHONY: test
