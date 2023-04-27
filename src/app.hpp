@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/27 13:25:37 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/27 15:23:42 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -786,11 +786,16 @@ private:
 
 		// Vertex data input handler
 		VkPipelineVertexInputStateCreateInfo	vertex_input_info{};
+		auto	binding_description = Vertex::getBindingDescription();
+		auto	attribute_descriptions = Vertex::getAttributeDescriptions();
+
 		vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		vertex_input_info.vertexBindingDescriptionCount = 0;
-		vertex_input_info.pVertexBindingDescriptions = nullptr;
-		vertex_input_info.vertexAttributeDescriptionCount = 0;
-		vertex_input_info.pVertexAttributeDescriptions = nullptr;
+		vertex_input_info.vertexBindingDescriptionCount = 1;
+		vertex_input_info.vertexAttributeDescriptionCount = static_cast<uint32_t>(
+			attribute_descriptions.size()
+		);
+		vertex_input_info.pVertexBindingDescriptions = &binding_description;
+		vertex_input_info.pVertexAttributeDescriptions = attribute_descriptions.data();
 
 		// Vertex input assembly descriptor: regular triangles here
 		VkPipelineInputAssemblyStateCreateInfo	input_assembly_info{};
@@ -1190,6 +1195,6 @@ private:
 		createFrameBuffers();
 	}
 
-};	// class App
+}; // class App
 
 #endif
