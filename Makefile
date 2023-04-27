@@ -6,7 +6,7 @@
 #    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/04/27 18:10:07 by eli              ###   ########.fr        #
+#    Updated: 2023/04/27 18:24:23 by eli              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,12 +14,13 @@
 #                                    TARGETS                                   #
 # ============================================================================ #
 
+# final binary
 NAME		:=	scop
 
 # directory names
 SRC_DIR		:=	src
 OBJ_DIR		:=	obj
-SH_DIR		:=	shaders
+SHD_DIR		:=	shaders
 
 # cpp files
 INC_FILES	:=	utils.hpp \
@@ -28,15 +29,15 @@ INC_FILES	:=	utils.hpp \
 
 SRC_FILES	:=	main.cpp
 
-INC			:=	$(addprefix	$(SRC_DIR)/,$(INC_F))
-SRC			:=	$(addprefix $(SRC_DIR)/,$(SRC_F))
+INC			:=	$(addprefix	$(SRC_DIR)/,$(INC_FILES))
+SRC			:=	$(addprefix $(SRC_DIR)/,$(SRC_FILES))
 OBJ			:=	$(addprefix $(OBJ_DIR)/,$(SRC_FILES:.cpp=.o))
 
 # shaders
-SH_FILES	:=	vert \
+SHD_FILES	:=	vert \
 				frag
-SHD			:=	$(addprefix $(SH_DIR)/,$(SH_FILES))
-SH_BIN		:=	$(addsuffix .spv,$(SHD))
+SHD			:=	$(addprefix $(SHD_DIR)/,$(SHD_FILES))
+SHD_BIN		:=	$(addsuffix .spv,$(SHD))
 
 # compiler
 CXX			:=	c++
@@ -57,16 +58,16 @@ RM			:=	rm -rf
 # ============================================================================ #
 
 .PHONY: all
-all: $(SH_BIN) $(NAME)
+all: $(SHD_BIN) $(NAME)
 
 $(NAME): $(OBJ)
 	$(CXX) $(CFLAGS) $(OBJ) -o $(NAME) $(LDFLAGS)
 
-$(OBJ): $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(INC)
-	@mkdir -p $(@D)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(INC)
+	@mkdir -p $(OBJ_DIR)
 	$(CXX) $(CFLAGS) -c $< -o $@ $(LDFLAGS)
 
-$(SH_DIR)/%.spv: $(SH_DIR)/shader.%
+$(SHD_DIR)/%.spv: $(SHD_DIR)/shader.%
 	$(GLSLC) $< -o $@
 
 .PHONY: test
@@ -76,7 +77,7 @@ test: all
 .PHONY: clean
 clean:
 	${RM} $(OBJ_DIR)
-	${RM} $(SH_BIN)
+	${RM} $(SHD_BIN)
 
 .PHONY: fclean
 fclean: clean
