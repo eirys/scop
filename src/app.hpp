@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/28 01:11:35 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/28 01:44:28 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -1212,20 +1212,40 @@ private:
 	void	createVertexBuffer() {
 		VkDeviceSize	buffer_size = sizeof(vertices[0]) * vertices.size();
 
+		// Create staging buffer to upload cpu memory to
+		VkBuffer		staging_buffer;
+		VkDeviceMemory	staging_buffer_memory;
+
 		createBuffer(
 			buffer_size,
-			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+			staging_buffer,
+			staging_buffer_memory
+		);
+
+		// Fill staging buffer
+		void*	data;
+
+		vkMapMemory(logical_device, staging_buffer_memory, 0, buffer_size, 0, &data);
+		memcpy(data, vertices.data(), static_cast<size_t>(buffer_size));
+		vkUnmapMemory(logical_device, staging_buffer_memory);
+
+		// Create vertex buffer that'll interact with gpu
+		createBuffer(
+			buffer_size,
+			VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
 			vertex_buffer,
 			vertex_buffer_memory
 		);
+		
+		// Now transfer data from staging buffer to vertex buffer
+		copyBuffer(staging_buffer, vertex_buffer, buffer_size);
 
-		// Fill buffer
-		void*	data;
-
-		vkMapMemory(logical_device, vertex_buffer_memory, 0, buffer_size, 0, &data);
-		memcpy(data, vertices.data(), static_cast<size_t>(buffer_size));
-		vkUnmapMemory(logical_device, vertex_buffer_memory);
+		// Cleanup staging buffer
+		vkDestroyBuffer(logical_device, staging_buffer, nullptr);
+		vkFreeMemory(logical_device, staging_buffer_memory, nullptr);
 	}
 
 	void	createBuffer(
@@ -1264,7 +1284,44 @@ private:
 
 		// Bind memory to instance
 		vkBindBufferMemory(logical_device, buffer, buffer_memory, 0);
+	}
 
+	void	copyBuffer(VkBuffer src_buffer, VkBuffer dst_buffer, VkDeviceSize size) {
+		// Allocate temporary command buffer for memory transfer
+		VkCommandBufferAllocateInfo	alloc_info{};
+		alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		alloc_info.commandPool = command_pool;
+		alloc_info.commandBufferCount = 1;
+
+		VkCommandBuffer	command_buffer;
+		vkAllocateCommandBuffers(logical_device, &alloc_info, &command_buffer);
+
+		// Record commands
+		VkCommandBufferBeginInfo	begin_info{};
+		begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+		vkBeginCommandBuffer(command_buffer, &begin_info);
+
+		VkBufferCopy	copy_region{};
+		copy_region.srcOffset = 0;
+		copy_region.dstOffset = 0;
+		copy_region.size = size;
+		vkCmdCopyBuffer(command_buffer, src_buffer, dst_buffer, 1, &copy_region);
+
+		vkEndCommandBuffer(command_buffer);
+
+		// Submit to graphics queue to execute transfer
+		VkSubmitInfo	submit_info{};
+		submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		submit_info.commandBufferCount = 1;
+		submit_info.pCommandBuffers = &command_buffer;
+		
+		vkQueueSubmit(graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
+		vkQueueWaitIdle(graphics_queue);
+
+		// Deallocate command buffer
+		vkFreeCommandBuffers(logical_device, command_pool, 1, &command_buffer);
 	}
 
 	uint32_t	findMemoryType(uint32_t type_filter, VkMemoryPropertyFlags properties) {
