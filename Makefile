@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: etran <etran@student.42.fr>                +#+  +:+       +#+         #
+#    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/04/26 15:26:23 by etran            ###   ########.fr        #
+#    Updated: 2023/04/27 13:56:02 by eli              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,54 +14,59 @@
 #                                    TARGETS                                   #
 # ============================================================================ #
 
-NAME	=	scop
+NAME		:=	scop
 
-INC_F	=	utils.hpp \
-			vertex.hpp \
-			app.hpp
+# directory names
+SRC_DIR		:=	src
+OBJ_DIR		:=	obj
+SHD_DIR		:=	shaders
 
-SRC_F	=	main.cpp
+# cpp files
+INC_FILES	:=	utils.hpp \
+				vertex.hpp \
+				app.hpp
 
-INC		=	$(addprefix	inc/,$(INC_F))
-SRC		=	$(addprefix src/,$(SRC_F))
-OBJS	=	$(subst src/,obj/,$(SRC:.cpp=.o))
+SRC_FILES	:=	main.cpp
 
-CXX		=	c++
-INCLUDE	=	./inc
-EXTRA	=	-Wall -Werror -Wextra
-CFLAGS	=	-I$(INCLUDE) -std=c++17 -O2
-LDFLAGS	=	-lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
+INC			:=	$(addprefix	$(SRC_DIR)/,$(INC_F))
+SRC			:=	$(addprefix $(SRC_DIR)/,$(SRC_F))
+OBJ			:=	$(addprefix $(OBJ_DIR)/,$(SRC_FILES:.cpp=.o))
 
-SH_NAME	=	vert \
-			frag
-SHADERS	=	$(addprefix shaders/,$(SH_NAME))
-SH_BIN	=	$(addsuffix .spv,$(SHADERS))
+# shaders
+SH_FILES	:=	vert \
+				frag
+SHADERS		:=	$(addprefix $(SHD_DIR)/,$(SH_FILES))
+SH_BIN		:=	$(addsuffix .spv,$(SHADERS))
 
+# compiler
+CXX			:=	c++
+EXTRA		:=	-Wall -Werror -Wextra
+CFLAGS		:=	-std=c++17 -O2 -DNDEBUG -D__VERBOSE
+LDFLAGS		:=	-lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
 ifdef school
 	GLSLC	=	~/my_sgoinfre/glslc
 else
 	GLSLC	=	glslc
 endif
 
-RM		=	rm -rf
+# misc
+RM			:=	rm -rf
 
 # ============================================================================ #
 #                                     RULES                                    #
 # ============================================================================ #
 
 .PHONY: all
-all: obj $(SH_BIN) $(NAME)
+all: $(SH_BIN) $(NAME)
 
-obj:
-	@mkdir -p obj
+$(NAME): $(OBJ)
+	$(CXX) $(CFLAGS) $(OBJ) -o $(NAME) $(LDFLAGS)
 
-$(NAME): $(OBJS)
-	$(CXX) $(CFLAGS) $(OBJS) -o $(NAME) $(LDFLAGS)
-
-obj/%.o: src/%.cpp $(INC)
+$(OBJ): $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(INC)
+	@mkdir -p $(@D)
 	$(CXX) $(CFLAGS) -c $< -o $@ $(LDFLAGS)
 
-shaders/%.spv: shaders/shader.%
+$(SHD_DIR)/%.spv: $(SHD_DIR)/shader.%
 	$(GLSLC) $< -o $@
 
 .PHONY: test
@@ -70,7 +75,7 @@ test: all
 
 .PHONY: clean
 clean:
-	${RM} obj
+	${RM} $(OBJ_DIR)
 	${RM} $(SH_BIN)
 
 .PHONY: fclean

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   app.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
+/*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/26 14:05:43 by etran            ###   ########.fr       */
+/*   Updated: 2023/04/27 13:25:37 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,14 +28,10 @@
 # include <limits>
 # include <algorithm>
 # include <fstream>
-
-/**
- * Un/comment to toggle NDEBUG mode and enable validation layers.
-*/
-# define NDEBUG 1
 # include <cassert>
 
 # include "utils.hpp"
+# include "vertex.hpp"
 
 # define SCOP_VERTEX_SHADER_BINARY		"shaders/vert.spv"
 # define SCOP_FRAGMENT_SHADER_BINARY	"shaders/frag.spv"
@@ -127,6 +123,11 @@ private:
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
 	const int						max_frames_in_flight = 2;
+	const std::vector<Vertex>		vertices = {
+		{{  0.0f, -0.5f }, { 1.0f, 0.0f, 0.0f }},
+		{{  0.5f,  0.5f }, { 0.0f, 1.0f, 0.0f }},
+		{{ -0.5f,  0.5f }, { 0.0f, 0.0f, 1.0f }}
+	};
 
 	#ifndef NDEBUG
 	const bool						enable_validation_layers = false;
@@ -339,9 +340,12 @@ private:
 		create_info = {};
 		create_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
 		create_info.messageSeverity =
-			VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
 			VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
 			VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+		#ifdef __VERBOSE
+		create_info.messageSeverity |= VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
+		#endif
+
 		create_info.messageType =
 			VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
 			VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |

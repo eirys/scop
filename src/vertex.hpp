@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   vertex.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
+/*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/26 15:25:04 by etran             #+#    #+#             */
-/*   Updated: 2023/04/26 15:26:07 by etran            ###   ########.fr       */
+/*   Updated: 2023/04/27 13:58:38 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,23 @@
 # define VERTEX_HPP
 
 // Graphics
-# define GLFW_INCLUDE_VULKAN
-# include <GLFW/glfw3.h>
 # include <glm/glm.hpp>
 
+struct Vertex {
+	glm::vec2	pos;
+	glm::vec3	color;
+
+	static VkVertexInputBindingDescription	getBindingDescription() {
+		// Passing data in readable format for Vulkan
+		VkVertexInputBindingDescription	binding_description{};
+
+		binding_description.binding = 0;
+		binding_description.stride = sizeof(Vertex);
+		binding_description.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+		return binding_description;
+	}
+};
 
 
 #endif
