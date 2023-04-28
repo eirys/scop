@@ -6,12 +6,19 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/28 01:44:28 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/28 11:10:06 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef APP_HPP
 # define APP_HPP
+
+/**
+ * Syntax rules for this project:
+ *  - Function names are camelCase
+ *  - Variable names are snake_case
+ *  - Class names are PascalCase
+*/
 
 // Graphics
 # ifndef GLFW_INCLUDE_VULKAN
@@ -127,9 +134,13 @@ private:
 	const int						max_frames_in_flight = 2;
 	const std::vector<Vertex>		vertices = {
 		// pos{},			 color{}
-		{{  0.0f, -0.5f }, { 0.9f, 0.4f, 0.0f }},
-		{{  0.5f,  0.5f }, { 0.0f, 0.8f, 0.2f }},
-		{{ -0.5f,  0.5f }, { 0.0f, 0.1f, 0.9f }}
+		{{ -0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f }},
+		{{  0.5f, -0.5f }, { 0.0f, 1.0f, 0.0f }},
+		{{  0.5f,  0.5f }, { 0.0f, 0.0f, 1.0f }},
+		{{ -0.5f,  0.5f }, { 1.0f, 1.0f, 1.0f }}
+	};
+	const std::vector<uint16_t>		indices = {
+		0, 1, 2, 2, 3, 0
 	};
 
 	#ifndef NDEBUG
@@ -173,6 +184,8 @@ private:
 
 	VkBuffer						vertex_buffer;
 	VkDeviceMemory					vertex_buffer_memory;
+	VkBuffer						index_buffer;
+	VkDeviceMemory					index_buffer_memory;
 
 	uint32_t						current_frame = 0;
 
@@ -217,6 +230,7 @@ private:
 		createFrameBuffers();
 		createCommandPool();
 		createVertexBuffer();
+		createIndexBuffer();
 		createCommandBuffers();
 		createSyncObjects();
 	}
@@ -249,6 +263,10 @@ private:
 
 	void	cleanup() {
 		cleanupSwapChain();
+
+		// Remove index buffer
+		vkDestroyBuffer(logical_device, index_buffer, nullptr);
+		vkFreeMemory(logical_device, index_buffer_memory, nullptr);
 
 		// Remove vertex buffer
 		vkDestroyBuffer(logical_device, vertex_buffer, nullptr);
@@ -1047,13 +1065,15 @@ private:
 		scissor.extent = swap_chain_extent;
 		vkCmdSetScissor(command_buffer, 0, 1, &scissor);
 
-		// Bind vertex buffer
+		// Bind vertex buffer && index buffer
 		VkBuffer		vertex_buffers[] = { vertex_buffer };
 		VkDeviceSize	offsets[] = { 0 };
 		vkCmdBindVertexBuffers(command_buffer, 0, 1, vertex_buffers, offsets);
+		vkCmdBindIndexBuffer(command_buffer, index_buffer, 0, VK_INDEX_TYPE_UINT16);
 
 		// Issue draw command for triangle
-		vkCmdDraw(command_buffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0);
+		// vkCmdDraw(command_buffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0);
+		vkCmdDrawIndexed(command_buffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 
 		// End render pass
 		vkCmdEndRenderPass(command_buffer);
@@ -1244,6 +1264,43 @@ private:
 		copyBuffer(staging_buffer, vertex_buffer, buffer_size);
 
 		// Cleanup staging buffer
+		vkDestroyBuffer(logical_device, staging_buffer, nullptr);
+		vkFreeMemory(logical_device, staging_buffer_memory, nullptr);
+	}
+
+	void	createIndexBuffer() {
+		// Create index buffer (pointers into the vertex buffer)
+		VkDeviceSize	buffer_size = sizeof(indices[0]) * indices.size();
+
+		VkBuffer		staging_buffer;
+		VkDeviceMemory	staging_buffer_memory;
+
+		createBuffer(
+			buffer_size,
+			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+			staging_buffer,
+			staging_buffer_memory
+		);
+
+		// Fill staging buffer with indices
+		void*	data;
+		vkMapMemory(logical_device, staging_buffer_memory, 0, buffer_size, 0, &data);
+		memcpy(data, indices.data(), static_cast<size_t>(buffer_size));
+		vkUnmapMemory(logical_device, staging_buffer_memory);
+
+		createBuffer(
+			buffer_size,
+			VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+			index_buffer,
+			index_buffer_memory
+		);
+
+		// Transfer data from staging buffer to index buffer
+		copyBuffer(staging_buffer, index_buffer, buffer_size);
+
+		// Flush temporary buffers
 		vkDestroyBuffer(logical_device, staging_buffer, nullptr);
 		vkFreeMemory(logical_device, staging_buffer_memory, nullptr);
 	}
