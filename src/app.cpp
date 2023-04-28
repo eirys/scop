@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/04/28 11:42:42 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/28 22:45:48 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,7 +209,9 @@ void	App::setupDebugMessenger() {
 /**
  * Explicit which debug messages are to be handled
 */
-void	App::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& create_info) {
+void	App::populateDebugMessengerCreateInfo(
+	VkDebugUtilsMessengerCreateInfoEXT& create_info
+) {
 	create_info = {};
 	create_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
 	create_info.messageSeverity =
@@ -231,7 +233,7 @@ void	App::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& c
  * Check if all required extensions are available for validation layers
 */
 bool	App::checkValidationLayerSupport() {
-	uint32_t						layer_count;
+	uint32_t	layer_count;
 	vkEnumerateInstanceLayerProperties(&layer_count, nullptr);
 
 	std::vector<VkLayerProperties>	available_layers(layer_count);
@@ -303,9 +305,17 @@ bool	App::checkDeviceExtensionSupport(const VkPhysicalDevice& device) {
 	vkEnumerateDeviceExtensionProperties(device, nullptr, &extension_count, nullptr);
 
 	std::vector<VkExtensionProperties>	available_extensions(extension_count);
-	vkEnumerateDeviceExtensionProperties(device, nullptr, &extension_count, available_extensions.data());
+	vkEnumerateDeviceExtensionProperties(
+		device,
+		nullptr,
+		&extension_count,
+		available_extensions.data()
+	);
 
-	std::set<std::string>	required_extensions(device_extensions.begin(), device_extensions.end());
+	std::set<std::string>	required_extensions(
+		device_extensions.begin(),
+		device_extensions.end()
+	);
 	for (const auto& extension: available_extensions) {
 		required_extensions.erase(extension.extensionName);
 	}
@@ -414,7 +424,12 @@ App::SwapChainSupportDetails	App::querySwapChainSupport(
 
 	if (format_count != 0) {
 		details.formats.resize(format_count);
-		vkGetPhysicalDeviceSurfaceFormatsKHR(device, vk_surface, &format_count, details.formats.data());
+		vkGetPhysicalDeviceSurfaceFormatsKHR(
+			device,
+			vk_surface,
+			&format_count,
+			details.formats.data()
+		);
 	}
 
 	// Query supported presentation modes
@@ -890,7 +905,7 @@ void	App::recordCommandBuffer(VkCommandBuffer command_buffer, uint32_t image_ind
 		throw std::runtime_error("failed to begin recording command buffer");
 	}
 
-	// Begin render pass to start drawing
+	// Spectify to render pass how to handle the command buffer
 	VkRenderPassBeginInfo	render_pass_info{};
 	render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	render_pass_info.renderPass = render_pass;
@@ -928,7 +943,6 @@ void	App::recordCommandBuffer(VkCommandBuffer command_buffer, uint32_t image_ind
 	vkCmdBindIndexBuffer(command_buffer, index_buffer, 0, VK_INDEX_TYPE_UINT16);
 
 	// Issue draw command for triangle
-	// vkCmdDraw(command_buffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0);
 	vkCmdDrawIndexed(command_buffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 
 	// End render pass
@@ -940,11 +954,17 @@ void	App::recordCommandBuffer(VkCommandBuffer command_buffer, uint32_t image_ind
 	}
 }
 
+/**
+ * Fence awaited: the cpu waits until the frame is ready to be retrieved.
+ * 
+ * Semaphores awaited: the gpu waits until the command buffer
+ * is done executing, aka the image is available in the swap chain.
+*/
 void	App::drawFrame() {
 	// Wait fence available, lock it
 	vkWaitForFences(logical_device, 1, &in_flight_fences[current_frame], VK_TRUE, UINT64_MAX);
 
-	// Retrieve available image
+	// Retrieve available image from swap chain
 	uint32_t	image_index;
 	VkResult	result = vkAcquireNextImageKHR(
 		logical_device,
@@ -969,21 +989,23 @@ void	App::drawFrame() {
 	vkResetCommandBuffer(command_buffers[current_frame], 0);
 	recordCommandBuffer(command_buffers[current_frame], image_index);
 
-	// Set synchronization
-	VkSubmitInfo	submit_info{};
+	// Set synchronization objects
+	VkSemaphore				wait_semaphore[] = {
+		image_available_semaphores[current_frame]
+	};
+	VkSemaphore				signal_semaphores[] = {
+		render_finished_semaphores[current_frame]
+	};
+	VkPipelineStageFlags	wait_stages[] = { 
+		VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT
+	};
+	VkSubmitInfo			submit_info{};
 	submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-
-	VkSemaphore	wait_semaphore[] = { image_available_semaphores[current_frame] };
-	VkPipelineStageFlags wait_stages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
-
 	submit_info.waitSemaphoreCount = 1;
 	submit_info.pWaitSemaphores = wait_semaphore;
 	submit_info.pWaitDstStageMask = wait_stages;
 	submit_info.commandBufferCount = 1;
 	submit_info.pCommandBuffers = &command_buffers[current_frame];
-
-	VkSemaphore	signal_semaphores[] = { render_finished_semaphores[current_frame] };
-
 	submit_info.signalSemaphoreCount = 1;
 	submit_info.pSignalSemaphores = signal_semaphores;
 
@@ -1018,11 +1040,14 @@ void	App::drawFrame() {
 		throw std::runtime_error("failed to present swapchain image");
 	}
 
+	// Update current frame
 	current_frame = (current_frame + 1) % max_frames_in_flight;
 }
 
+/**
+ * Create semaphores and fences
+*/
 void	App::createSyncObjects() {
-	// Create semaphores and fence
 	image_available_semaphores.resize(max_frames_in_flight);
 	render_finished_semaphores.resize(max_frames_in_flight);
 	in_flight_fences.resize(max_frames_in_flight);
@@ -1043,8 +1068,10 @@ void	App::createSyncObjects() {
 	}
 }
 
+/**
+ *  Retrieve list of extensions if validation layers enabled
+ */
 std::vector<const char*>	App::getRequiredExtensions() {
-	// Retrieve list of extensions if validation layers enabled
 	uint32_t		glfw_extension_count = 0;
 	const char**	glfw_extensions;
 	glfw_extensions = glfwGetRequiredInstanceExtensions(&glfw_extension_count);
@@ -1057,6 +1084,9 @@ std::vector<const char*>	App::getRequiredExtensions() {
 	return extensions;
 }
 
+/**
+ * Debug callback function, used by validation layers
+*/
 VKAPI_ATTR VkBool32 VKAPI_CALL	App::debugCallback(
 	VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
 	VkDebugUtilsMessageTypeFlagsEXT message_type,
@@ -1067,6 +1097,9 @@ VKAPI_ATTR VkBool32 VKAPI_CALL	App::debugCallback(
 	return VK_FALSE;
 }
 
+/**
+ * Force recreation of swap chain when not compatible with window
+*/
 void	App::recreateSwapChain() {
 	// Handle window minimization
 	int width = 0, height = 0;
@@ -1085,6 +1118,9 @@ void	App::recreateSwapChain() {
 	createFrameBuffers();
 }
 
+/**
+ * Create the vertex buffer that'll be used to store the vertices of the triangle.
+*/
 void	App::createVertexBuffer() {
 	VkDeviceSize	buffer_size = sizeof(vertices[0]) * vertices.size();
 
@@ -1092,6 +1128,7 @@ void	App::createVertexBuffer() {
 	VkBuffer		staging_buffer;
 	VkDeviceMemory	staging_buffer_memory;
 
+	// Cpu accessible memory
 	createBuffer(
 		buffer_size,
 		VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -1124,8 +1161,10 @@ void	App::createVertexBuffer() {
 	vkFreeMemory(logical_device, staging_buffer_memory, nullptr);
 }
 
+/**
+ *  Create index buffer (pointers into the vertex buffer)
+ */
 void	App::createIndexBuffer() {
-	// Create index buffer (pointers into the vertex buffer)
 	VkDeviceSize	buffer_size = sizeof(indices[0]) * indices.size();
 
 	VkBuffer		staging_buffer;
@@ -1161,6 +1200,9 @@ void	App::createIndexBuffer() {
 	vkFreeMemory(logical_device, staging_buffer_memory, nullptr);
 }
 
+/**
+ * Create a vk buffer and allocate memory for it
+*/
 void	App::createBuffer(
 	VkDeviceSize size,
 	VkBufferUsageFlags usage,
@@ -1199,6 +1241,10 @@ void	App::createBuffer(
 	vkBindBufferMemory(logical_device, buffer, buffer_memory, 0);
 }
 
+/**
+ * Record commands to copy data from one buffer to another,
+ * and submit them to the graphics queue.
+*/
 void	App::copyBuffer(VkBuffer src_buffer, VkBuffer dst_buffer, VkDeviceSize size) const {
 	// Allocate temporary command buffer for memory transfer
 	VkCommandBufferAllocateInfo	alloc_info{};
@@ -1237,11 +1283,13 @@ void	App::copyBuffer(VkBuffer src_buffer, VkBuffer dst_buffer, VkDeviceSize size
 	vkFreeCommandBuffers(logical_device, command_pool, 1, &command_buffer);
 }
 
+/**
+ * Map memory and find one suitable with filter and properties
+*/
 uint32_t	App::findMemoryType(
 	uint32_t type_filter,
 	VkMemoryPropertyFlags properties
 ) const {
-	// Map memory and find one suitable with filter and properties
 	VkPhysicalDeviceMemoryProperties	mem_properties;
 	vkGetPhysicalDeviceMemoryProperties(physical_device, &mem_properties);
 
@@ -1258,13 +1306,15 @@ uint32_t	App::findMemoryType(
 /*                                    OTHER                                   */
 /* ========================================================================== */
 
+/**
+ * Load the debug object creation function if avail
+*/
 VkResult	CreateDebugUtilsMessengerEXT(
 	VkInstance instance,
 	const VkDebugUtilsMessengerCreateInfoEXT* p_create_info,
 	const VkAllocationCallbacks* p_allocator,
 	VkDebugUtilsMessengerEXT* p_debug_messenger
 ) {
-	// Load the debug object creation function if avail
 	auto	func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
 		instance,
 		"vkCreateDebugUtilsMessengerEXT"
@@ -1277,12 +1327,14 @@ VkResult	CreateDebugUtilsMessengerEXT(
 	}
 }
 
+/**
+ * Load the debug object destructor function if available
+*/
 void	DestroyDebugUtilsMessengerEXT(
 	VkInstance instance,
 	VkDebugUtilsMessengerEXT debug_messenger,
 	const VkAllocationCallbacks* p_allocator
 ) {
-	// Load the debug object destructor function if avail
 	auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
 		instance,
 		"vkDestroyDebugUtilsMessengerEXT"

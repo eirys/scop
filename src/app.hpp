@@ -6,19 +6,12 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/28 11:36:39 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/28 12:25:37 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef APP_HPP
 # define APP_HPP
-
-/**
- * Syntax rules for this project:
- *  - Function names are camelCase
- *  - Variable names are snake_case
- *  - Class names are PascalCase
-*/
 
 // Graphics
 # ifndef GLFW_INCLUDE_VULKAN
