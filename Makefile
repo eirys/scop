@@ -6,7 +6,7 @@
 #    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/04/27 18:24:23 by eli              ###   ########.fr        #
+#    Updated: 2023/04/28 11:13:34 by eli              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,7 +27,8 @@ INC_FILES	:=	utils.hpp \
 				vertex.hpp \
 				app.hpp
 
-SRC_FILES	:=	main.cpp
+SRC_FILES	:=	main.cpp \
+				app.cpp
 
 INC			:=	$(addprefix	$(SRC_DIR)/,$(INC_FILES))
 SRC			:=	$(addprefix $(SRC_DIR)/,$(SRC_FILES))
