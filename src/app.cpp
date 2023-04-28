@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/04/28 22:45:48 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/28 23:06:20 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,13 +44,15 @@ void	App::initWindow() {
 	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 }
 
+/**
+ * Function callback for when the window is resized
+*/
 void	App::framebufferResizeCallback(GLFWwindow* window, int width, int height) {
 	(void)width;
 	(void)height;
 	auto	app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));
 	app->frame_buffer_resized = true;
 }
-
 
 void	App::initVulkan() {
 	createInstance();
@@ -278,7 +280,7 @@ void	App::pickPhysicalDevice() {
 }
 
 /**
- * Verify that the physical device is suitable for the app needs
+ * Verify that the selected physical device is suitable for the app needs
 */
 bool	App::isDeviceSuitable(const VkPhysicalDevice& device) {
 	QueueFamilyIndices	indices = findQueueFamilies(device);
@@ -323,6 +325,9 @@ bool	App::checkDeviceExtensionSupport(const VkPhysicalDevice& device) {
 	return required_extensions.empty();
 }
 
+/**
+ * Retrieve queue families that are appropriate for the physical device and the app needs.
+*/
 App::QueueFamilyIndices	App::findQueueFamilies(const VkPhysicalDevice& device) {
 	QueueFamilyIndices	indices;
 	uint32_t			queue_family_count = 0;
@@ -351,6 +356,9 @@ App::QueueFamilyIndices	App::findQueueFamilies(const VkPhysicalDevice& device) {
 	return indices;
 }
 
+/**
+ * Setup logical device, the interface between the app and the physical device (GPU).
+*/
 void	App::createLogicalDevice() {
 	// Indicate that we want to create a single queue, with graphics capabilities
 	QueueFamilyIndices	indices = findQueueFamilies(physical_device);
@@ -810,6 +818,10 @@ void	App::createGraphicsPipeline() {
 	vkDestroyShaderModule(logical_device, vert_shader_module, nullptr);
 }
 
+/**
+ * Read compiled file in binary mode and return in vector of char format.
+ * Avoids problems with text files and end of line characters presence.
+*/
 std::vector<char>	App::readFile(const std::string& filename) {
 	// Read file as binary file, at the end of the file
 	std::ifstream	file(filename, std::ios::ate | std::ios::binary);
@@ -826,6 +838,9 @@ std::vector<char>	App::readFile(const std::string& filename) {
 	return buffer;
 }
 
+/**
+ * Create a shader module, from a GLSL shader file, that will be used in the pipeline
+*/
 VkShaderModule	App::createShaderModule(const std::vector<char>& code) {
 	// Create a shader module from code
 	VkShaderModuleCreateInfo	create_info{};
@@ -841,6 +856,9 @@ VkShaderModule	App::createShaderModule(const std::vector<char>& code) {
 	return shader_module;
 }
 
+/**
+ * Create frame buffers wrapping each swap chain image view
+*/
 void	App::createFrameBuffers() {
 	swap_chain_frame_buffers.resize(swap_chain_image_views.size());
 	for (size_t i = 0; i < swap_chain_image_views.size(); ++i) {
@@ -858,15 +876,16 @@ void	App::createFrameBuffers() {
 		create_info.height = swap_chain_extent.height;
 		create_info.layers = 1;
 
-		if (vkCreateFramebuffer(logical_device, &create_info, nullptr,
-		&swap_chain_frame_buffers[i]) != VK_SUCCESS) {
+		if (vkCreateFramebuffer(logical_device, &create_info, nullptr, &swap_chain_frame_buffers[i]) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create frame buffer");
 		}
 	}
 }
 
+/**
+ * Command buffers memory handler
+*/
 void	App::createCommandPool() {
-	// Command buffers handler
 	QueueFamilyIndices	queue_family_indices = findQueueFamilies(physical_device);
 
 	VkCommandPoolCreateInfo	pool_info{};
@@ -894,8 +913,10 @@ void	App::createCommandBuffers() {
 	}
 }
 
+/**
+ *  Write commands to command buffer to be subimtted to queue.
+ */
 void	App::recordCommandBuffer(VkCommandBuffer command_buffer, uint32_t image_index) {
-	// Write commands to command buffer
 	VkCommandBufferBeginInfo	begin_info{};
 	begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 	begin_info.flags = 0;
@@ -905,7 +926,8 @@ void	App::recordCommandBuffer(VkCommandBuffer command_buffer, uint32_t image_ind
 		throw std::runtime_error("failed to begin recording command buffer");
 	}
 
-	// Spectify to render pass how to handle the command buffer
+	// Spectify to render pass how to handle the command buffer,
+	// and which framebuffer to render to
 	VkRenderPassBeginInfo	render_pass_info{};
 	render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	render_pass_info.renderPass = render_pass;
