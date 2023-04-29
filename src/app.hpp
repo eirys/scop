@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/28 12:25:37 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/29 20:13:47 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@
 
 # include "utils.hpp"
 # include "vertex.hpp"
+# include "ubo.hpp"
 
 # define SCOP_VERTEX_SHADER_BINARY		"shaders/vert.spv"
 # define SCOP_FRAGMENT_SHADER_BINARY	"shaders/frag.spv"
