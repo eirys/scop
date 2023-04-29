@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/04/28 23:06:20 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/29 22:52:22 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ void	App::initVulkan() {
 	createSwapChain();
 	createImageViews();
 	createRenderPass();
+	createDescriptorSetLayout();
 	createGraphicsPipeline();
 	createFrameBuffers();
 	createCommandPool();
@@ -101,22 +102,21 @@ void	App::cleanupSwapChain() {
 void	App::cleanup() {
 	cleanupSwapChain();
 
-	// Remove index buffer
-	vkDestroyBuffer(logical_device, index_buffer, nullptr);
-	vkFreeMemory(logical_device, index_buffer_memory, nullptr);
-
-	// Remove vertex buffer
-	vkDestroyBuffer(logical_device, vertex_buffer, nullptr);
-	vkFreeMemory(logical_device, vertex_buffer_memory, nullptr);
-
 	// Remove pipeline
 	vkDestroyPipeline(logical_device, graphics_pipeline, nullptr);
-
-	// Remove pipeline layout
 	vkDestroyPipelineLayout(logical_device, pipeline_layout, nullptr);
 
 	// Remove render pass
 	vkDestroyRenderPass(logical_device, render_pass, nullptr);
+
+	// Remove descriptor set layout
+	vkDestroyDescriptorSetLayout(logical_device, descriptor_set_layout, nullptr);
+
+	// Remove index buffer && vertex buffer
+	vkDestroyBuffer(logical_device, index_buffer, nullptr);
+	vkFreeMemory(logical_device, index_buffer_memory, nullptr);
+	vkDestroyBuffer(logical_device, vertex_buffer, nullptr);
+	vkFreeMemory(logical_device, vertex_buffer_memory, nullptr);
 
 	// Remove sync objects
 	for (size_t i = 0; i < max_frames_in_flight; ++i) {
@@ -136,10 +136,8 @@ void	App::cleanup() {
 		DestroyDebugUtilsMessengerEXT(vk_instance, debug_messenger, nullptr);
 	}
 
-	// Remove vk surface
+	// Remove vk surface && vk instance
 	vkDestroySurfaceKHR(vk_instance, vk_surface, nullptr);
-
-	// Remove vk instance
 	vkDestroyInstance(vk_instance, nullptr);
 
 	// Remove window instance
@@ -169,7 +167,6 @@ void	App::createInstance() {
 
 	// Pass those informations to the Vulkan driver
 	VkInstanceCreateInfo	create_info{};
-
 	create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	create_info.pApplicationInfo = &app_info;
 
@@ -177,8 +174,8 @@ void	App::createInstance() {
 	create_info.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
 	create_info.ppEnabledExtensionNames = extensions.data();
 
+	// Setup debug messenger to go along with the instance
 	VkDebugUtilsMessengerCreateInfoEXT	debug_create_info{};
-
 	if (enable_validation_layers) {
 		create_info.enabledLayerCount = static_cast<uint32_t>(validation_layers.size());
 		create_info.ppEnabledLayerNames = validation_layers.data();
@@ -413,6 +410,9 @@ void	App::createLogicalDevice() {
 	vkGetDeviceQueue(logical_device, indices.present_family.value(), 0, &present_queue);
 }
 
+/**
+ * Establish connection between Vulkan and the window system
+*/
 void	App::createSurface() {
 	if (glfwCreateWindowSurface(vk_instance, window, nullptr, &vk_surface) != VK_SUCCESS)
 		throw std::runtime_error("failed to create window surface");
@@ -781,8 +781,8 @@ void	App::createGraphicsPipeline() {
 	// Pipeline layout setup
 	VkPipelineLayoutCreateInfo	pipeline_layout_info{};
 	pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipeline_layout_info.setLayoutCount = 0;
-	pipeline_layout_info.pSetLayouts = nullptr;
+	pipeline_layout_info.setLayoutCount = 1;
+	pipeline_layout_info.pSetLayouts = &descriptor_set_layout;
 	pipeline_layout_info.pushConstantRangeCount = 0;
 	pipeline_layout_info.pPushConstantRanges = nullptr;
 
@@ -1323,6 +1323,29 @@ uint32_t	App::findMemoryType(
 	}
 	throw std::runtime_error("failed to find suitable memory type");
 }
+
+/**
+ * Tells the graphic pipeline how to setup the descriptor set
+ * with the vertex shader
+*/
+void	App::createDescriptorSetLayout() {
+	VkDescriptorSetLayoutBinding	ubo_layout_binding{};
+	ubo_layout_binding.binding = 0;
+	ubo_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	ubo_layout_binding.descriptorCount = 1;
+	ubo_layout_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+	ubo_layout_binding.pImmutableSamplers = nullptr;
+	
+	VkDescriptorSetLayoutCreateInfo	layout_info{};
+	layout_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	layout_info.bindingCount = 1;
+	layout_info.pBindings = &ubo_layout_binding;
+
+	if (vkCreateDescriptorSetLayout(logical_device, &layout_info, nullptr, &descriptor_set_layout) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create descriptor set layout");
+	}
+}
+
 
 /* ========================================================================== */
 /*                                    OTHER                                   */

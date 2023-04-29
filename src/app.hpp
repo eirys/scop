@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/29 20:13:47 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/29 22:19:46 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,11 +135,13 @@ private:
 	VkFormat						swap_chain_image_format;
 	VkExtent2D						swap_chain_extent;
 	std::vector<VkImageView>		swap_chain_image_views;
+	std::vector<VkFramebuffer>		swap_chain_frame_buffers;
 
 	VkRenderPass					render_pass;
+
+	VkDescriptorSetLayout			descriptor_set_layout;
 	VkPipelineLayout				pipeline_layout;
 	VkPipeline						graphics_pipeline;
-	std::vector<VkFramebuffer>		swap_chain_frame_buffers;
 
 	VkCommandPool					command_pool;
 	std::vector<VkCommandBuffer>	command_buffers;
@@ -147,13 +149,13 @@ private:
 	std::vector<VkSemaphore>		image_available_semaphores;
 	std::vector<VkSemaphore>		render_finished_semaphores;
 	std::vector<VkFence>			in_flight_fences;
-	bool							frame_buffer_resized = false;
 
 	VkBuffer						vertex_buffer;
 	VkDeviceMemory					vertex_buffer_memory;
 	VkBuffer						index_buffer;
 	VkDeviceMemory					index_buffer_memory;
 
+	bool							frame_buffer_resized = false;
 	uint32_t						current_frame = 0;
 
 	/* ========================================================================= */
@@ -240,6 +242,7 @@ private:
 	) const;
 	void									copyBuffer(VkBuffer src_buffer, VkBuffer dst_buffer, VkDeviceSize size) const;
 	uint32_t								findMemoryType(uint32_t type_filter, VkMemoryPropertyFlags properties) const;
+	void									createDescriptorSetLayout();
 
 }; // class App
 
