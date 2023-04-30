@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/04/30 15:50:41 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/30 19:01:46 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,8 @@ void	App::initVulkan() {
 	createVertexBuffer();
 	createIndexBuffer();
 	createUniformBuffers();
+	createDescriptorPool();
+	createDescriptorSets();
 	createCommandBuffers();
 	createSyncObjects();
 }
@@ -115,6 +117,9 @@ void	App::cleanup() {
 		vkDestroyBuffer(logical_device, uniform_buffers[i], nullptr);
 		vkFreeMemory(logical_device, uniform_buffers_memory[i], nullptr);
 	}
+
+	// Remove descriptor pool
+	vkDestroyDescriptorPool(logical_device, descriptor_pool, nullptr);
 
 	// Remove descriptor set layout
 	vkDestroyDescriptorSetLayout(logical_device, descriptor_set_layout, nullptr);
@@ -732,7 +737,7 @@ void	App::createGraphicsPipeline() {
 	rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
 	rasterizer.lineWidth = 1.0f;
 	rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-	rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+	rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 	rasterizer.depthBiasEnable = VK_FALSE;
 	rasterizer.depthBiasConstantFactor = 0.0f;
 	rasterizer.depthBiasClamp = 0.0f;
@@ -971,6 +976,18 @@ void	App::recordCommandBuffer(VkCommandBuffer command_buffer, uint32_t image_ind
 	vkCmdBindVertexBuffers(command_buffer, 0, 1, vertex_buffers, offsets);
 	vkCmdBindIndexBuffer(command_buffer, index_buffer, 0, VK_INDEX_TYPE_UINT16);
 
+	// Bind descriptor sets
+	vkCmdBindDescriptorSets(
+		command_buffer,
+		VK_PIPELINE_BIND_POINT_GRAPHICS,
+		pipeline_layout,
+		0,
+		1,
+		&descriptor_sets[current_frame],
+		0,
+		nullptr
+	);
+
 	// Issue draw command for triangle
 	vkCmdDrawIndexed(command_buffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 
@@ -985,7 +1002,7 @@ void	App::recordCommandBuffer(VkCommandBuffer command_buffer, uint32_t image_ind
 
 /**
  * Fence awaited: the cpu waits until the frame is ready to be retrieved.
- * 
+ *
  * Semaphores awaited: the gpu waits until the command buffer
  * is done executing, aka the image is available in the swap chain.
 */
@@ -1027,7 +1044,7 @@ void	App::drawFrame() {
 	VkSemaphore				signal_semaphores[] = {
 		render_finished_semaphores[current_frame]
 	};
-	VkPipelineStageFlags	wait_stages[] = { 
+	VkPipelineStageFlags	wait_stages[] = {
 		VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT
 	};
 	VkSubmitInfo			submit_info{};
@@ -1183,7 +1200,7 @@ void	App::createVertexBuffer() {
 		vertex_buffer,
 		vertex_buffer_memory
 	);
-	
+
 	// Now transfer data from staging buffer to vertex buffer
 	copyBuffer(staging_buffer, vertex_buffer, buffer_size);
 
@@ -1310,7 +1327,7 @@ void	App::copyBuffer(
 	submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 	submit_info.commandBufferCount = 1;
 	submit_info.pCommandBuffers = &command_buffer;
-	
+
 	vkQueueSubmit(graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
 	vkQueueWaitIdle(graphics_queue);
 
@@ -1348,7 +1365,7 @@ void	App::createDescriptorSetLayout() {
 	ubo_layout_binding.descriptorCount = 1;
 	ubo_layout_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 	ubo_layout_binding.pImmutableSamplers = nullptr;
-	
+
 	VkDescriptorSetLayoutCreateInfo	layout_info{};
 	layout_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 	layout_info.bindingCount = 1;
@@ -1364,7 +1381,7 @@ void	App::createDescriptorSetLayout() {
 */
 void	App::createUniformBuffers() {
 	VkDeviceSize	buffer_size = sizeof(UniformBufferObject);
-	
+
 	uniform_buffers.resize(max_frames_in_flight);
 	uniform_buffers_memory.resize(max_frames_in_flight);
 	uniform_buffers_mapped.resize(max_frames_in_flight);
@@ -1394,7 +1411,7 @@ void	App::createUniformBuffers() {
 void	App::updateUniformBuffer(uint32_t current_image) {
 	// Ensure 90deg rotation/sec
 	static auto	start_time = std::chrono::high_resolution_clock::now();
-	
+
 	auto	current_time = std::chrono::high_resolution_clock::now();
 	float	time = std::chrono::duration<float, std::chrono::seconds::period>(
 					current_time - start_time
@@ -1428,6 +1445,62 @@ void	App::updateUniformBuffer(uint32_t current_image) {
 	ubo.proj[1][1] *= -1;
 
 	memcpy(uniform_buffers_mapped[current_image], &ubo, sizeof(ubo));
+}
+
+/**
+ * Handler for descriptor sets (like command pool)
+*/
+void	App::createDescriptorPool() {
+	VkDescriptorPoolSize	pool_size{};
+	pool_size.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	pool_size.descriptorCount = static_cast<uint32_t>(max_frames_in_flight);
+
+	VkDescriptorPoolCreateInfo	pool_info{};
+	pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	pool_info.poolSizeCount = 1;
+	pool_info.pPoolSizes = &pool_size;
+	pool_info.maxSets = static_cast<uint32_t>(max_frames_in_flight);
+
+	if (vkCreateDescriptorPool(logical_device, &pool_info, nullptr, &descriptor_pool) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create descriptor pool");
+	}
+}
+
+void	App::createDescriptorSets() {
+	std::vector<VkDescriptorSetLayout>	layouts(max_frames_in_flight, descriptor_set_layout);
+	VkDescriptorSetAllocateInfo			alloc_info{};
+	alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	alloc_info.descriptorPool = descriptor_pool;
+	alloc_info.descriptorSetCount = static_cast<uint32_t>(max_frames_in_flight);
+	alloc_info.pSetLayouts = layouts.data();
+
+	descriptor_sets.resize(max_frames_in_flight);
+
+	if (vkAllocateDescriptorSets(logical_device, &alloc_info, descriptor_sets.data()) != VK_SUCCESS) {
+		throw std::runtime_error("failed to allocate descriptor sets");
+	}
+
+	// Populate descriptors
+	for (size_t i = 0; i < max_frames_in_flight; ++i) {
+		VkDescriptorBufferInfo	buffer_info{};
+		buffer_info.buffer = uniform_buffers[i];
+		buffer_info.offset = 0;
+		buffer_info.range = sizeof(UniformBufferObject);
+
+		// Update buffer using descriptor write
+		VkWriteDescriptorSet	descriptor_write{};
+		descriptor_write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptor_write.dstSet = descriptor_sets[i];
+		descriptor_write.dstBinding = 0;
+		descriptor_write.dstArrayElement = 0;
+		descriptor_write.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		descriptor_write.descriptorCount = 1;
+		descriptor_write.pBufferInfo = &buffer_info;
+		descriptor_write.pImageInfo = nullptr;
+		descriptor_write.pTexelBufferView = nullptr;
+
+		vkUpdateDescriptorSets(logical_device, 1, &descriptor_write, 0, nullptr);
+	}
 }
 
 /* ========================================================================== */

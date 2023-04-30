@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/30 15:32:58 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/30 17:10:20 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,9 +161,13 @@ private:
 	VkDeviceMemory					vertex_buffer_memory;
 	VkBuffer						index_buffer;
 	VkDeviceMemory					index_buffer_memory;
+
 	std::vector<VkBuffer>			uniform_buffers;
 	std::vector<VkDeviceMemory>		uniform_buffers_memory;
 	std::vector<void*>				uniform_buffers_mapped;
+
+	VkDescriptorPool				descriptor_pool;
+	std::vector<VkDescriptorSet>	descriptor_sets;
 
 	bool							frame_buffer_resized = false;
 	uint32_t						current_frame = 0;
@@ -255,6 +259,8 @@ private:
 	void									createDescriptorSetLayout();
 	void									createUniformBuffers();
 	void									updateUniformBuffer(uint32_t current_image);
+	void									createDescriptorPool();
+	void									createDescriptorSets();
 
 }; // class App
 
