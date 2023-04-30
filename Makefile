@@ -6,7 +6,7 @@
 #    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/04/30 19:34:12 by eli              ###   ########.fr        #
+#    Updated: 2023/04/30 21:47:59 by eli              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -35,6 +35,9 @@ INC			:=	$(addprefix	$(SRC_DIR)/,$(INC_FILES))
 SRC			:=	$(addprefix $(SRC_DIR)/,$(SRC_FILES))
 OBJ			:=	$(addprefix $(OBJ_DIR)/,$(SRC_FILES:.cpp=.o))
 
+# stb
+STB_PATH	:=	./stb
+
 # shaders
 SHD_FILES	:=	vert \
 				frag
@@ -44,7 +47,7 @@ SHD_BIN		:=	$(addsuffix .spv,$(SHD))
 # compiler
 CXX			:=	c++
 EXTRA		:=	-Wall -Werror -Wextra
-CFLAGS		:=	-std=c++17 -O2 -DNDEBUG -D__VERBOSE
+CFLAGS		:=	-std=c++17 -I$(STB_PATH) -O2 -DNDEBUG -D__VERBOSE
 LDFLAGS		:=	-lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
 ifdef school
 	GLSLC	:=	~/my_sgoinfre/glslc

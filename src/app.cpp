@@ -6,11 +6,16 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/04/30 19:08:24 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/30 21:58:32 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "app.hpp"
+
+#ifndef STB_IMAGE_IMPLEMENTATION
+# define STB_IMAGE_IMPLEMENTATION
+# include <stb_image.h>
+#endif
 
 /* ========================================================================== */
 /*                                   PUBLIC                                   */
