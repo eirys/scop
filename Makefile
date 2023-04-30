@@ -6,7 +6,7 @@
 #    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/04/29 21:20:58 by eli              ###   ########.fr        #
+#    Updated: 2023/04/30 19:34:12 by eli              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,7 @@ SHD_DIR		:=	shaders
 # cpp files
 INC_FILES	:=	utils.hpp \
 				vertex.hpp \
-				ubo.hpp \
+				uniform_buffer_object.hpp \
 				app.hpp
 
 SRC_FILES	:=	main.cpp \

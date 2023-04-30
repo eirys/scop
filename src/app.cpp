@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/04/30 19:01:46 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/30 19:08:24 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -1406,7 +1406,7 @@ void	App::createUniformBuffers() {
 }
 
 /**
- * Update transformation of vertices?
+ * Update transformation of vertices
 */
 void	App::updateUniformBuffer(uint32_t current_image) {
 	// Ensure 90deg rotation/sec
@@ -1419,7 +1419,7 @@ void	App::updateUniformBuffer(uint32_t current_image) {
 
 	UniformBufferObject	ubo{};
 
-	// Define model: rotation around z axis
+	// Define model: continuous rotation around z axis
 	ubo.model = glm::rotate(
 		glm::mat4(1.0f),					// identity matrix
 		time * glm::radians(90.0f),			// rotation angle

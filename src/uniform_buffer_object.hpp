@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 20:12:41 by eli               #+#    #+#             */
-/*   Updated: 2023/04/29 20:13:20 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/30 19:33:19 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,9 @@
 # include <glm/glm.hpp>
 
 struct UniformBufferObject {
-	glm::mat4	model;
-	glm::mat4	view;
-	glm::mat4	proj;
+	alignas(16) glm::mat4	model;
+	alignas(16) glm::mat4	view;
+	alignas(16) glm::mat4	proj;
 };
 
 #endif
