@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/04/30 21:58:32 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/30 22:26:55 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 #ifndef STB_IMAGE_IMPLEMENTATION
 # define STB_IMAGE_IMPLEMENTATION
-# include <stb_image.h>
+# include "stb_image.h"
 #endif
 
 /* ========================================================================== */
@@ -72,6 +72,7 @@ void	App::initVulkan() {
 	createGraphicsPipeline();
 	createFrameBuffers();
 	createCommandPool();
+	createTextureImage();
 	createVertexBuffer();
 	createIndexBuffer();
 	createUniformBuffers();
@@ -1506,6 +1507,46 @@ void	App::createDescriptorSets() {
 
 		vkUpdateDescriptorSets(logical_device, 1, &descriptor_write, 0, nullptr);
 	}
+}
+
+/**
+ * Texture loader
+*/
+void	App::createTextureImage() {
+	int			tex_width, tex_height, tex_channels;
+
+	// Load image
+	stbi_uc*	pixels = stbi_load(
+		SCOP_TEXTURE_FILE,
+		&tex_width,
+		&tex_height,
+		&tex_channels,
+		STBI_rgb_alpha
+	);
+	if (!pixels) {
+		throw std::runtime_error("failed to load texture image");
+	}
+
+	VkDeviceSize	image_size = tex_width * tex_height * 4;
+	VkBuffer		staging_buffer;
+	VkDeviceMemory	staging_buffer_memory;
+	
+	createBuffer(
+		image_size,
+		VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+		staging_buffer,
+		staging_buffer_memory
+	);
+	
+	// Map buffer, copy image load into buffer
+	void*	data;
+	vkMapMemory(logical_device, staging_buffer_memory, 0, image_size, 0, &data);
+	memcpy(data, pixels, static_cast<size_t>(image_size));
+	vkUnmapMemory(logical_device, staging_buffer_memory);
+
+	// Free image loaded
+	stbi_image_free(pixels);
 }
 
 /* ========================================================================== */

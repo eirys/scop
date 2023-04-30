@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/30 21:59:11 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/30 22:21:41 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@
 
 # define SCOP_VERTEX_SHADER_BINARY		"shaders/vert.spv"
 # define SCOP_FRAGMENT_SHADER_BINARY	"shaders/frag.spv"
+# define SCOP_TEXTURE_FILE				"textures/hammy.jpg"
 
 /* ========================================================================== */
 /*                                    UTILS                                   */
@@ -264,6 +265,7 @@ private:
 	void									updateUniformBuffer(uint32_t current_image);
 	void									createDescriptorPool();
 	void									createDescriptorSets();
+	void									createTextureImage();
 
 }; // class App
 
