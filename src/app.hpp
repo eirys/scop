@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/29 22:19:46 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/30 15:32:58 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,11 @@
 #  define GLFW_INCLUDE_VULKAN
 # endif
 # include <GLFW/glfw3.h>
+# ifndef GLM_FORCE_RADIANS
+#  define GLM_FORCE_RADIANS
+# endif
+# include <glm/glm.hpp>
+# include <glm/gtc/matrix_transform.hpp>
 
 // Std
 # include <iostream>
@@ -31,6 +36,7 @@
 # include <algorithm>
 # include <fstream>
 # include <cassert>
+# include <chrono>
 
 # include "utils.hpp"
 # include "vertex.hpp"
@@ -60,8 +66,9 @@ void	DestroyDebugUtilsMessengerEXT(
 
 class App {
 public:
+
 	/* ========================================================================= */
-	/*                               HELPER OBJECT                               */
+	/*                               HELPER OBJECTS                              */
 	/* ========================================================================= */
 
 	struct QueueFamilyIndices {
@@ -154,6 +161,9 @@ private:
 	VkDeviceMemory					vertex_buffer_memory;
 	VkBuffer						index_buffer;
 	VkDeviceMemory					index_buffer_memory;
+	std::vector<VkBuffer>			uniform_buffers;
+	std::vector<VkDeviceMemory>		uniform_buffers_memory;
+	std::vector<void*>				uniform_buffers_mapped;
 
 	bool							frame_buffer_resized = false;
 	uint32_t						current_frame = 0;
@@ -243,6 +253,8 @@ private:
 	void									copyBuffer(VkBuffer src_buffer, VkBuffer dst_buffer, VkDeviceSize size) const;
 	uint32_t								findMemoryType(uint32_t type_filter, VkMemoryPropertyFlags properties) const;
 	void									createDescriptorSetLayout();
+	void									createUniformBuffers();
+	void									updateUniformBuffer(uint32_t current_image);
 
 }; // class App
 

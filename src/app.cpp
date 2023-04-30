@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/04/29 22:52:22 by eli              ###   ########.fr       */
+/*   Updated: 2023/04/30 15:50:41 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ void	App::initVulkan() {
 	createCommandPool();
 	createVertexBuffer();
 	createIndexBuffer();
+	createUniformBuffers();
 	createCommandBuffers();
 	createSyncObjects();
 }
@@ -102,12 +103,18 @@ void	App::cleanupSwapChain() {
 void	App::cleanup() {
 	cleanupSwapChain();
 
-	// Remove pipeline
+	// Remove graphics pipeline
 	vkDestroyPipeline(logical_device, graphics_pipeline, nullptr);
 	vkDestroyPipelineLayout(logical_device, pipeline_layout, nullptr);
 
 	// Remove render pass
 	vkDestroyRenderPass(logical_device, render_pass, nullptr);
+
+	// Remove uniform buffers
+	for (size_t i = 0; i < max_frames_in_flight; ++i) {
+		vkDestroyBuffer(logical_device, uniform_buffers[i], nullptr);
+		vkFreeMemory(logical_device, uniform_buffers_memory[i], nullptr);
+	}
 
 	// Remove descriptor set layout
 	vkDestroyDescriptorSetLayout(logical_device, descriptor_set_layout, nullptr);
@@ -1011,6 +1018,8 @@ void	App::drawFrame() {
 	vkResetCommandBuffer(command_buffers[current_frame], 0);
 	recordCommandBuffer(command_buffers[current_frame], image_index);
 
+	updateUniformBuffer(current_frame);
+
 	// Set synchronization objects
 	VkSemaphore				wait_semaphore[] = {
 		image_available_semaphores[current_frame]
@@ -1267,7 +1276,11 @@ void	App::createBuffer(
  * Record commands to copy data from one buffer to another,
  * and submit them to the graphics queue.
 */
-void	App::copyBuffer(VkBuffer src_buffer, VkBuffer dst_buffer, VkDeviceSize size) const {
+void	App::copyBuffer(
+	VkBuffer src_buffer,
+	VkBuffer dst_buffer,
+	VkDeviceSize size
+) const {
 	// Allocate temporary command buffer for memory transfer
 	VkCommandBufferAllocateInfo	alloc_info{};
 	alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -1346,6 +1359,76 @@ void	App::createDescriptorSetLayout() {
 	}
 }
 
+/**
+ * Create uniform buffers
+*/
+void	App::createUniformBuffers() {
+	VkDeviceSize	buffer_size = sizeof(UniformBufferObject);
+	
+	uniform_buffers.resize(max_frames_in_flight);
+	uniform_buffers_memory.resize(max_frames_in_flight);
+	uniform_buffers_mapped.resize(max_frames_in_flight);
+
+	for (size_t i = 0; i < max_frames_in_flight; ++i) {
+		createBuffer(
+			buffer_size,
+			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+			uniform_buffers[i],
+			uniform_buffers_memory[i]
+		);
+		vkMapMemory(
+			logical_device,
+			uniform_buffers_memory[i],
+			0,
+			buffer_size,
+			0,
+			&uniform_buffers_mapped[i]
+		);
+	}
+}
+
+/**
+ * Update transformation of vertices?
+*/
+void	App::updateUniformBuffer(uint32_t current_image) {
+	// Ensure 90deg rotation/sec
+	static auto	start_time = std::chrono::high_resolution_clock::now();
+	
+	auto	current_time = std::chrono::high_resolution_clock::now();
+	float	time = std::chrono::duration<float, std::chrono::seconds::period>(
+					current_time - start_time
+				).count();
+
+	UniformBufferObject	ubo{};
+
+	// Define model: rotation around z axis
+	ubo.model = glm::rotate(
+		glm::mat4(1.0f),					// identity matrix
+		time * glm::radians(90.0f),			// rotation angle
+		glm::vec3(0.0f, 0.0f, 1.0f)			// axis (z axis)
+	);
+	// Define view transformation: above, 45deg angle
+	ubo.view = glm::lookAt(
+		glm::vec3(2.0f, 2.0f, 2.0f),		// eye position
+		glm::vec3(0.0f, 0.0f, 0.0f),		// center position
+		glm::vec3(0.0f, 0.0f, 1.0f)			// up axis (z axis)
+	);
+	// Define persp. projection (clip space?)
+	ubo.proj = glm::perspective(
+		glm::radians(45.0f),				// FOV angle
+		swap_chain_extent.width				// aspect ratio
+		/ static_cast<float>(
+				swap_chain_extent.height
+		),
+		0.1f,								// near view plane
+		10.0f								// far view plane
+	);
+	// Invert y axis (OpenGL has y axis inverted)
+	ubo.proj[1][1] *= -1;
+
+	memcpy(uniform_buffers_mapped[current_image], &ubo, sizeof(ubo));
+}
 
 /* ========================================================================== */
 /*                                    OTHER                                   */
