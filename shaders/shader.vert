@@ -16,6 +16,5 @@ void	main() {
 				* ubo.view
 				* ubo.model
 				* vec4(in_position, 0.0, 1.0);
-	// gl_Position = vec4(in_position, 0.0, 1.0);
 	frag_color = in_color;
 }

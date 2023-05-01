@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/04/30 22:26:55 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/01 22:14:43 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -559,7 +559,6 @@ void	App::createSwapChain() {
 
 	// Setup the creation of the swap chain object, tied to the vk_surface
 	VkSwapchainCreateInfoKHR	create_info{};
-
 	create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 	create_info.surface = vk_surface;
 	create_info.minImageCount = image_count;
@@ -1193,7 +1192,6 @@ void	App::createVertexBuffer() {
 
 	// Fill staging buffer
 	void*	data;
-
 	vkMapMemory(logical_device, staging_buffer_memory, 0, buffer_size, 0, &data);
 	memcpy(data, vertices.data(), static_cast<size_t>(buffer_size));
 	vkUnmapMemory(logical_device, staging_buffer_memory);
@@ -1220,7 +1218,6 @@ void	App::createVertexBuffer() {
  */
 void	App::createIndexBuffer() {
 	VkDeviceSize	buffer_size = sizeof(indices[0]) * indices.size();
-
 	VkBuffer		staging_buffer;
 	VkDeviceMemory	staging_buffer_memory;
 
@@ -1513,7 +1510,7 @@ void	App::createDescriptorSets() {
  * Texture loader
 */
 void	App::createTextureImage() {
-	int			tex_width, tex_height, tex_channels;
+	int	tex_width, tex_height, tex_channels;
 
 	// Load image
 	stbi_uc*	pixels = stbi_load(
@@ -1530,7 +1527,7 @@ void	App::createTextureImage() {
 	VkDeviceSize	image_size = tex_width * tex_height * 4;
 	VkBuffer		staging_buffer;
 	VkDeviceMemory	staging_buffer_memory;
-	
+
 	createBuffer(
 		image_size,
 		VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -1538,7 +1535,7 @@ void	App::createTextureImage() {
 		staging_buffer,
 		staging_buffer_memory
 	);
-	
+
 	// Map buffer, copy image load into buffer
 	void*	data;
 	vkMapMemory(logical_device, staging_buffer_memory, 0, image_size, 0, &data);
@@ -1547,6 +1544,70 @@ void	App::createTextureImage() {
 
 	// Free image loaded
 	stbi_image_free(pixels);
+
+	createImage(
+		tex_width,
+		tex_height,
+		VK_FORMAT_R8G8B8_SRGB,
+		VK_IMAGE_TILING_OPTIMAL,
+		VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+		texture_image,
+		texture_image_memory
+	);
+}
+
+/**
+ * Create image object for vulkan
+*/
+void	App::createImage(
+	uint32_t width,
+	uint32_t height,
+	VkFormat format,
+	VkImageTiling tiling,
+	VkImageUsageFlags usage,
+	VkMemoryPropertyFlags properties,
+	VkImage& image,
+	VkDeviceMemory& image_memory
+) const {
+	VkImageCreateInfo	image_info{};
+	image_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+	image_info.imageType = VK_IMAGE_TYPE_2D;
+	image_info.extent.width = width;
+	image_info.extent.height = height;
+	image_info.extent.depth = 1;
+	image_info.mipLevels = 1;
+	image_info.arrayLayers = 1;
+	image_info.format = format;
+	image_info.tiling = tiling;
+	image_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	image_info.usage = usage;
+	image_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	image_info.samples = VK_SAMPLE_COUNT_1_BIT;
+	image_info.flags = 0;
+
+	if (vkCreateImage(logical_device, &image_info, nullptr, &image) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create image");
+	}
+
+	// Allocate memory for image
+	VkMemoryRequirements	mem_requirements;
+	vkGetImageMemoryRequirements(logical_device, image, &mem_requirements);
+	
+	VkMemoryAllocateInfo	alloc_info{};
+	alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	alloc_info.allocationSize = mem_requirements.size;
+	alloc_info.memoryTypeIndex = findMemoryType(
+		mem_requirements.memoryTypeBits,
+		properties
+	);
+
+	if (vkAllocateMemory(logical_device, &alloc_info, nullptr, &image_memory) != VK_SUCCESS) {
+		throw std::runtime_error("failed to allocate image memory");
+	}
+
+	// Bind memory to instance
+	vkBindImageMemory(logical_device, image, image_memory, 0);
 }
 
 /* ========================================================================== */

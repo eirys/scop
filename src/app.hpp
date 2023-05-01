@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/04/30 22:21:41 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/01 22:09:44 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,6 +173,9 @@ private:
 	VkDescriptorPool				descriptor_pool;
 	std::vector<VkDescriptorSet>	descriptor_sets;
 
+	VkImage							texture_image;
+	VkDeviceMemory					texture_image_memory;
+
 	bool							frame_buffer_resized = false;
 	uint32_t						current_frame = 0;
 
@@ -266,6 +269,16 @@ private:
 	void									createDescriptorPool();
 	void									createDescriptorSets();
 	void									createTextureImage();
+	void									createImage(
+		uint32_t width,
+		uint32_t height,
+		VkFormat format,
+		VkImageTiling tiling,
+		VkImageUsageFlags usage,
+		VkMemoryPropertyFlags properties,
+		VkImage& image,
+		VkDeviceMemory& image_memory
+	) const;
 
 }; // class App
 
