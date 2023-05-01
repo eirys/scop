@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/01 22:14:43 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/01 23:58:20 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,6 +110,10 @@ void	App::cleanupSwapChain() {
 
 void	App::cleanup() {
 	cleanupSwapChain();
+
+	// Remove texture image
+	vkDestroyImage(logical_device, texture_image, nullptr);
+	vkFreeMemory(logical_device, texture_image_memory, nullptr);
 
 	// Remove graphics pipeline
 	vkDestroyPipeline(logical_device, graphics_pipeline, nullptr);
@@ -1301,21 +1305,7 @@ void	App::copyBuffer(
 	VkBuffer dst_buffer,
 	VkDeviceSize size
 ) const {
-	// Allocate temporary command buffer for memory transfer
-	VkCommandBufferAllocateInfo	alloc_info{};
-	alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	alloc_info.commandPool = command_pool;
-	alloc_info.commandBufferCount = 1;
-
-	VkCommandBuffer	command_buffer;
-	vkAllocateCommandBuffers(logical_device, &alloc_info, &command_buffer);
-
-	// Record commands
-	VkCommandBufferBeginInfo	begin_info{};
-	begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-	vkBeginCommandBuffer(command_buffer, &begin_info);
+	VkCommandBuffer	command_buffer = beginSingleTimeCommands();
 
 	VkBufferCopy	copy_region{};
 	copy_region.srcOffset = 0;
@@ -1323,19 +1313,7 @@ void	App::copyBuffer(
 	copy_region.size = size;
 	vkCmdCopyBuffer(command_buffer, src_buffer, dst_buffer, 1, &copy_region);
 
-	vkEndCommandBuffer(command_buffer);
-
-	// Submit to graphics queue to execute transfer
-	VkSubmitInfo	submit_info{};
-	submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	submit_info.commandBufferCount = 1;
-	submit_info.pCommandBuffers = &command_buffer;
-
-	vkQueueSubmit(graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
-	vkQueueWaitIdle(graphics_queue);
-
-	// Deallocate command buffer
-	vkFreeCommandBuffers(logical_device, command_pool, 1, &command_buffer);
+	endSingleTimeCommands(command_buffer);
 }
 
 /**
@@ -1545,6 +1523,7 @@ void	App::createTextureImage() {
 	// Free image loaded
 	stbi_image_free(pixels);
 
+	// Create texture image to be filled
 	createImage(
 		tex_width,
 		tex_height,
@@ -1555,6 +1534,31 @@ void	App::createTextureImage() {
 		texture_image,
 		texture_image_memory
 	);
+
+	// Copy staging buffer to texture image
+	transitionImageLayout(
+		texture_image,
+		VK_FORMAT_R8G8B8_SRGB,
+		VK_IMAGE_LAYOUT_UNDEFINED,
+		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
+	);
+	copyBufferToImage(
+		staging_buffer,
+		texture_image,
+		static_cast<uint32_t>(tex_width),
+		static_cast<uint32_t>(tex_height)
+	);
+
+	// Allow shader access
+	transitionImageLayout(
+		texture_image,
+		VK_FORMAT_R8G8B8_SRGB,
+		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+		VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+	);
+
+	vkDestroyBuffer(logical_device, staging_buffer, nullptr);
+	vkFreeMemory(logical_device, staging_buffer_memory, nullptr);
 }
 
 /**
@@ -1593,7 +1597,7 @@ void	App::createImage(
 	// Allocate memory for image
 	VkMemoryRequirements	mem_requirements;
 	vkGetImageMemoryRequirements(logical_device, image, &mem_requirements);
-	
+
 	VkMemoryAllocateInfo	alloc_info{};
 	alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	alloc_info.allocationSize = mem_requirements.size;
@@ -1608,6 +1612,142 @@ void	App::createImage(
 
 	// Bind memory to instance
 	vkBindImageMemory(logical_device, image, image_memory, 0);
+}
+
+VkCommandBuffer	App::beginSingleTimeCommands() const {
+	// Allocate temporary command buffer for memory transfer
+	VkCommandBufferAllocateInfo	alloc_info{};
+	alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	alloc_info.commandPool = command_pool;
+	alloc_info.commandBufferCount = 1;
+
+	VkCommandBuffer	command_buffer;
+	vkAllocateCommandBuffers(logical_device, &alloc_info, &command_buffer);
+
+	VkCommandBufferBeginInfo	begin_info{};
+	begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+	vkBeginCommandBuffer(command_buffer, &begin_info);
+
+	return command_buffer;
+}
+
+void	App::endSingleTimeCommands(VkCommandBuffer command_buffer) const {
+	// Submit to graphics queue to execute transfer
+	vkEndCommandBuffer(command_buffer);
+
+	VkSubmitInfo	submit_info{};
+	submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submit_info.commandBufferCount = 1;
+	submit_info.pCommandBuffers = &command_buffer;
+
+	vkQueueSubmit(graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
+	vkQueueWaitIdle(graphics_queue);
+
+	// Deallocate temporary command buffer
+	vkFreeCommandBuffers(logical_device, command_pool, 1, &command_buffer);
+}
+
+void	App::transitionImageLayout(
+	VkImage image,
+	VkFormat format,
+	VkImageLayout old_layout,
+	VkImageLayout new_layout
+) const {
+	VkCommandBuffer	command_buffer = beginSingleTimeCommands();
+
+	// Create image memory barrier to synchronize proper access to resources
+	VkImageMemoryBarrier	barrier{};
+	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	barrier.oldLayout = old_layout;
+	barrier.newLayout = new_layout;
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.image = image;
+	barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	barrier.subresourceRange.baseMipLevel = 0;
+	barrier.subresourceRange.levelCount = 1;
+	barrier.subresourceRange.baseArrayLayer = 0;
+	barrier.subresourceRange.layerCount = 1;
+	barrier.srcAccessMask = 0;
+	barrier.dstAccessMask = 0;
+
+	// Set access maks depending on layout in transition,
+	// cause multiple actions will be performed during pipeline execution
+	VkPipelineStageFlags	src_stage;
+	VkPipelineStageFlags	dst_stage;
+
+	if (
+		old_layout == VK_IMAGE_LAYOUT_UNDEFINED
+		&& new_layout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
+	) {
+		// Transfer destination doesn't need waiting, so do it in the beginning
+		barrier.srcAccessMask = 0;
+		barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+		src_stage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+		dst_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+	} else if (
+		old_layout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
+		&& new_layout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+	) {
+		// Shader reading needs to wait for transfer to finish
+		barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+		barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+		src_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+		dst_stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+	} else {
+		throw std::invalid_argument("unsupported layout transition");
+	}
+
+	// Submit barrier
+	vkCmdPipelineBarrier(
+		command_buffer,
+		src_stage,
+		dst_stage,
+		0,
+		0,
+		nullptr,
+		0,
+		nullptr,
+		1,
+		&barrier
+	);
+
+	endSingleTimeCommands(command_buffer);
+}
+
+void	App::copyBufferToImage(
+	VkBuffer buffer,
+	VkImage image,
+	uint32_t width,
+	uint32_t height
+) const {
+	VkCommandBuffer	command_buffer = beginSingleTimeCommands();
+
+	// Specify part of buffer to be copied to image
+	VkBufferImageCopy	region{};
+	region.bufferOffset = 0;
+	region.bufferRowLength = 0;
+	region.bufferImageHeight = 0;
+	region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	region.imageSubresource.mipLevel = 0;
+	region.imageSubresource.baseArrayLayer = 0;
+	region.imageSubresource.layerCount = 1;
+	region.imageOffset = { 0, 0, 0 };
+	region.imageExtent = { width, height, 1 };
+
+	vkCmdCopyBufferToImage(
+		command_buffer,
+		buffer,
+		image,
+		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+		1,
+		&region	
+	);
+
+	endSingleTimeCommands(command_buffer);
 }
 
 /* ========================================================================== */

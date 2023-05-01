@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/01 22:09:44 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/01 22:41:51 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -231,7 +231,9 @@ private:
 	void									createImageViews();
 	void									createRenderPass();
 	void									createGraphicsPipeline();
-	static std::vector<char>				readFile(const std::string& filename);
+	static std::vector<char>				readFile(
+		const std::string& filename
+	);
 	VkShaderModule							createShaderModule(
 		const std::vector<char>& code
 	);
@@ -261,11 +263,20 @@ private:
 		VkBuffer& buffer,
 		VkDeviceMemory& buffer_memory
 	) const;
-	void									copyBuffer(VkBuffer src_buffer, VkBuffer dst_buffer, VkDeviceSize size) const;
-	uint32_t								findMemoryType(uint32_t type_filter, VkMemoryPropertyFlags properties) const;
+	void									copyBuffer(
+		VkBuffer src_buffer,
+		VkBuffer dst_buffer,
+		VkDeviceSize size
+	) const;
+	uint32_t								findMemoryType(
+		uint32_t type_filter,
+		VkMemoryPropertyFlags properties
+	) const;
 	void									createDescriptorSetLayout();
 	void									createUniformBuffers();
-	void									updateUniformBuffer(uint32_t current_image);
+	void									updateUniformBuffer(
+		uint32_t current_image
+	);
 	void									createDescriptorPool();
 	void									createDescriptorSets();
 	void									createTextureImage();
@@ -278,6 +289,22 @@ private:
 		VkMemoryPropertyFlags properties,
 		VkImage& image,
 		VkDeviceMemory& image_memory
+	) const;
+	VkCommandBuffer							beginSingleTimeCommands() const;
+	void									endSingleTimeCommands(
+		VkCommandBuffer command_buffer
+	) const;
+	void									transitionImageLayout(
+		VkImage image,
+		VkFormat format,
+		VkImageLayout old_layout,
+		VkImageLayout new_layout
+	) const;
+	void									copyBufferToImage(
+		VkBuffer buffer,
+		VkImage image,
+		uint32_t width,
+		uint32_t height
 	) const;
 
 }; // class App
