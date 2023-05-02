@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/26 15:25:04 by etran             #+#    #+#             */
-/*   Updated: 2023/05/02 22:23:14 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/02 23:45:14 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ struct Vertex {
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
 
-	glm::vec2		pos;
+	glm::vec3		pos;
 	glm::vec3		color;
 	glm::vec2		tex_coord;
 
@@ -58,7 +58,7 @@ struct Vertex {
 		// `pos` attribute
 		attribute_descriptions[0].binding = 0;
 		attribute_descriptions[0].location = 0;
-		attribute_descriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+		attribute_descriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
 		attribute_descriptions[0].offset = offsetof(Vertex, pos);
 
 		// `color` attribute

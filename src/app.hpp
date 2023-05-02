@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/02 22:19:18 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/02 23:57:07 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,11 @@
 # ifndef GLM_FORCE_RADIANS
 #  define GLM_FORCE_RADIANS
 # endif
-# ifndef GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
-#  define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
+// # ifndef GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
+// #  define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
+// # endif
+# ifndef GLM_FORCE_DEPTH_ZERO_TO_ONE
+#  define GLM_FORCE_DEPTH_ZERO_TO_ONE
 # endif
 # include <GLFW/glfw3.h>
 # include <glm/glm.hpp>
@@ -111,14 +114,20 @@ private:
 	};
 	const int						max_frames_in_flight = 2;
 	const std::vector<Vertex>		vertices = {
-		// pos{},			 color{}			texcoord{}
-		{{ -0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f }},
-		{{  0.5f, -0.5f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f }},
-		{{  0.5f,  0.5f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f }},
-		{{ -0.5f,  0.5f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f }}
+		// pos{},			 	color{}			texcoord{}
+		{{ -0.5f, -0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f }},
+		{{  0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f }},
+		{{  0.5f,  0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f }},
+		{{ -0.5f,  0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f }},
+
+		{{ -0.5f, -0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f }},
+		{{  0.5f, -0.5f, -0.5f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f }},
+		{{  0.5f,  0.5f, -0.5f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f }},
+		{{ -0.5f,  0.5f, -0.5f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f }}
 	};
 	const std::vector<uint16_t>		indices = {
-		0, 1, 2, 2, 3, 0
+		0, 1, 2, 2, 3, 0,
+		4, 5, 6, 6, 7, 4
 	};
 
 	#ifndef NDEBUG
@@ -177,6 +186,10 @@ private:
 	VkDeviceMemory					texture_image_memory;
 	VkImageView						texture_image_view;
 	VkSampler 						texture_sampler;
+
+	VkImage							depth_image;
+	VkDeviceMemory					depth_image_memory;
+	VkImageView						depth_image_view;
 
 	bool							frame_buffer_resized = false;
 	uint32_t						current_frame = 0;
