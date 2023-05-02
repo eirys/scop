@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/01 23:58:20 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/02 14:21:35 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,8 @@ void	App::initVulkan() {
 	createFrameBuffers();
 	createCommandPool();
 	createTextureImage();
+	createTextureImageView();
+	createTextureSampler();
 	createVertexBuffer();
 	createIndexBuffer();
 	createUniformBuffers();
@@ -112,6 +114,8 @@ void	App::cleanup() {
 	cleanupSwapChain();
 
 	// Remove texture image
+	vkDestroySampler(logical_device, texture_sampler, nullptr);
+	vkDestroyImageView(logical_device, texture_image_view, nullptr);
 	vkDestroyImage(logical_device, texture_image, nullptr);
 	vkFreeMemory(logical_device, texture_image_memory, nullptr);
 
@@ -303,18 +307,25 @@ void	App::pickPhysicalDevice() {
 */
 bool	App::isDeviceSuitable(const VkPhysicalDevice& device) {
 	QueueFamilyIndices	indices = findQueueFamilies(device);
-
 	bool	extensions_supported = checkDeviceExtensionSupport(device);
-
 	bool	swap_chain_adequate = false;
+
 	if (extensions_supported) {
 		SwapChainSupportDetails	swap_chain_support = querySwapChainSupport(device);
 		swap_chain_adequate =
-			!swap_chain_support.formats.empty()
-			&& !swap_chain_support.present_modes.empty();
+			!swap_chain_support.formats.empty() &&
+			!swap_chain_support.present_modes.empty();
 	}
 
-	return indices.isComplete() && extensions_supported && swap_chain_adequate;
+	VkPhysicalDeviceFeatures	supported_features;
+	vkGetPhysicalDeviceFeatures(device, &supported_features);
+
+	return (
+		indices.isComplete() &&
+		extensions_supported &&
+		swap_chain_adequate &&
+		supported_features.samplerAnisotropy
+	);
 }
 
 /**
@@ -400,19 +411,17 @@ void	App::createLogicalDevice() {
 		queue_create_infos.push_back(queue_create_info);
 	}
 
-	// Logical device creation info
+	// Enable device features
 	VkPhysicalDeviceFeatures	device_features{};
+	device_features.samplerAnisotropy = VK_TRUE;
+
 	VkDeviceCreateInfo			create_info{};
-
 	create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-
-	// Passing queue families
 	create_info.pQueueCreateInfos = queue_create_infos.data();
 	create_info.queueCreateInfoCount = static_cast<uint32_t>(queue_create_infos.size());
 	create_info.pEnabledFeatures = &device_features;
 
 	// Validation layers
-	// Deprecated, but set for compatibility with older Vulkan implementations
 	if (enable_validation_layers) {
 		create_info.enabledLayerCount = static_cast<uint32_t>(validation_layers.size());
 		create_info.ppEnabledLayerNames = validation_layers.data();
@@ -613,30 +622,39 @@ void	App::createSwapChain() {
 	swap_chain_extent = swap_extent;
 }
 
+/**
+ * Color targets
+*/
 void	App::createImageViews() {
 	// Create image view for each images
 	swap_chain_image_views.resize(swap_chain_images.size());
 
 	for (size_t i = 0; i < swap_chain_images.size(); ++i) {
-		VkImageViewCreateInfo	create_info{};
-		create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		create_info.image = swap_chain_images[i];
-		create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		create_info.format = swap_chain_image_format;
-		create_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-		create_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-		create_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-		create_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-		create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		create_info.subresourceRange.baseMipLevel = 0;
-		create_info.subresourceRange.levelCount = 1;
-		create_info.subresourceRange.baseArrayLayer = 0;
-		create_info.subresourceRange.layerCount = 1;
-
-		if (vkCreateImageView(logical_device, &create_info, nullptr, &swap_chain_image_views[i]) != VK_SUCCESS) {
-			throw std::runtime_error("failed to create image views");
-		}
+		swap_chain_image_views[i] = createImageView(
+			swap_chain_images[i],
+			swap_chain_image_format
+		);
 	}
+}
+
+VkImageView	App::createImageView(VkImage image, VkFormat format) const {
+	VkImageViewCreateInfo	view_info{};
+	view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	view_info.image = image;
+	view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+	view_info.format = format;
+	view_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	view_info.subresourceRange.baseMipLevel = 0;
+	view_info.subresourceRange.levelCount = 1;
+	view_info.subresourceRange.baseArrayLayer = 0;
+	view_info.subresourceRange.layerCount = 1;
+
+	VkImageView	image_view;
+
+	if (vkCreateImageView(logical_device, &view_info, nullptr, &image_view) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create texture image view");
+	}
+	return image_view;
 }
 
 void	App::createRenderPass() {
@@ -887,7 +905,7 @@ void	App::createFrameBuffers() {
 			swap_chain_image_views[i]
 		};
 
-		// Create frame buffer from image view, associate with a rend pass
+		// Create frame buffer from image view, associate with a render pass
 		VkFramebufferCreateInfo	create_info{};
 		create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 		create_info.renderPass = render_pass;
@@ -1527,7 +1545,7 @@ void	App::createTextureImage() {
 	createImage(
 		tex_width,
 		tex_height,
-		VK_FORMAT_R8G8B8_SRGB,
+		VK_FORMAT_R8G8B8A8_SRGB,
 		VK_IMAGE_TILING_OPTIMAL,
 		VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
 		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
@@ -1538,7 +1556,7 @@ void	App::createTextureImage() {
 	// Copy staging buffer to texture image
 	transitionImageLayout(
 		texture_image,
-		VK_FORMAT_R8G8B8_SRGB,
+		VK_FORMAT_R8G8B8A8_SRGB,
 		VK_IMAGE_LAYOUT_UNDEFINED,
 		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
 	);
@@ -1552,7 +1570,7 @@ void	App::createTextureImage() {
 	// Allow shader access
 	transitionImageLayout(
 		texture_image,
-		VK_FORMAT_R8G8B8_SRGB,
+		VK_FORMAT_R8G8B8A8_SRGB,
 		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
 		VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
 	);
@@ -1744,10 +1762,44 @@ void	App::copyBufferToImage(
 		image,
 		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
 		1,
-		&region	
+		&region
 	);
 
 	endSingleTimeCommands(command_buffer);
+}
+
+void	App::createTextureImageView() {
+	texture_image_view = createImageView(texture_image, VK_FORMAT_R8G8B8A8_SRGB);
+}
+
+/**
+ * Create sampler, that'll apply transformations to image when sampling
+*/
+void	App::createTextureSampler() {
+	VkPhysicalDeviceProperties	properties{};
+	vkGetPhysicalDeviceProperties(physical_device, &properties);
+
+	VkSamplerCreateInfo	sampler_info{};
+	sampler_info.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+	sampler_info.magFilter = VK_FILTER_LINEAR;
+	sampler_info.minFilter = VK_FILTER_LINEAR;
+	sampler_info.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	sampler_info.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	sampler_info.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	sampler_info.anisotropyEnable = VK_TRUE;
+	sampler_info.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
+	sampler_info.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+	sampler_info.unnormalizedCoordinates = VK_FALSE;
+	sampler_info.compareEnable = VK_FALSE;
+	sampler_info.compareOp = VK_COMPARE_OP_ALWAYS;
+	sampler_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+	sampler_info.mipLodBias = 0.0f;
+	sampler_info.minLod = 0.0f;
+	sampler_info.maxLod = 0.0f;
+
+	if (vkCreateSampler(logical_device, &sampler_info, nullptr, &texture_sampler) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create texture sampler");
+	}
 }
 
 /* ========================================================================== */

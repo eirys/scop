@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/01 22:41:51 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/02 14:14:29 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,6 +175,8 @@ private:
 
 	VkImage							texture_image;
 	VkDeviceMemory					texture_image_memory;
+	VkImageView						texture_image_view;
+	VkSampler 						texture_sampler;
 
 	bool							frame_buffer_resized = false;
 	uint32_t						current_frame = 0;
@@ -229,6 +231,10 @@ private:
 	);
 	void									createSwapChain();
 	void									createImageViews();
+	VkImageView								createImageView(
+		VkImage image,
+		VkFormat format
+	) const;
 	void									createRenderPass();
 	void									createGraphicsPipeline();
 	static std::vector<char>				readFile(
@@ -306,6 +312,8 @@ private:
 		uint32_t width,
 		uint32_t height
 	) const;
+	void									createTextureImageView();
+	void									createTextureSampler();
 
 }; // class App
 
