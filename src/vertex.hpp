@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/26 15:25:04 by etran             #+#    #+#             */
-/*   Updated: 2023/04/30 21:58:18 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/02 22:23:14 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ struct Vertex {
 
 	glm::vec2		pos;
 	glm::vec3		color;
+	glm::vec2		tex_coord;
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
@@ -51,8 +52,8 @@ struct Vertex {
 	/**
 	 * Expliciting to vulkan the vertex struct format.
 	*/
-	static std::array<VkVertexInputAttributeDescription, 2>	getAttributeDescriptions() {
-		std::array<VkVertexInputAttributeDescription, 2>	attribute_descriptions{};
+	static std::array<VkVertexInputAttributeDescription, 3>	getAttributeDescriptions() {
+		std::array<VkVertexInputAttributeDescription, 3>	attribute_descriptions{};
 
 		// `pos` attribute
 		attribute_descriptions[0].binding = 0;
@@ -65,6 +66,12 @@ struct Vertex {
 		attribute_descriptions[1].location = 1;
 		attribute_descriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
 		attribute_descriptions[1].offset = offsetof(Vertex, color);
+
+		// `tex_coord` attribute
+		attribute_descriptions[2].binding = 0;
+		attribute_descriptions[2].location = 2;
+		attribute_descriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+		attribute_descriptions[2].offset = offsetof(Vertex, tex_coord);
 
 		return attribute_descriptions;
 	}
