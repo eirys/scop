@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/02 23:57:07 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/03 11:33:03 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -246,7 +246,8 @@ private:
 	void									createImageViews();
 	VkImageView								createImageView(
 		VkImage image,
-		VkFormat format
+		VkFormat format,
+		VkImageAspectFlags aspect_flags
 	) const;
 	void									createRenderPass();
 	void									createGraphicsPipeline();
@@ -327,6 +328,16 @@ private:
 	) const;
 	void									createTextureImageView();
 	void									createTextureSampler();
+	void									createDepthResources();
+	VkFormat								findSupportedFormat(
+		const std::vector<VkFormat>& candidates,
+		VkImageTiling tiling,
+		VkFormatFeatureFlags features
+	) const;
+	VkFormat								findDepthFormat() const;
+	bool									hasStencilCompotent(
+		VkFormat format
+	) const;
 
 }; // class App
 
