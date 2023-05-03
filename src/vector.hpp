@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 13:54:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/03 16:05:53 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/03 16:16:36 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,7 +153,6 @@ struct Vect2 {
 	Vect2	operator*(float rhs) const {
 		return Vect2{x * rhs, y * rhs};
 	}
-
 };
 
 } // namespace scop

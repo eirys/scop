@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/03 16:01:54 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/03 16:16:00 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,8 @@
 # ifndef GLFW_INCLUDE_VULKAN
 #  define GLFW_INCLUDE_VULKAN
 # endif
-# ifndef GLM_FORCE_RADIANS
-#  define GLM_FORCE_RADIANS
-# endif
-# ifndef GLM_FORCE_DEPTH_ZERO_TO_ONE
-#  define GLM_FORCE_DEPTH_ZERO_TO_ONE
-# endif
+
+// Window handler
 # include <GLFW/glfw3.h>
 
 // Std

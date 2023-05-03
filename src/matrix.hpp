@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 14:11:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/03 16:02:25 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/03 16:14:17 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,6 +166,9 @@ inline Mat4	lookAt(const Vect3& eye, const Vect3& center, const Vect3& up) {
 	};
 }
 
+/**
+ * @brief Produces orthographic projection matrix
+*/
 inline Mat4	perspective(float fov, float aspect_ratio, float near, float far) {
 	float	tanHalfFov = std::tan(fov / 2);
 	float	range = far - near;
