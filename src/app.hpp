@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/03 11:33:03 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/03 16:01:54 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,15 +20,10 @@
 # ifndef GLM_FORCE_RADIANS
 #  define GLM_FORCE_RADIANS
 # endif
-// # ifndef GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
-// #  define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
-// # endif
 # ifndef GLM_FORCE_DEPTH_ZERO_TO_ONE
 #  define GLM_FORCE_DEPTH_ZERO_TO_ONE
 # endif
 # include <GLFW/glfw3.h>
-# include <glm/glm.hpp>
-# include <glm/gtc/matrix_transform.hpp>
 
 // Std
 # include <iostream>

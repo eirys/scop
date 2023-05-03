@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 13:54:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/03 14:17:17 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/03 16:05:53 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 // Std
 # include <cmath>
+# include <stdexcept>
 
 namespace scop {
 
@@ -33,13 +34,24 @@ struct Vect3 {
 
 	/* CONSTRUCTOR ============================================================= */
 
-	Vect3() : x(0), y(0), z(0) {}
-
-	Vect3(float x, float y, float z) : x(x), y(y), z(z) {}
+	Vect3(float new_x, float new_y, float new_z): x(new_x), y(new_y), z(new_z) {}
 
 	/* ACCESSORS =============================================================== */
 
-	float& operator[](size_t index) {
+	const float&	operator[](size_t index) const {
+		switch (index) {
+			case 0:
+				return x;
+			case 1:
+				return y;
+			case 2:
+				return z;
+			default:
+				throw std::out_of_range("Matrix index out of range");
+		}
+	}
+
+	float&	operator[](size_t index) {
 		switch (index) {
 			case 0:
 				return x;
@@ -55,40 +67,67 @@ struct Vect3 {
 	/* OPERATORS =============================================================== */
 
 	Vect3	operator+(const Vect3& rhs) const {
-		return Vect3{x + rhs.x, y + rhs.y, z + rhs.z};
+		return Vect3{ x + rhs.x, y + rhs.y, z + rhs.z };
 	}
 
 	Vect3	operator-(const Vect3& rhs) const {
-		return Vect3{x - rhs.x, y - rhs.y, z - rhs.z};
+		return Vect3{ x - rhs.x, y - rhs.y, z - rhs.z };
 	}
 
 	Vect3	operator*(float rhs) const {
-		return Vect3{x * rhs, y * rhs, z * rhs};
+		return Vect3{ x * rhs, y * rhs, z * rhs };
 	}
 
+	/**
+	 * @brief Returns the dot product of the vector with another vector
+	 */
 	float	dot(const Vect3& rhs) const {
 		return x * rhs.x + y * rhs.y + z * rhs.z;
 	}
 
+	/**
+	 * @brief Returns the norm of the vector
+	*/
 	float	norm() const {
-		return std::sqrt(x * x + y * y + z * z);
+		return std::sqrt(dot(*this));
+	}
+
+	/**
+	 * @brief Returns a normalized vector
+	*/
+	Vect3	normalize() const {
+		float	n = norm();
+		return Vect3{ x / n, y / n, z / n };
+	}
+
+	/**
+	 * @brief Returns the cross product of the vector with another vector
+	*/
+	Vect3	cross(const Vect3& rhs) const {
+		return Vect3{
+			y * rhs.z - z * rhs.y,
+			z * rhs.x - x * rhs.z,
+			x * rhs.y - y * rhs.x
+		};
 	}
 };
 
-
-struct Vect4 {
+struct Vect2 {
 	/* ========================================================================= */
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
 
 	float	x;
 	float	y;
-	float	z;
-	float	w;
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
 	/* ========================================================================= */
+
+	Vect2(): x(0), y(0) {}
+	Vect2(float x, float y): x(x), y(y) {}
+
+	/* CONSTRUCTOR ============================================================= */
 
 	float&	operator[](size_t index) {
 		switch (index) {
@@ -96,10 +135,6 @@ struct Vect4 {
 				return x;
 			case 1:
 				return y;
-			case 2:
-				return z;
-			case 3:
-				return w;
 			default:
 				throw std::out_of_range("Matrix index out of range");
 		}
@@ -107,16 +142,16 @@ struct Vect4 {
 
 	/* OPERATORS =============================================================== */
 
-	Vect4	operator+(const Vect4& rhs) const {
-		return Vect4{x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w};
+	Vect2	operator+(const Vect2& rhs) const {
+		return Vect2{x + rhs.x, y + rhs.y};
 	}
 
-	Vect4	operator-(const Vect4& rhs) const {
-		return Vect4{x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w};
+	Vect2	operator-(const Vect2& rhs) const {
+		return Vect2{x - rhs.x, y - rhs.y};
 	}
 
-	Vect4	operator*(float rhs) const {
-		return Vect4{x * rhs, y * rhs, z * rhs, w * rhs};
+	Vect2	operator*(float rhs) const {
+		return Vect2{x * rhs, y * rhs};
 	}
 
 };
