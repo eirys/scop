@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/03 13:51:11 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/03 14:17:46 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -1490,13 +1490,13 @@ void	App::updateUniformBuffer(uint32_t current_image) {
 	ubo.model = glm::rotate(
 		glm::mat4(1.0f),					// identity matrix
 		time * glm::radians(90.0f),			// rotation angle
-		glm::vec3(0.0f, 0.0f, 1.0f)			// axis (z axis)
+		scop::Vect3(0.0f, 0.0f, 1.0f)		// axis (z axis)
 	);
 	// Define view transformation: above, 45deg angle
 	ubo.view = glm::lookAt(
-		glm::vec3(2.0f, 2.0f, 2.0f),		// eye position
-		glm::vec3(0.0f, 0.0f, 0.0f),		// center position
-		glm::vec3(0.0f, 0.0f, 1.0f)			// up axis (z axis)
+		scop::Vect3(2.0f, 2.0f, 2.0f),		// eye position
+		scop::Vect3(0.0f, 0.0f, 0.0f),		// center position
+		scop::Vect3(0.0f, 0.0f, 1.0f)		// up axis (z axis)
 	);
 	// Define persp. projection (clip space?)
 	ubo.proj = glm::perspective(
