@@ -6,7 +6,7 @@
 #    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/04/30 22:15:50 by eli              ###   ########.fr        #
+#    Updated: 2023/05/03 18:07:48 by eli              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,10 +21,15 @@ NAME		:=	scop
 SRC_DIR		:=	src
 OBJ_DIR		:=	obj
 SHD_DIR		:=	shaders
-STB_PATH	:=	stb
+
+# external libraries
+STB_PATH	:=	lib/stb
+TOL_PATH	:=	lib/tol
 
 # cpp files
 INC_FILES	:=	utils.hpp \
+				matrix.hpp \
+				vector.hpp \
 				vertex.hpp \
 				uniform_buffer_object.hpp \
 				app.hpp
@@ -45,7 +50,7 @@ SHD_BIN		:=	$(addsuffix .spv,$(SHD))
 # compiler
 CXX			:=	c++
 EXTRA		:=	-Wall -Werror -Wextra
-CFLAGS		:=	-std=c++17 -I./$(STB_PATH) -O2 -DNDEBUG -D__VERBOSE
+CFLAGS		:=	-std=c++17 -I./$(STB_PATH) -I./${TOL_PATH} -O3 -DNDEBUG -D__VERBOSE
 LDFLAGS		:=	-lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
 ifdef school
 	GLSLC	:=	~/my_sgoinfre/glslc

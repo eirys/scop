@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/03 16:01:34 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/03 18:23:06 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,11 @@
 #ifndef STB_IMAGE_IMPLEMENTATION
 # define STB_IMAGE_IMPLEMENTATION
 # include "stb_image.h"
+#endif
+
+#ifndef TINYOBJLOADER_IMPLEMENTATION
+# define TINYOBJLOADER_IMPLEMENTATION
+# include "tiny_obj_loader.h"
 #endif
 
 /* ========================================================================== */
@@ -77,6 +82,7 @@ void	App::initVulkan() {
 	createTextureImage();
 	createTextureImageView();
 	createTextureSampler();
+	loadModel();
 	createVertexBuffer();
 	createIndexBuffer();
 	createUniformBuffers();
@@ -1056,7 +1062,7 @@ void	App::recordCommandBuffer(VkCommandBuffer command_buffer, uint32_t image_ind
 	VkBuffer		vertex_buffers[] = { vertex_buffer };
 	VkDeviceSize	offsets[] = { 0 };
 	vkCmdBindVertexBuffers(command_buffer, 0, 1, vertex_buffers, offsets);
-	vkCmdBindIndexBuffer(command_buffer, index_buffer, 0, VK_INDEX_TYPE_UINT16);
+	vkCmdBindIndexBuffer(command_buffer, index_buffer, 0, VK_INDEX_TYPE_UINT32);
 
 	// Bind descriptor sets
 	vkCmdBindDescriptorSets(
@@ -1601,7 +1607,7 @@ void	App::createTextureImage() {
 
 	// Load image
 	stbi_uc*	pixels = stbi_load(
-		SCOP_TEXTURE_FILE,
+		SCOP_TEXTURE_FILE_VIKING_PNG,
 		&tex_width,
 		&tex_height,
 		&tex_channels,
@@ -1964,6 +1970,45 @@ bool	App::hasStencilCompotent(VkFormat format) const {
 		format == VK_FORMAT_D32_SFLOAT_S8_UINT ||
 		format == VK_FORMAT_D24_UNORM_S8_UINT
 	);
+}
+
+void	App::loadModel() {
+	tinyobj::attrib_t					attributes;
+	std::vector<tinyobj::shape_t>		shapes;
+	std::vector<tinyobj::material_t>	materials;
+	std::string							warn, err;
+
+	bool	ret = tinyobj::LoadObj(
+		&attributes,
+		&shapes,
+		&materials,
+		&warn,
+		&err,
+		SCOP_MODEL_FILE_VIKING_OBJ
+	);
+	if (!ret) {
+		throw std::runtime_error(warn + err);
+	}
+
+	for (const auto& shape: shapes) {
+		for (const auto& index: shape.mesh.indices) {
+			Vertex	vertex{};
+
+			vertex.pos = {
+				attributes.vertices[3 * index.vertex_index + 0],
+				attributes.vertices[3 * index.vertex_index + 1],
+				attributes.vertices[3 * index.vertex_index + 2]
+			};
+			vertex.tex_coord = {
+				attributes.texcoords[2 * index.texcoord_index + 0],
+				1.0f - attributes.texcoords[2 * index.texcoord_index + 1]
+			};
+			vertex.color = { 1.0f, 1.0f, 1.0f };
+
+			vertices.push_back(vertex);
+			indices.push_back(indices.size());
+		}
+	}
 }
 
 /* ========================================================================== */

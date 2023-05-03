@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/03 17:20:48 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/03 17:55:00 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,10 @@
 
 # define SCOP_VERTEX_SHADER_BINARY		"shaders/vert.spv"
 # define SCOP_FRAGMENT_SHADER_BINARY	"shaders/frag.spv"
-# define SCOP_TEXTURE_FILE				"textures/hammy.jpg"
+# define SCOP_TEXTURE_FILE_HAMSTER_JPG	"textures/hammy.jpg"
+
+# define SCOP_MODEL_FILE_VIKING_OBJ		"models/viking_room.obj"
+# define SCOP_TEXTURE_FILE_VIKING_PNG	"textures/viking_room.png"
 
 /* ========================================================================== */
 /*                                    UTILS                                   */
@@ -104,22 +107,6 @@ private:
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
 	const int						max_frames_in_flight = 2;
-	const std::vector<Vertex>		vertices = {
-		// pos{},			 	color{}			texcoord{}
-		{{ -0.5f, -0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f }},
-		{{  0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f }},
-		{{  0.5f,  0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f }},
-		{{ -0.5f,  0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f }},
-
-		{{ -0.5f, -0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f }},
-		{{  0.5f, -0.5f, -0.5f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f }},
-		{{  0.5f,  0.5f, -0.5f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f }},
-		{{ -0.5f,  0.5f, -0.5f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f }}
-	};
-	const std::vector<uint16_t>		indices = {
-		0, 1, 2, 2, 3, 0,
-		4, 5, 6, 6, 7, 4
-	};
 
 	#ifndef NDEBUG
 	const bool						enable_validation_layers = false;
@@ -160,6 +147,9 @@ private:
 	std::vector<VkSemaphore>		image_available_semaphores;
 	std::vector<VkSemaphore>		render_finished_semaphores;
 	std::vector<VkFence>			in_flight_fences;
+
+	std::vector<Vertex>				vertices;
+	std::vector<uint32_t>			indices;
 
 	VkBuffer						vertex_buffer;
 	VkDeviceMemory					vertex_buffer_memory;
@@ -329,6 +319,7 @@ private:
 	bool									hasStencilCompotent(
 		VkFormat format
 	) const;
+	void									loadModel();
 
 }; // class App
 
