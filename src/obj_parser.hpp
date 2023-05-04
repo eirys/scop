@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:02:06 by etran             #+#    #+#             */
-/*   Updated: 2023/05/04 15:20:33 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/04 15:27:57 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,7 @@
 
 class ObjParser {
 	public:
-		void				parse(const std::string& file);
-		
+		void				parseFile(const std::string& file);
 
 	private:
 		std::string			current_token;
