@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 13:54:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/03 18:12:14 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/04 12:38:27 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,6 +111,12 @@ struct Vect3 {
 			x * rhs.y - y * rhs.x
 		};
 	}
+
+	/* BOOLEAN COMPARISON ====================================================== */
+
+	bool	operator==(const Vect3& rhs) const {
+		return x == rhs.x && y == rhs.y && z == rhs.z;
+	}
 };
 
 struct Vect2 {
@@ -154,8 +160,40 @@ struct Vect2 {
 	Vect2	operator*(float rhs) const {
 		return Vect2{x * rhs, y * rhs};
 	}
+
+	/* BOOLEAN COMPARISON ====================================================== */
+
+	bool	operator==(const Vect2& rhs) const {
+		return x == rhs.x && y == rhs.y;
+	}
 };
 
 } // namespace scop
+
+namespace std {
+
+	template<>
+	struct hash<scop::Vect3> {
+		size_t	operator()(const scop::Vect3& vect) const {
+			return (
+				hash<float>()(vect.x) ^
+				hash<float>()(vect.y) ^
+				hash<float>()(vect.z)
+			);
+		}
+	};
+
+
+	template<>
+	struct hash<scop::Vect2> {
+		size_t	operator()(const scop::Vect2& vect) const {
+			return (
+				hash<float>()(vect.x) ^
+				hash<float>()(vect.y)
+			);
+		}
+	};
+
+} // namespace std
 
 #endif

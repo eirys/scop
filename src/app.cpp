@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/03 18:23:06 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/04 13:00:21 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -1990,6 +1990,8 @@ void	App::loadModel() {
 		throw std::runtime_error(warn + err);
 	}
 
+	std::unordered_map<Vertex, uint32_t>	unique_vertices{};
+
 	for (const auto& shape: shapes) {
 		for (const auto& index: shape.mesh.indices) {
 			Vertex	vertex{};
@@ -2005,8 +2007,11 @@ void	App::loadModel() {
 			};
 			vertex.color = { 1.0f, 1.0f, 1.0f };
 
-			vertices.push_back(vertex);
-			indices.push_back(indices.size());
+			if (unique_vertices.count(vertex) == 0) {
+				unique_vertices[vertex] = static_cast<uint32_t>(vertices.size());
+				vertices.push_back(vertex);
+			}
+			indices.push_back(unique_vertices[vertex]);
 		}
 	}
 }

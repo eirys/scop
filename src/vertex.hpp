@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/26 15:25:04 by etran             #+#    #+#             */
-/*   Updated: 2023/05/03 18:11:15 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/04 12:31:43 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,29 @@ struct Vertex {
 		return attribute_descriptions;
 	}
 
+	bool	operator==(const Vertex& rhs) const {
+		return (
+			pos == rhs.pos &&
+			color == rhs.color &&
+			tex_coord == rhs.tex_coord
+		);
+	}
+
 }; // struct Vertex
+
+namespace std {
+
+	template<>
+	struct hash<Vertex> {
+		size_t	operator()(const Vertex& vertex) const {
+			return (
+				(hash<scop::Vect3>()(vertex.pos) ^
+				(hash<scop::Vect3>()(vertex.color) << 1)) >> 1 ^
+				(hash<scop::Vect2>()(vertex.tex_coord) << 1)
+			);
+		}
+	};
+
+} // namespace std
 
 #endif
