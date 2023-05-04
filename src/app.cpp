@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/04 13:00:21 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/04 13:15:39 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -1484,20 +1484,23 @@ void	App::createUniformBuffers() {
 */
 void	App::updateUniformBuffer(uint32_t current_image) {
 	// Ensure 90deg rotation/sec
-	static auto	start_time = std::chrono::high_resolution_clock::now();
+	// static auto	start_time = std::chrono::high_resolution_clock::now();
 
-	auto	current_time = std::chrono::high_resolution_clock::now();
-	float	time = std::chrono::duration<float, std::chrono::seconds::period>(
-					current_time - start_time
-				).count();
+	// auto	current_time = std::chrono::high_resolution_clock::now();
+	// float	time = std::chrono::duration<float, std::chrono::seconds::period>(
+	// 				current_time - start_time
+	// 			).count();
 
 	UniformBufferObject	ubo{};
 
 	// Define model: continuous rotation around z axis
-	ubo.model = scop::rotate(
-		time * scop::utils::radians(90.0f),	// rotation angle
-		scop::Vect3(0.0f, 0.0f, 1.0f)		// axis (z axis)
-	);
+	// ubo.model = scop::rotate(
+	// 	time * scop::utils::radians(90.0f),	// rotation angle
+	// 	scop::Vect3(0.0f, 0.0f, 1.0f)		// axis (z axis)
+	// );
+
+	// Model: static
+	ubo.model = scop::Mat4(1.0f);
 	// Define view transformation: above, 45deg angle
 	ubo.view = scop::lookAt(
 		scop::Vect3(2.0f, 2.0f, 2.0f),		// eye position

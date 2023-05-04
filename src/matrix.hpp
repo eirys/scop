@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 14:11:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/03 16:14:17 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/04 13:12:53 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 // Std
 # include <stdexcept>
+# include <cstring>
 
 # include "vector.hpp"
 
@@ -35,14 +36,15 @@ struct Mat4 {
 	/* CONSTRUCTOR ============================================================= */
 
 	Mat4() {
-		for (size_t i = 0; i < 16; i++) {
-			mat[i] = 0;
-		}
+		bzero(mat, 16 * sizeof(float));
 	}
 
 	Mat4(float x) {
-		for (size_t i = 0; i < 16; i++) {
-			mat[i] = x;
+		for (size_t i = 0; i < 16; ++i) {
+			if (i % 5 == 0)
+				mat[i] = x;
+			else
+				mat[i] = 0;
 		}
 	}
 
@@ -56,7 +58,7 @@ struct Mat4 {
 	}
 
 	Mat4&	operator=(const Mat4& rhs) {
-		for (size_t i = 0; i < 16; i++) {
+		for (size_t i = 0; i < 16; ++i) {
 			mat[i] = rhs.mat[i];
 		}
 		return *this;
