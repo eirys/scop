@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   obj_parser.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
+/*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:02:06 by etran             #+#    #+#             */
-/*   Updated: 2023/05/04 15:27:57 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/04 21:31:09 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,34 @@
 # define OBJ_PARSER_HPP
 
 // Std
+# include <fstream>
 # include <string>
 
-class ObjParser {
-	public:
-		void				parseFile(const std::string& file);
+# include "model.hpp"
 
-	private:
-		std::string			current_token;
+class ObjParser {
+
+public:
+	/* ======================================================================== */
+	/*                               MAIN FUNCTION                              */
+	/* ======================================================================== */
+
+	void				parseFile(const std::string& file_name);
+
+private:
+	/* ======================================================================== */
+	/*                               CLASS MEMBERS                              */
+	/* ======================================================================== */
+
+	std::ifstream		file;
+	std::string			current_line;
+	std::string			current_token;
+
+	/* ======================================================================== */
+
+	void				processLine();
+	void				getNextToken();
+
 };
 
 #endif

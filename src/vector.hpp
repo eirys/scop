@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 13:54:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/04 12:38:27 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/04 21:33:30 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,27 +172,26 @@ struct Vect2 {
 
 namespace std {
 
-	template<>
-	struct hash<scop::Vect3> {
-		size_t	operator()(const scop::Vect3& vect) const {
-			return (
-				hash<float>()(vect.x) ^
-				hash<float>()(vect.y) ^
-				hash<float>()(vect.z)
-			);
-		}
-	};
+template<>
+struct hash<scop::Vect3> {
+	size_t	operator()(const scop::Vect3& vect) const {
+		return (
+			hash<float>()(vect.x) ^
+			hash<float>()(vect.y) ^
+			hash<float>()(vect.z)
+		);
+	}
+};
 
-
-	template<>
-	struct hash<scop::Vect2> {
-		size_t	operator()(const scop::Vect2& vect) const {
-			return (
-				hash<float>()(vect.x) ^
-				hash<float>()(vect.y)
-			);
-		}
-	};
+template<>
+struct hash<scop::Vect2> {
+	size_t	operator()(const scop::Vect2& vect) const {
+		return (
+			hash<float>()(vect.x) ^
+			hash<float>()(vect.y)
+		);
+	}
+};
 
 } // namespace std
 
