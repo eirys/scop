@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
+#    By: etran <etran@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/05/03 18:07:48 by eli              ###   ########.fr        #
+#    Updated: 2023/05/04 15:09:07 by etran            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,9 +32,11 @@ INC_FILES	:=	utils.hpp \
 				vector.hpp \
 				vertex.hpp \
 				uniform_buffer_object.hpp \
+				obj_parser.hpp
 				app.hpp
 
 SRC_FILES	:=	main.cpp \
+				obj_parser.cpp \
 				app.cpp
 
 INC			:=	$(addprefix	$(SRC_DIR)/,$(INC_FILES))

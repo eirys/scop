@@ -1,0 +1,748 @@
+<html>
+
+<head>
+<meta http-equiv=Content-Type content="text/html" charset="windows-1252">
+<meta name=Generator content="Microsoft Word 12 (filtered)">
+<style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:Wingdings;
+	panose-1:5 0 0 0 0 0 0 0 0 0;}
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:10.0pt;
+	margin-left:0in;
+	line-height:115%;
+	font-size:11.0pt;
+	font-family:"Calibri","sans-serif";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;}
+pre
+	{mso-style-link:"HTML Preformatted Char";
+	margin:0in;
+	margin-bottom:.0001pt;
+	font-size:10.0pt;
+	font-family:"Courier New";}
+p.MsoListParagraph, li.MsoListParagraph, div.MsoListParagraph
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:10.0pt;
+	margin-left:.5in;
+	line-height:115%;
+	font-size:11.0pt;
+	font-family:"Calibri","sans-serif";}
+p.MsoListParagraphCxSpFirst, li.MsoListParagraphCxSpFirst, div.MsoListParagraphCxSpFirst
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.5in;
+	margin-bottom:.0001pt;
+	line-height:115%;
+	font-size:11.0pt;
+	font-family:"Calibri","sans-serif";}
+p.MsoListParagraphCxSpMiddle, li.MsoListParagraphCxSpMiddle, div.MsoListParagraphCxSpMiddle
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.5in;
+	margin-bottom:.0001pt;
+	line-height:115%;
+	font-size:11.0pt;
+	font-family:"Calibri","sans-serif";}
+p.MsoListParagraphCxSpLast, li.MsoListParagraphCxSpLast, div.MsoListParagraphCxSpLast
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:10.0pt;
+	margin-left:.5in;
+	line-height:115%;
+	font-size:11.0pt;
+	font-family:"Calibri","sans-serif";}
+span.HTMLPreformattedChar
+	{mso-style-name:"HTML Preformatted Char";
+	mso-style-link:"HTML Preformatted";
+	font-family:"Courier New";}
+.MsoPapDefault
+	{margin-bottom:10.0pt;
+	line-height:115%;}
+@page WordSection1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.0in 1.0in 1.0in;}
+div.WordSection1
+	{page:WordSection1;}
+ /* List Definitions */
+ ol
+	{margin-bottom:0in;}
+ul
+	{margin-bottom:0in;}
+-->
+</style>
+
+</head>
+
+<body lang=EN-US link=blue vlink=purple>
+
+<div class=WordSection1>
+
+<p class=MsoNormal><span style='font-size:20.0pt;line-height:115%'>Guidance to
+write a parser for .Obj and mtl file</span></p>
+
+<p class=MsoNormal><span style='font-size:12.0pt;line-height:115%'>.Obj file is
+an <b>ascii</b> file that stores 3D geometric models. It contains information
+about vertex, normals, and textures.</span></p>
+
+<p class=MsoNormal>.mtl file is an ascii file, that saves object materials used
+for obj files. </p>
+
+<p class=MsoNormal>Wiki link: <a
+href="http://en.wikipedia.org/wiki/Wavefront_.obj_file">http://en.wikipedia.org/wiki/Wavefront_.obj_file</a></p>
+
+<p class=MsoNormal><span style='font-size:12.0pt;line-height:115%'>In this lab
+you will need to write a parser for .obj and .mtl file to extract the geometric
+objects and also their materials. </span></p>
+
+<p class=MsoNormal><span style='font-size:12.0pt;line-height:115%'>The guide includes
+three parts:</span></p>
+
+<p class=MsoListParagraphCxSpFirst style='text-indent:-.25in'><span
+style='font-size:12.0pt;line-height:115%;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style='font-size:12.0pt;line-height:115%'>File format for
+.Obj file</span></p>
+
+<p class=MsoListParagraphCxSpMiddle style='text-indent:-.25in'><span
+style='font-size:12.0pt;line-height:115%;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style='font-size:12.0pt;line-height:115%'>File format for
+.mtl file</span></p>
+
+<p class=MsoListParagraphCxSpMiddle style='text-indent:-.25in'><span
+style='font-size:12.0pt;line-height:115%;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style='font-size:12.0pt;line-height:115%'>Guidance on
+writing a parser for the files</span></p>
+
+<p class=MsoListParagraphCxSpLast style='margin-bottom:0in;margin-bottom:.0001pt;
+text-indent:-.25in;line-height:normal;text-autospace:none'><span
+style='font-size:20.0pt'>1.<span style='font:7.0pt "Times New Roman"'>&nbsp; </span></span><span
+style='font-size:20.0pt'>Obj File Format</span></p>
+
+<p class=MsoNormal>Each line of .Obj file starts from a special character or
+word</p>
+
+<table class=MsoTableGrid border=1 cellspacing=0 cellpadding=0
+ style='border-collapse:collapse;border:none'>
+ <tr>
+  <td width=175 valign=top style='width:131.4pt;border:solid windowtext 1.0pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>Starting character / word</p>
+  </td>
+  <td width=463 valign=top style='width:347.4pt;border:solid windowtext 1.0pt;
+  border-left:none;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>Meaning</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=175 valign=top style='width:131.4pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>#</p>
+  </td>
+  <td width=463 valign=top style='width:347.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>Comment line</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=175 valign=top style='width:131.4pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>v</p>
+  </td>
+  <td width=463 valign=top style='width:347.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>Defines  vertex points in 3D space, with coordinates of( x, y,z,w), w
+  is optional</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=175 valign=top style='width:131.4pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>vt</p>
+  </td>
+  <td width=463 valign=top style='width:347.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>Define   texture coordinates (u,v,w) where w is optional</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=175 valign=top style='width:131.4pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>vn</p>
+  </td>
+  <td width=463 valign=top style='width:347.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>Defines normals (x,y,z)</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=175 valign=top style='width:131.4pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>f</p>
+  </td>
+  <td width=463 valign=top style='width:347.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>Defines a face, composed of index of  vertex/texture/normal. Note
+  that texture and normal is optional. </p>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>If both texture and normal are absent</p>
+  <pre>f 1 2 3</pre>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>If texture exists, but normal absent</p>
+  <pre>f 1/3  2/2  3/4</pre>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>If texture is absent, but normal exists</p>
+  <pre>f 1//3  2//2  3//4</pre><pre>if all them exist</pre><pre>f 1/2/3  2/3/2  3/2/4</pre><pre>each face can contains more than 3 elements</pre></td>
+ </tr>
+ <tr>
+  <td width=175 valign=top style='width:131.4pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 5.4pt 0in 5.4pt'><pre>mtllib </pre></td>
+  <td width=463 valign=top style='width:347.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>Materials that describe the visual aspects of the polygons are stored
+  in external .mtl files. The .mtl file may contain one or more named material
+  definitions.</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=175 valign=top style='width:131.4pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>o</p>
+  </td>
+  <td width=463 valign=top style='width:347.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>Object name</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=175 valign=top style='width:131.4pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>g</p>
+  </td>
+  <td width=463 valign=top style='width:347.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>group name</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=175 valign=top style='width:131.4pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>usemtl</p>
+  </td>
+  <td width=463 valign=top style='width:347.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>Defines
+  a material to use, this material will continue</span></p>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'><span style='font-size:10.0pt;font-family:"Courier New"'>to be used
+  until another usemtl line (corresponding material is saved in .mtl file)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=175 valign=top style='width:131.4pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>s</p>
+  </td>
+  <td width=463 valign=top style='width:347.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>Smooth shading</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=175 valign=top style='width:131.4pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'><span style='font-size:10.0pt;font-family:"Courier New"'>mtllib </span></p>
+  </td>
+  <td width=463 valign=top style='width:347.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'><span style='font-size:10.0pt;font-family:"Courier New"'>Point to an
+  external .mtl file that saves the object materials</span></p>
+  </td>
+ </tr>
+</table>
+
+<p class=MsoNormal>Note: all index starts from 1</p>
+
+<p class=MsoNormal>An example Obj file:</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>mtllib
+al.mtl # al.mtl is the file that defines the materials used</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>…</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>#
+vertex coordinates</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>v 
+8 0 11.0   </span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>v 
+16 0 6</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>v 
+3 0 3</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>….</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>#vertex
+textures</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal'><span style='font-size:10.0pt;font-family:"Courier New"'>vt 0.500
+-1.352 0.234 #vertex texture</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>…</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>#vertex
+normal</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>vn
+-0.717798 -0.043116 0.694915 </span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>vn
+-0.322618 -0.014997 0.946410</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>vn
+-0.218708 -0.027535 0.975402</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>…</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>#material
+for the following face, defined in .mtl file (al.mtl in this example)</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>usemtl
+dolph01</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>…</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>#faces</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>f
+1795//1880 1794//1879 1793//1878 </span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>f
+1796//1881 1794//1879 1795//1880</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>f
+1797//1882 1796//1881 1795//1880</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>...</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>usemtl
+green_material</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>…</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>f
+1/2/3 2/1/6 4/6/7</span></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoListParagraph style='margin-bottom:0in;margin-bottom:.0001pt;
+text-indent:-.25in;line-height:normal;text-autospace:none'><span
+style='font-size:20.0pt'>2.<span style='font:7.0pt "Times New Roman"'>&nbsp; </span></span><span
+style='font-size:20.0pt'> mtl File Format</span></p>
+
+<p class=MsoNormal>Each line of .mtl file starts from a special character or
+word</p>
+
+<table class=MsoTableGrid border=1 cellspacing=0 cellpadding=0
+ style='border-collapse:collapse;border:none'>
+ <tr>
+  <td width=221 valign=top style='width:166.1pt;border:solid windowtext 1.0pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>Starting character / word</p>
+  </td>
+  <td width=417 valign=top style='width:312.7pt;border:solid windowtext 1.0pt;
+  border-left:none;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'>Meaning</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=221 valign=top style='width:166.1pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>newmtl</span></p>
+  </td>
+  <td width=417 valign=top style='width:312.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal;text-autospace:none'>Start a definition of a new material</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=221 valign=top style='width:166.1pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>Ka</span></p>
+  </td>
+  <td width=417 valign=top style='width:312.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal;text-autospace:none'><span style='font-size:12.0pt;font-family:"Times New Roman","serif"'>ambient
+  color (r,g,b)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=221 valign=top style='width:166.1pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>Kd</span></p>
+  </td>
+  <td width=417 valign=top style='width:312.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal;text-autospace:none'><span style='font-size:12.0pt;font-family:"Times New Roman","serif"'>diffuse
+  color (r,g,b)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=221 valign=top style='width:166.1pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>Ks</span></p>
+  </td>
+  <td width=417 valign=top style='width:312.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal;text-autospace:none'><span style='font-size:12.0pt;font-family:"Times New Roman","serif"'>specular
+  color (r,g,b)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=221 valign=top style='width:166.1pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>illum</span></p>
+  </td>
+  <td width=417 valign=top style='width:312.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal;text-autospace:none'><span style='font-size:12.0pt;font-family:"Times New Roman","serif"'>Define
+  the illumination model: <b>illum</b> = 1 a flat material with no specular
+  highlights, <b>illum</b> = 2 denotes the presence of specular highlights</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=221 valign=top style='width:166.1pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>Ns</span></p>
+  </td>
+  <td width=417 valign=top style='width:312.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal;text-autospace:none'><span style='font-size:12.0pt;font-family:"Times New Roman","serif"'>shininess
+  of the material</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=221 valign=top style='width:166.1pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal;text-autospace:none'><span style='font-size:10.0pt;font-family:"Courier New"'>d
+  or Tr</span></p>
+  </td>
+  <td width=417 valign=top style='width:312.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal;text-autospace:none'><span style='font-size:12.0pt;font-family:"Times New Roman","serif"'>the
+  transparency of the material</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=221 valign=top style='width:166.1pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal;text-autospace:none'><span style='font-size:12.0pt;font-family:"Times New Roman","serif"'>map_Ka</span></p>
+  </td>
+  <td width=417 valign=top style='width:312.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal;text-autospace:none'><span style='font-size:12.0pt;font-family:"Times New Roman","serif"'>names
+  a file containing a texture map, which should just be an ASCII dump of RGB
+  values</span></p>
+  </td>
+ </tr>
+</table>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:12.0pt'>&nbsp;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:12.0pt'>An example .mtl file</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:12.0pt;font-family:"Courier New"'>…</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:12.0pt;font-family:"Courier New"'>newmtl
+dolph01</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:12.0pt;font-family:"Courier New"'>Ka
+0.4000 0.4000 0.4000</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:12.0pt;font-family:"Courier New"'>Kd
+0.0000 0.2000 1.0000</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:12.0pt;font-family:"Courier New"'>Ks
+0.5000 0.5000 0.5000</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:12.0pt;font-family:"Courier New"'>illum
+2</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:12.0pt;font-family:"Courier New"'>Ns
+60.0000</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:12.0pt'>…</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;text-autospace:none'><span style='font-size:12.0pt'>&nbsp;</span></p>
+
+<p class=MsoListParagraphCxSpFirst style='margin-bottom:0in;margin-bottom:.0001pt;
+text-indent:-.25in;line-height:normal;text-autospace:none'><span
+style='font-size:20.0pt'>3.<span style='font:7.0pt "Times New Roman"'>&nbsp; </span></span><span
+style='font-size:20.0pt'>Writing a parser</span></p>
+
+<p class=MsoListParagraphCxSpMiddle style='margin-bottom:0in;margin-bottom:
+.0001pt;line-height:normal;text-autospace:none'><span style='font-size:12.0pt'>The
+following is a sequence of possible steps you can follow to create the parser,
+it can give you a overview of the structure of the program.</span></p>
+
+<p class=MsoListParagraphCxSpMiddle style='margin-bottom:0in;margin-bottom:
+.0001pt;line-height:normal;text-autospace:none'><span style='font-size:12.0pt'>3.1
+Define the storage classes</span></p>
+
+<p class=MsoListParagraphCxSpMiddle style='margin-top:0in;margin-right:0in;
+margin-bottom:0in;margin-left:.75in;margin-bottom:.0001pt;text-indent:-.25in;
+line-height:normal;text-autospace:none'><span style='font-size:12.0pt'>a)<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span
+style='font-size:12.0pt'>A 3D <b>vector</b> class that used to save the
+components of vertex coordinates, vertex normals and texture coordinates</span></p>
+
+<p class=MsoListParagraphCxSpMiddle style='margin-top:0in;margin-right:0in;
+margin-bottom:0in;margin-left:.75in;margin-bottom:.0001pt;text-indent:-.25in;
+line-height:normal;text-autospace:none'><span style='font-size:12.0pt'>b)<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span
+style='font-size:12.0pt'>A class to save <b>face</b></span></p>
+
+<p class=MsoListParagraphCxSpMiddle style='margin-top:0in;margin-right:0in;
+margin-bottom:0in;margin-left:.75in;margin-bottom:.0001pt;text-indent:-.25in;
+line-height:normal;text-autospace:none'><span style='font-size:12.0pt'>c)<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span
+style='font-size:12.0pt'>A class to save <b>material</b> defined in .mtl file</span></p>
+
+<p class=MsoListParagraphCxSpMiddle style='margin-top:0in;margin-right:0in;
+margin-bottom:0in;margin-left:.75in;margin-bottom:.0001pt;text-indent:-.25in;
+line-height:normal;text-autospace:none'><span style='font-size:12.0pt'>d)<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span
+style='font-size:12.0pt'>A class to save the whole <b>scene</b> that saves list
+of vertex, face, list of materials etc.</span></p>
+
+<p class=MsoListParagraphCxSpMiddle style='margin-top:0in;margin-right:0in;
+margin-bottom:0in;margin-left:.75in;margin-bottom:.0001pt;line-height:normal;
+text-autospace:none'><span style='font-size:12.0pt'>&nbsp;</span></p>
+
+<p class=MsoListParagraphCxSpMiddle style='margin-top:0in;margin-right:0in;
+margin-bottom:0in;margin-left:.75in;margin-bottom:.0001pt;text-indent:-.25in;
+line-height:normal;text-autospace:none'><span style='font-size:12.0pt'>3.2<span
+style='font:7.0pt "Times New Roman"'>&nbsp; </span></span><span
+style='font-size:12.0pt'>Write subroutines that takes a line of text as input
+and return a pointer to the object of the class defined (vector, face, material…)</span></p>
+
+<p class=MsoListParagraphCxSpMiddle style='margin-top:0in;margin-right:0in;
+margin-bottom:0in;margin-left:.75in;margin-bottom:.0001pt;line-height:normal;
+text-autospace:none'><span style='font-size:12.0pt'>You can write different subroutines
+for different primitives to make the code clean</span></p>
+
+<p class=MsoListParagraphCxSpMiddle style='margin-top:0in;margin-right:0in;
+margin-bottom:0in;margin-left:.75in;margin-bottom:.0001pt;line-height:normal;
+text-autospace:none'><span style='font-size:12.0pt'>&nbsp;</span></p>
+
+<p class=MsoListParagraphCxSpMiddle style='margin-top:0in;margin-right:0in;
+margin-bottom:0in;margin-left:.75in;margin-bottom:.0001pt;text-indent:-.25in;
+line-height:normal;text-autospace:none'><span style='font-size:12.0pt'>3.3<span
+style='font:7.0pt "Times New Roman"'>&nbsp; </span></span><span
+style='font-size:12.0pt'>write a top level parser function (for both .obj and
+.mtl file) that completes the following tasks by calling the functions defined
+in 3.2</span></p>
+
+<p class=MsoListParagraphCxSpMiddle style='margin-top:0in;margin-right:0in;
+margin-bottom:0in;margin-left:.75in;margin-bottom:.0001pt;text-indent:-.25in;
+line-height:normal;text-autospace:none'><span style='font-size:12.0pt'>a)<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span
+style='font-size:12.0pt'>open a file</span></p>
+
+<p class=MsoListParagraphCxSpMiddle style='margin-top:0in;margin-right:0in;
+margin-bottom:0in;margin-left:.75in;margin-bottom:.0001pt;text-indent:-.25in;
+line-height:normal;text-autospace:none'><span style='font-size:12.0pt'>b)<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span
+style='font-size:12.0pt'>a loop that read one text line a time, until read the end
+of the file</span></p>
+
+<p class=MsoListParagraphCxSpMiddle style='margin-top:0in;margin-right:0in;
+margin-bottom:0in;margin-left:1.75in;margin-bottom:.0001pt;text-indent:-1.75in;
+line-height:normal;text-autospace:none'><span style='font-size:12.0pt'><span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>i.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style='font-size:12.0pt'>extract the first token (use </span><span
+style='font-size:10.0pt;font-family:"Courier New"'>strtok() function )</span></p>
+
+<p class=MsoListParagraphCxSpMiddle style='margin-top:0in;margin-right:0in;
+margin-bottom:0in;margin-left:1.75in;margin-bottom:.0001pt;text-indent:-1.75in;
+line-height:normal;text-autospace:none'><span style='font-size:12.0pt'><span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>ii.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style='font-size:12.0pt'>compare again ‘#’, ‘v’, ‘vn’,’vt’…,
+</span></p>
+
+<p class=MsoListParagraphCxSpMiddle style='margin-top:0in;margin-right:0in;
+margin-bottom:0in;margin-left:1.75in;margin-bottom:.0001pt;text-indent:-1.75in;
+line-height:normal;text-autospace:none'><span style='font-size:12.0pt'><span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>iii.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style='font-size:12.0pt'>if equals ‘v’ use the subroutine
+that parse vectors to parse it</span></p>
+
+<p class=MsoListParagraphCxSpMiddle style='margin-top:0in;margin-right:0in;
+margin-bottom:0in;margin-left:1.75in;margin-bottom:.0001pt;text-indent:-1.75in;
+line-height:normal;text-autospace:none'><span style='font-size:12.0pt'><span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>iv.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style='font-size:12.0pt'>if equals ‘f’ use the subroutine
+that parse face to parse it</span></p>
+
+<p class=MsoListParagraphCxSpMiddle style='margin-top:0in;margin-right:0in;
+margin-bottom:0in;margin-left:1.75in;margin-bottom:.0001pt;text-indent:-1.75in;
+line-height:normal;text-autospace:none'><span style='font-size:12.0pt'><span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>v.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style='font-size:12.0pt'>add the parse result (can be a
+pointer to a proper object) to the <b>scene</b> class</span></p>
+
+<p class=MsoListParagraphCxSpMiddle style='margin-top:0in;margin-right:0in;
+margin-bottom:0in;margin-left:1.75in;margin-bottom:.0001pt;line-height:normal;
+text-autospace:none'><span style='font-size:12.0pt'>&nbsp;</span></p>
+
+<p class=MsoListParagraphCxSpMiddle style='margin-bottom:0in;margin-bottom:
+.0001pt;line-height:normal;text-autospace:none'><span style='font-size:12.0pt'>Note:
+About Memory management</span></p>
+
+<p class=MsoListParagraphCxSpMiddle style='margin-top:0in;margin-right:0in;
+margin-bottom:0in;margin-left:.75in;margin-bottom:.0001pt;line-height:normal;
+text-autospace:none'><span style='font-size:12.0pt'>The amount of memory will
+be needed to hold the model is not known beforehand (no such field as total
+vertex), </span></p>
+
+<p class=MsoListParagraphCxSpLast style='margin-top:0in;margin-right:0in;
+margin-bottom:0in;margin-left:.75in;margin-bottom:.0001pt;line-height:normal;
+text-autospace:none'><span style='font-size:12.0pt'>You can either wait the
+memory by allocating a large buffer at the beginning, or more desirably allow
+dynamic growing of your buffer size.</span></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><span style='font-size:14.0pt;line-height:115%'>&nbsp;</span></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+</div>
+
+</body>
+
+</html>
