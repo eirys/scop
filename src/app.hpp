@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/04 12:26:41 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/05 16:17:26 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,6 +164,7 @@ private:
 	VkDescriptorPool				descriptor_pool;
 	std::vector<VkDescriptorSet>	descriptor_sets;
 
+	uint32_t						mip_levels;
 	VkImage							texture_image;
 	VkDeviceMemory					texture_image_memory;
 	VkImageView						texture_image_view;
@@ -229,7 +230,8 @@ private:
 	VkImageView								createImageView(
 		VkImage image,
 		VkFormat format,
-		VkImageAspectFlags aspect_flags
+		VkImageAspectFlags aspect_flags,
+		uint32_t mip_level
 	) const;
 	void									createRenderPass();
 	void									createGraphicsPipeline();
@@ -285,6 +287,7 @@ private:
 	void									createImage(
 		uint32_t width,
 		uint32_t height,
+		uint32_t mip_level,
 		VkFormat format,
 		VkImageTiling tiling,
 		VkImageUsageFlags usage,
@@ -300,7 +303,8 @@ private:
 		VkImage image,
 		VkFormat format,
 		VkImageLayout old_layout,
-		VkImageLayout new_layout
+		VkImageLayout new_layout,
+		uint32_t mip_level
 	) const;
 	void									copyBufferToImage(
 		VkBuffer buffer,
@@ -321,6 +325,13 @@ private:
 		VkFormat format
 	) const;
 	void									loadModel();
+	void									generateMipmaps(
+		VkImage image,
+		VkFormat image_format,
+		int32_t tex_width,
+		int32_t tex_height,
+		uint32_t mip_level
+	) const;
 
 }; // class App
 

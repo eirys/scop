@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/04 13:15:39 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/05 16:30:52 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -646,7 +646,8 @@ void	App::createImageViews() {
 		swap_chain_image_views[i] = createImageView(
 			swap_chain_images[i],
 			swap_chain_image_format,
-			VK_IMAGE_ASPECT_COLOR_BIT
+			VK_IMAGE_ASPECT_COLOR_BIT,
+			1
 		);
 	}
 }
@@ -654,7 +655,8 @@ void	App::createImageViews() {
 VkImageView	App::createImageView(
 	VkImage image,
 	VkFormat format,
-	VkImageAspectFlags aspect_flags
+	VkImageAspectFlags aspect_flags,
+	uint32_t mip_level
 ) const {
 	VkImageViewCreateInfo	view_info{};
 	view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -663,7 +665,7 @@ VkImageView	App::createImageView(
 	view_info.format = format;
 	view_info.subresourceRange.aspectMask = aspect_flags;
 	view_info.subresourceRange.baseMipLevel = 0;
-	view_info.subresourceRange.levelCount = 1;
+	view_info.subresourceRange.levelCount = mip_level;
 	view_info.subresourceRange.baseArrayLayer = 0;
 	view_info.subresourceRange.layerCount = 1;
 
@@ -1620,6 +1622,13 @@ void	App::createTextureImage() {
 		throw std::runtime_error("failed to load texture image");
 	}
 
+	mip_levels = 1 + static_cast<uint32_t>(
+		std::floor(std::log2(std::max(
+			tex_width,
+			tex_height
+		)))
+	);
+
 	VkDeviceSize	image_size = tex_width * tex_height * 4;
 	VkBuffer		staging_buffer;
 	VkDeviceMemory	staging_buffer_memory;
@@ -1645,9 +1654,12 @@ void	App::createTextureImage() {
 	createImage(
 		tex_width,
 		tex_height,
+		mip_levels,
 		VK_FORMAT_R8G8B8A8_SRGB,
 		VK_IMAGE_TILING_OPTIMAL,
-		VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+		VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
+		VK_IMAGE_USAGE_TRANSFER_DST_BIT |
+		VK_IMAGE_USAGE_SAMPLED_BIT,
 		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
 		texture_image,
 		texture_image_memory
@@ -1658,7 +1670,8 @@ void	App::createTextureImage() {
 		texture_image,
 		VK_FORMAT_R8G8B8A8_SRGB,
 		VK_IMAGE_LAYOUT_UNDEFINED,
-		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
+		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+		mip_levels
 	);
 	copyBufferToImage(
 		staging_buffer,
@@ -1667,12 +1680,13 @@ void	App::createTextureImage() {
 		static_cast<uint32_t>(tex_height)
 	);
 
-	// Allow shader access
-	transitionImageLayout(
+	// Fill mipmaps images (directly handled by gpu)
+	generateMipmaps(
 		texture_image,
 		VK_FORMAT_R8G8B8A8_SRGB,
-		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-		VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+		tex_width,
+		tex_height,
+		mip_levels
 	);
 
 	vkDestroyBuffer(logical_device, staging_buffer, nullptr);
@@ -1685,6 +1699,7 @@ void	App::createTextureImage() {
 void	App::createImage(
 	uint32_t width,
 	uint32_t height,
+	uint32_t mip_level,
 	VkFormat format,
 	VkImageTiling tiling,
 	VkImageUsageFlags usage,
@@ -1698,7 +1713,7 @@ void	App::createImage(
 	image_info.extent.width = width;
 	image_info.extent.height = height;
 	image_info.extent.depth = 1;
-	image_info.mipLevels = 1;
+	image_info.mipLevels = mip_level;
 	image_info.arrayLayers = 1;
 	image_info.format = format;
 	image_info.tiling = tiling;
@@ -1772,7 +1787,8 @@ void	App::transitionImageLayout(
 	VkImage image,
 	VkFormat format,
 	VkImageLayout old_layout,
-	VkImageLayout new_layout
+	VkImageLayout new_layout,
+	uint32_t mip_level
 ) const {
 	VkCommandBuffer	command_buffer = beginSingleTimeCommands();
 
@@ -1786,7 +1802,7 @@ void	App::transitionImageLayout(
 	barrier.image = image;
 	barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 	barrier.subresourceRange.baseMipLevel = 0;
-	barrier.subresourceRange.levelCount = 1;
+	barrier.subresourceRange.levelCount = mip_level;
 	barrier.subresourceRange.baseArrayLayer = 0;
 	barrier.subresourceRange.layerCount = 1;
 	barrier.srcAccessMask = 0;
@@ -1875,7 +1891,8 @@ void	App::createTextureImageView() {
 	texture_image_view = createImageView(
 		texture_image,
 		VK_FORMAT_R8G8B8A8_SRGB,
-		VK_IMAGE_ASPECT_COLOR_BIT
+		VK_IMAGE_ASPECT_COLOR_BIT,
+		mip_levels
 	);
 }
 
@@ -1902,7 +1919,7 @@ void	App::createTextureSampler() {
 	sampler_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
 	sampler_info.mipLodBias = 0.0f;
 	sampler_info.minLod = 0.0f;
-	sampler_info.maxLod = 0.0f;
+	sampler_info.maxLod = static_cast<float>(mip_levels);
 
 	if (vkCreateSampler(logical_device, &sampler_info, nullptr, &texture_sampler) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create texture sampler");
@@ -1915,6 +1932,7 @@ void	App::createDepthResources() {
 	createImage(
 		swap_chain_extent.width,
 		swap_chain_extent.height,
+		1,
 		depth_format,
 		VK_IMAGE_TILING_OPTIMAL,
 		VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
@@ -1926,7 +1944,8 @@ void	App::createDepthResources() {
 	depth_image_view = createImageView(
 		depth_image,
 		depth_format,
-		VK_IMAGE_ASPECT_DEPTH_BIT
+		VK_IMAGE_ASPECT_DEPTH_BIT,
+		1
 	);
 }
 
@@ -2018,6 +2037,143 @@ void	App::loadModel() {
 		}
 	}
 }
+
+/**
+ * Record command to generate mipmaps levels
+*/
+void	App::generateMipmaps(
+	VkImage image,
+	VkFormat image_format,
+	int32_t tex_width,
+	int32_t tex_height,
+	uint32_t mip_level
+) const {
+	// Check if support blitting
+	VkFormatProperties	properties;
+	vkGetPhysicalDeviceFormatProperties(physical_device, image_format, &properties);
+
+	if (!(properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT)) {
+		throw std::runtime_error("texture image format doesn't support linear blitting");
+	}
+	
+	VkCommandBuffer	command_buffer = beginSingleTimeCommands();
+
+	VkImageMemoryBarrier	barrier{};
+	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	barrier.image = image;
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	barrier.subresourceRange.baseArrayLayer = 0;
+	barrier.subresourceRange.layerCount = 1;
+	barrier.subresourceRange.levelCount = 1;
+
+	int32_t	mip_width = tex_width;
+	int32_t	mip_height = tex_height;
+
+	// Redefine parts of barrier for each level
+	for (uint32_t i = 1; i < mip_level; ++i) {
+		barrier.subresourceRange.baseMipLevel = i - 1;
+		barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+		barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+		barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+		barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+
+		vkCmdPipelineBarrier(
+			command_buffer,
+			VK_PIPELINE_STAGE_TRANSFER_BIT,
+			VK_PIPELINE_STAGE_TRANSFER_BIT,
+			0,
+			0,
+			nullptr,
+			0,
+			nullptr,
+			1,
+			&barrier
+		);
+
+		// Define blit region
+		VkImageBlit	blit{};
+		blit.srcOffsets[0] = { 0, 0, 0 };
+		blit.srcOffsets[1] = { mip_width, mip_height, 1 };
+		blit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		blit.srcSubresource.mipLevel = i - 1;
+		blit.srcSubresource.baseArrayLayer = 0;
+		blit.srcSubresource.layerCount = 1;
+		blit.dstOffsets[0] = { 0, 0, 0 };
+		blit.dstOffsets[1] = {
+			mip_width > 1 ? mip_width / 2 : 1,
+			mip_height > 1 ? mip_height / 2: 1,
+			1
+		};
+		blit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		blit.dstSubresource.mipLevel = i;
+		blit.dstSubresource.baseArrayLayer = 0;
+		blit.dstSubresource.layerCount = 1;
+
+		// Record blit command
+		vkCmdBlitImage(
+			command_buffer,
+			image,
+			VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+			image,
+			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+			1,
+			&blit,
+			VK_FILTER_LINEAR
+		);
+
+		// Transition to shader readable layout
+		barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+		barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+		barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+		vkCmdPipelineBarrier(
+			command_buffer,
+			VK_PIPELINE_STAGE_TRANSFER_BIT,
+			VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+			0,
+			0,
+			nullptr,
+			0,
+			nullptr,
+			1,
+			&barrier
+		);
+
+		// Set next mip level size
+		if (mip_width > 1) {
+			mip_width /= 2;
+		}
+		if (mip_height > 1) {
+			mip_height /= 2;
+		}
+	}
+
+	// Last mip level
+	barrier.subresourceRange.baseMipLevel = mip_level - 1;
+	barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+	barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+	barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+	vkCmdPipelineBarrier(
+		command_buffer,
+		VK_PIPELINE_STAGE_TRANSFER_BIT,
+		VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+		0,
+		0,
+		nullptr,
+		0,
+		nullptr,
+		1,
+		&barrier
+	);
+
+	endSingleTimeCommands(command_buffer);
+}
+
 
 /* ========================================================================== */
 /*                                    OTHER                                   */

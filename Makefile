@@ -6,7 +6,7 @@
 #    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/05/04 21:07:28 by eli              ###   ########.fr        #
+#    Updated: 2023/05/05 12:48:37 by eli              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,11 +32,9 @@ INC_FILES	:=	utils.hpp \
 				vector.hpp \
 				vertex.hpp \
 				uniform_buffer_object.hpp \
-				obj_parser.hpp \
 				app.hpp
 
 SRC_FILES	:=	main.cpp \
-				obj_parser.cpp \
 				app.cpp
 
 INC			:=	$(addprefix	$(SRC_DIR)/,$(INC_FILES))
