@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 13:54:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 12:24:53 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 18:41:25 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,6 +167,15 @@ struct Vect2 {
 		return x == rhs.x && y == rhs.y;
 	}
 }; // struct Vect2
+
+struct Vect4 {
+
+	float	x;
+	float	y;
+	float	z;
+	float	w;
+
+}; // struct Vect4
 
 } // namespace scop
 

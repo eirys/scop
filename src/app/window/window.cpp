@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:42 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 18:20:23 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 18:26:13 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,6 @@ Window::Window() {
 	// handle resizing
 	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 	glfwSetKeyCallback(window, keyCallback);
-	
 }
 
 Window::~Window() {
@@ -95,7 +94,7 @@ void	Window::toggleFrameBufferResized(bool is_resized) {
 /* ========================================================================== */
 
 /**
- * Function callback for when the window is resized
+ * Function callback for window resize
 */
 void	framebufferResizeCallback(
 	GLFWwindow* window,
@@ -109,7 +108,7 @@ void	framebufferResizeCallback(
 }
 
 /**
- * Function callback when a key is pressed
+ * Function callback for key press
 */
 void	keyCallback(
 	GLFWwindow* window,
@@ -125,9 +124,7 @@ void	keyCallback(
 	if (key != GLFW_KEY_SPACE) {
 		return;
 	}
-
 	if (action == GLFW_PRESS) {
-		// TODO: shift color
 		scop::App::toggleColorShift();
 	}
 }

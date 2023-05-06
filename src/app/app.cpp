@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 18:24:06 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 21:49:28 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,9 +129,10 @@ void	App::run() {
 	vkDeviceWaitIdle(logical_device);
 }
 
+/* ========================================================================== */
+
 void	App::toggleColorShift() {
 	toggle_color_shift = !toggle_color_shift;
-	std::cout << "Pressed a key" << __NL;
 }
 
 /* ========================================================================== */
@@ -1245,14 +1246,6 @@ VKAPI_ATTR VkBool32 VKAPI_CALL	App::debugCallback(
  * Force recreation of swap chain when not compatible with window
 */
 void	App::recreateSwapChain() {
-	// int width = 0, height = 0;
-	// glfwGetFramebufferSize(window, &width, &height);
-
-	// "Pausing" frame refreshing until window is in foreground
-	// while (width == 0 || height == 0) {
-	// 	glfwGetFramebufferSize(window, &width, &height);
-	// 	glfwWaitEvents();
-	// }
 	window.pause();
 	vkDeviceWaitIdle(logical_device);
 
@@ -1435,7 +1428,7 @@ void	App::createDescriptorSetLayout() {
 	ubo_layout_binding.descriptorCount = 1;
 	ubo_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	ubo_layout_binding.pImmutableSamplers = nullptr;
-	ubo_layout_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+	ubo_layout_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 
 	// Sampler descriptor layout: used during fragment shading
 	VkDescriptorSetLayoutBinding	sampler_layout_binding{};
@@ -1508,7 +1501,6 @@ void	App::updateUniformBuffer(uint32_t current_image) {
 		time * scop::utils::radians(90.0f),	// rotation angle
 		scop::Vect3(0.0f, 0.0f, 1.0f)		// axis (z axis)
 	);
-
 	// Model: static
 	// ubo.model = scop::Mat4(1.0f);
 
@@ -1522,14 +1514,14 @@ void	App::updateUniformBuffer(uint32_t current_image) {
 	ubo.proj = scop::perspective(
 		scop::utils::radians(45.0f),		// FOV angle
 		swap_chain_extent.width				// aspect ratio
-		/ static_cast<float>(
-				swap_chain_extent.height
-		),
+		/ static_cast<float>(swap_chain_extent.height),
 		0.1f,								// near view plane
 		10.0f								// far view plane
 	);
 	// Invert y axis (OpenGL has y axis inverted)
 	ubo.proj[5] *= -1;
+	ubo.is_textured = toggle_color_shift;
+
 	memcpy(uniform_buffers_mapped[current_image], &ubo, sizeof(ubo));
 }
 
@@ -1571,10 +1563,10 @@ void	App::createDescriptorSets() {
 	// Populate descriptors
 	for (size_t i = 0; i < max_frames_in_flight; ++i) {
 		// Uniform buffer
-		VkDescriptorBufferInfo	buffer_info{};
-		buffer_info.buffer = uniform_buffers[i];
-		buffer_info.offset = 0;
-		buffer_info.range = sizeof(UniformBufferObject);
+		VkDescriptorBufferInfo	ubo_info{};
+		ubo_info.buffer = uniform_buffers[i];
+		ubo_info.offset = 0;
+		ubo_info.range = sizeof(UniformBufferObject);
 
 		// Texture sampler
 		VkDescriptorImageInfo	image_info{};
@@ -1590,7 +1582,7 @@ void	App::createDescriptorSets() {
 		descriptor_writes[0].dstArrayElement = 0;
 		descriptor_writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 		descriptor_writes[0].descriptorCount = 1;
-		descriptor_writes[0].pBufferInfo = &buffer_info;
+		descriptor_writes[0].pBufferInfo = &ubo_info;
 		descriptor_writes[0].pImageInfo = nullptr;
 		descriptor_writes[0].pTexelBufferView = nullptr;
 

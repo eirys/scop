@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 18:23:45 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 21:16:57 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,12 +172,12 @@ private:
 	VkBuffer						index_buffer;
 	VkDeviceMemory					index_buffer_memory;
 
+	VkDescriptorPool				descriptor_pool;
+	std::vector<VkDescriptorSet>	descriptor_sets;
+
 	std::vector<VkBuffer>			uniform_buffers;
 	std::vector<VkDeviceMemory>		uniform_buffers_memory;
 	std::vector<void*>				uniform_buffers_mapped;
-
-	VkDescriptorPool				descriptor_pool;
-	std::vector<VkDescriptorSet>	descriptor_sets;
 
 	uint32_t						mip_levels;
 	VkImage							texture_image;
