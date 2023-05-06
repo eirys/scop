@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 12:19:44 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 13:00:40 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@
 # include <chrono>
 # include <unordered_map>
 
+# include "window.hpp"
 # include "utils.hpp"
 # include "vertex.hpp"
 # include "uniform_buffer_object.hpp"
@@ -94,13 +95,15 @@ public:
 
 	void	run();
 
+	/* ========================================================================= */
+
+	void	toggleFrameBufferResized(bool resized);
+
 private:
 	/* ========================================================================= */
 	/*                               CONST MEMBERS                               */
 	/* ========================================================================= */
 
-	static constexpr uint32_t		width = 800;
-	static constexpr uint32_t		height = 600;
 	const std::vector<const char*>	validation_layers = {
 		"VK_LAYER_KHRONOS_validation"
 	};
@@ -119,7 +122,7 @@ private:
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
 
-	GLFWwindow*						window;
+	scop::Window					window;
 	VkInstance						vk_instance;
 	VkDebugUtilsMessengerEXT		debug_messenger;
 	VkPhysicalDevice				physical_device = VK_NULL_HANDLE;
@@ -186,110 +189,99 @@ private:
 	/*                                 CORE SETUP                                */
 	/* ========================================================================= */
 
-	void									initWindow();
-	static void								framebufferResizeCallback(
-		GLFWwindow* window,
-		int width,
-		int height
-	);
-	void									initVulkan();
-	void									mainLoop();
+	void							initVulkan();
+	void							mainLoop();
 
-	void									cleanupSwapChain();
-	void									cleanup();
+	void							cleanupSwapChain();
+	void							cleanup();
 
-	void									createInstance();
+	void							createInstance();
 
-	void									setupDebugMessenger();
+	void							setupDebugMessenger();
 
-	void									populateDebugMessengerCreateInfo(
+	void							populateDebugMessengerCreateInfo(
 		VkDebugUtilsMessengerCreateInfoEXT& create_info
 	);
-	bool									checkValidationLayerSupport();
-	void									pickPhysicalDevice();
-	bool									isDeviceSuitable(
+	bool							checkValidationLayerSupport();
+	void							pickPhysicalDevice();
+	bool							isDeviceSuitable(
 		const VkPhysicalDevice& device
 	);
-	bool									checkDeviceExtensionSupport(
+	bool							checkDeviceExtensionSupport(
 		const VkPhysicalDevice& device
 	);
-	QueueFamilyIndices						findQueueFamilies(
+	QueueFamilyIndices				findQueueFamilies(
 		const VkPhysicalDevice& device
 	);
-	void									createLogicalDevice();
-	void									createSurface();
-	SwapChainSupportDetails					querySwapChainSupport(
+	void							createLogicalDevice();
+	void							createSurface();
+	SwapChainSupportDetails			querySwapChainSupport(
 		const VkPhysicalDevice& device
 	) const;
-	VkSurfaceFormatKHR						chooseSwapSurfaceFormat(
+	VkSurfaceFormatKHR				chooseSwapSurfaceFormat(
 		const std::vector<VkSurfaceFormatKHR>& available_formats
 	) const;
-	VkPresentModeKHR						chooseSwapPresentMode(
+	VkPresentModeKHR				chooseSwapPresentMode(
 		const std::vector<VkPresentModeKHR>& available_present_modes
 	) const;
-	VkExtent2D								chooseSwapExtent(
+	VkExtent2D						chooseSwapExtent(
 		const VkSurfaceCapabilitiesKHR& capabilities
 	);
-	void									createSwapChain();
-	void									createImageViews();
-	VkImageView								createImageView(
+	void							createSwapChain();
+	void							createImageViews();
+	VkImageView						createImageView(
 		VkImage image,
 		VkFormat format,
 		VkImageAspectFlags aspect_flags,
 		uint32_t mip_level
 	) const;
-	void									createRenderPass();
-	void									createGraphicsPipeline();
-	static std::vector<char>				readFile(
+	void							createRenderPass();
+	void							createGraphicsPipeline();
+	static std::vector<char>		readFile(
 		const std::string& filename
 	);
-	VkShaderModule							createShaderModule(
+	VkShaderModule					createShaderModule(
 		const std::vector<char>& code
 	);
-	void									createFrameBuffers();
-	void									createCommandPool();
-	void									createCommandBuffers();
-	void									recordCommandBuffer(
+	void							createFrameBuffers();
+	void							createCommandPool();
+	void							createCommandBuffers();
+	void							recordCommandBuffer(
 		VkCommandBuffer command_buffer,
 		uint32_t image_index
 	);
-	void									drawFrame();
-	void									createSyncObjects();
-	std::vector<const char*>				getRequiredExtensions();
-	static VKAPI_ATTR VkBool32 VKAPI_CALL	debugCallback(
-		VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
-		VkDebugUtilsMessageTypeFlagsEXT message_type,
-		const VkDebugUtilsMessengerCallbackDataEXT* p_callback_data,
-		void* p_user_data
-	);
-	void									recreateSwapChain();
-	void									createVertexBuffer();
-	void									createIndexBuffer();
-	void									createBuffer(
+	void							drawFrame();
+	void							createSyncObjects();
+	std::vector<const char*>		getRequiredExtensions();
+
+	void							recreateSwapChain();
+	void							createVertexBuffer();
+	void							createIndexBuffer();
+	void							createBuffer(
 		VkDeviceSize size,
 		VkBufferUsageFlags usage,
 		VkMemoryPropertyFlags properties,
 		VkBuffer& buffer,
 		VkDeviceMemory& buffer_memory
 	) const;
-	void									copyBuffer(
+	void							copyBuffer(
 		VkBuffer src_buffer,
 		VkBuffer dst_buffer,
 		VkDeviceSize size
 	) const;
-	uint32_t								findMemoryType(
+	uint32_t						findMemoryType(
 		uint32_t type_filter,
 		VkMemoryPropertyFlags properties
 	) const;
-	void									createDescriptorSetLayout();
-	void									createUniformBuffers();
-	void									updateUniformBuffer(
+	void							createDescriptorSetLayout();
+	void							createUniformBuffers();
+	void							updateUniformBuffer(
 		uint32_t current_image
 	);
-	void									createDescriptorPool();
-	void									createDescriptorSets();
-	void									createTextureImage();
-	void									createImage(
+	void							createDescriptorPool();
+	void							createDescriptorSets();
+	void							createTextureImage();
+	void							createImage(
 		uint32_t width,
 		uint32_t height,
 		uint32_t mip_level,
@@ -301,45 +293,53 @@ private:
 		VkImage& image,
 		VkDeviceMemory& image_memory
 	) const;
-	VkCommandBuffer							beginSingleTimeCommands() const;
-	void									endSingleTimeCommands(
+	VkCommandBuffer					beginSingleTimeCommands() const;
+	void							endSingleTimeCommands(
 		VkCommandBuffer command_buffer
 	) const;
-	void									transitionImageLayout(
+	void							transitionImageLayout(
 		VkImage image,
 		VkFormat format,
 		VkImageLayout old_layout,
 		VkImageLayout new_layout,
 		uint32_t mip_level
 	) const;
-	void									copyBufferToImage(
+	void							copyBufferToImage(
 		VkBuffer buffer,
 		VkImage image,
 		uint32_t width,
 		uint32_t height
 	) const;
-	void									createTextureImageView();
-	void									createTextureSampler();
-	void									createDepthResources();
-	VkFormat								findSupportedFormat(
+	void							createTextureImageView();
+	void							createTextureSampler();
+	void							createDepthResources();
+	VkFormat						findSupportedFormat(
 		const std::vector<VkFormat>& candidates,
 		VkImageTiling tiling,
 		VkFormatFeatureFlags features
 	) const;
-	VkFormat								findDepthFormat() const;
-	bool									hasStencilCompotent(
+	VkFormat						findDepthFormat() const;
+	bool							hasStencilCompotent(
 		VkFormat format
 	) const;
-	void									loadModel();
-	void									generateMipmaps(
+	void							loadModel();
+	void							generateMipmaps(
 		VkImage image,
 		VkFormat image_format,
 		int32_t tex_width,
 		int32_t tex_height,
 		uint32_t mip_level
 	) const;
-	VkSampleCountFlagBits					getMaxUsableSampleCount() const;
-	void									createColorResources();
+	VkSampleCountFlagBits			getMaxUsableSampleCount() const;
+	void							createColorResources();
+
+	static VKAPI_ATTR
+	VkBool32 VKAPI_CALL				debugCallback(
+		VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
+		VkDebugUtilsMessageTypeFlagsEXT message_type,
+		const VkDebugUtilsMessengerCallbackDataEXT* p_callback_data,
+		void* p_user_data
+	);
 
 }; // class App
 

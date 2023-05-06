@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 11:44:49 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 13:11:31 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,42 +28,18 @@
 /* ========================================================================== */
 
 void	App::run() {
-	initWindow();
 	initVulkan();
 	mainLoop();
 	cleanup();
 }
 
+void	App::toggleFrameBufferResized(bool resized) {
+	frame_buffer_resized = resized;
+}
+
 /* ========================================================================== */
 /*                                   PRIVATE                                  */
 /* ========================================================================== */
-
-void	App::initWindow() {
-	// initialize glfw
-	glfwInit();
-
-	// disable OpenGL context creation
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-
-	// create a window pointer
-	window = glfwCreateWindow(width, height, "Etran's cute lil app", nullptr, nullptr);
-
-	// set pointer to window to `this` instance pointer
-	glfwSetWindowUserPointer(window, this);
-
-	// handle resizing
-	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
-}
-
-/**
- * Function callback for when the window is resized
-*/
-void	App::framebufferResizeCallback(GLFWwindow* window, int width, int height) {
-	(void)width;
-	(void)height;
-	auto	app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));
-	app->frame_buffer_resized = true;
-}
 
 void	App::initVulkan() {
 	createInstance();
@@ -94,9 +70,9 @@ void	App::initVulkan() {
 }
 
 void	App::mainLoop() {
-	while (!glfwWindowShouldClose(window)) {
+	while (window.alive()) {
 		// Poll events while not pressing x...
-		glfwPollEvents();
+		window.await();
 		drawFrame();
 	}
 
@@ -184,12 +160,6 @@ void	App::cleanup() {
 	// Remove vk surface && vk instance
 	vkDestroySurfaceKHR(vk_instance, vk_surface, nullptr);
 	vkDestroyInstance(vk_instance, nullptr);
-
-	// Remove window instance
-	glfwDestroyWindow(window);
-
-	// Remove glfw instance
-	glfwTerminate();
 }
 
 /**
@@ -465,7 +435,7 @@ void	App::createLogicalDevice() {
  * Establish connection between Vulkan and the window system
 */
 void	App::createSurface() {
-	if (glfwCreateWindowSurface(vk_instance, window, nullptr, &vk_surface) != VK_SUCCESS)
+	if (glfwCreateWindowSurface(vk_instance, window.getWindow(), nullptr, &vk_surface) != VK_SUCCESS)
 		throw std::runtime_error("failed to create window surface");
 }
 
@@ -544,7 +514,8 @@ VkExtent2D	App::chooseSwapExtent(
 		return capabilities.currentExtent;
 	} else {
 		int	width, height;
-		glfwGetFramebufferSize(window, &width, &height);
+		window.retrieveSize(width, height);
+		// glfwGetFramebufferSize(window, &width, &height);
 
 		VkExtent2D	actual_extent = {
 			static_cast<uint32_t>(width),
@@ -1267,14 +1238,15 @@ VKAPI_ATTR VkBool32 VKAPI_CALL	App::debugCallback(
  * Force recreation of swap chain when not compatible with window
 */
 void	App::recreateSwapChain() {
-	int width = 0, height = 0;
-	glfwGetFramebufferSize(window, &width, &height);
+	// int width = 0, height = 0;
+	// glfwGetFramebufferSize(window, &width, &height);
 
 	// "Pausing" frame refreshing until window is in foreground
-	while (width == 0 || height == 0) {
-		glfwGetFramebufferSize(window, &width, &height);
-		glfwWaitEvents();
-	}
+	// while (width == 0 || height == 0) {
+	// 	glfwGetFramebufferSize(window, &width, &height);
+	// 	glfwWaitEvents();
+	// }
+	window.pause();
 	vkDeviceWaitIdle(logical_device);
 
 	cleanupSwapChain();

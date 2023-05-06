@@ -6,7 +6,7 @@
 #    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/05/06 12:34:44 by eli              ###   ########.fr        #
+#    Updated: 2023/05/06 12:49:51 by eli              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,11 +26,13 @@ LIB_DIR		:=	lib
 # subdirectories
 APP_DIR		:=	app
 TOOLS_DIR	:=	tools
+WINDOW_DIR	:=	$(APP_DIR)/window
 UTILS_DIR	:=	$(APP_DIR)/utils
 
 OBJ_SUBDIRS	:=	$(addprefix $(OBJ_DIR)/,\
 				$(APP_DIR) \
 				$(TOOLS_DIR) \
+				$(WINDOW_DIR) \
 				$(UTILS_DIR))
 
 # external libraries
@@ -43,9 +45,11 @@ INC_FILES	:=	$(TOOLS_DIR)/utils.hpp \
 				$(TOOLS_DIR)/vector.hpp \
 				$(UTILS_DIR)/vertex.hpp \
 				$(UTILS_DIR)/uniform_buffer_object.hpp \
+				$(WINDOW_DIR)/window.hpp \
 				$(APP_DIR)/app.hpp
 
 SRC_FILES	:=	main.cpp \
+				$(WINDOW_DIR)/window.cpp \
 				$(APP_DIR)/app.cpp
 
 INC			:=	$(addprefix	$(SRC_DIR)/,$(INC_FILES))
@@ -65,6 +69,7 @@ CFLAGS		:=	-std=c++17 \
 				-I./$(SRC_DIR)/$(APP_DIR) \
 				-I./$(SRC_DIR)/$(TOOLS_DIR) \
 				-I./$(SRC_DIR)/$(UTILS_DIR) \
+				-I./$(SRC_DIR)/$(WINDOW_DIR) \
 				-I./$(STB_PATH) \
 				-I./${TOL_PATH} \
 				-O3 \
