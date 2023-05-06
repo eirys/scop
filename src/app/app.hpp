@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 13:00:40 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 14:57:53 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,8 @@
 
 # define SCOP_MODEL_FILE_VIKING_OBJ		"models/viking_room.obj"
 # define SCOP_TEXTURE_FILE_VIKING_PNG	"textures/viking_room.png"
+
+namespace scop {
 
 /* ========================================================================== */
 /*                                    UTILS                                   */
@@ -90,13 +92,15 @@ public:
 	};
 
 	/* ========================================================================= */
-	/*                               MAIN FUNCTION                               */
+	/*                                  METHODS                                  */
+	/* ========================================================================= */
+
+	App();
+	~App();
+
 	/* ========================================================================= */
 
 	void	run();
-
-	/* ========================================================================= */
-
 	void	toggleFrameBufferResized(bool resized);
 
 private:
@@ -189,16 +193,9 @@ private:
 	/*                                 CORE SETUP                                */
 	/* ========================================================================= */
 
-	void							initVulkan();
-	void							mainLoop();
-
 	void							cleanupSwapChain();
-	void							cleanup();
-
 	void							createInstance();
-
 	void							setupDebugMessenger();
-
 	void							populateDebugMessengerCreateInfo(
 		VkDebugUtilsMessengerCreateInfoEXT& create_info
 	);
@@ -342,5 +339,7 @@ private:
 	);
 
 }; // class App
+
+} // namespace scop
 
 #endif

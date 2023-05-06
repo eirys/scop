@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:36 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 13:10:40 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 13:56:59 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,7 @@
 
 namespace scop {
 
-
-void								framebufferResizeCallback(
+void	framebufferResizeCallback(
 	GLFWwindow* window,
 	int width,
 	int height
@@ -34,7 +33,6 @@ void								framebufferResizeCallback(
  * Window handler
 */
 class Window {
-
 public:
 	/* ========================================================================= */
 	/*                               CONST MEMBERS                               */

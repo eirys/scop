@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:42 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 13:11:19 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 14:59:33 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ void	Window::retrieveSize(int& width, int& height) const {
 void	Window::pause() const {
 	int	current_width, current_height;
 	retrieveSize(current_width, current_height);
-	
+
 	while (current_width == 0 || current_height == 0) {
 		retrieveSize(current_width, current_height);
 		glfwWaitEvents();
@@ -78,14 +78,22 @@ GLFWwindow const*	Window::getWindow() const {
 	return window;
 }
 
+/* ========================================================================== */
+/*                                    OTHER                                   */
+/* ========================================================================== */
+
 /**
  * Function callback for when the window is resized
 */
-void	framebufferResizeCallback(GLFWwindow* window, int width, int height) {
+void	framebufferResizeCallback(
+	GLFWwindow* window,
+	int width,
+	int height
+) {
 	(void)width;
 	(void)height;
 	auto	app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));
 	app->toggleFrameBufferResized(true);
 }
 
-}
+} // namespace scop

@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 13:11:31 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 14:58:22 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,25 +23,13 @@
 # include "tiny_obj_loader.h"
 #endif
 
+namespace scop {
+
 /* ========================================================================== */
 /*                                   PUBLIC                                   */
 /* ========================================================================== */
 
-void	App::run() {
-	initVulkan();
-	mainLoop();
-	cleanup();
-}
-
-void	App::toggleFrameBufferResized(bool resized) {
-	frame_buffer_resized = resized;
-}
-
-/* ========================================================================== */
-/*                                   PRIVATE                                  */
-/* ========================================================================== */
-
-void	App::initVulkan() {
+App::App() {
 	createInstance();
 	setupDebugMessenger();
 	createSurface();
@@ -69,43 +57,7 @@ void	App::initVulkan() {
 	createSyncObjects();
 }
 
-void	App::mainLoop() {
-	while (window.alive()) {
-		// Poll events while not pressing x...
-		window.await();
-		drawFrame();
-	}
-
-	// Wait for logical device to finish executing everything before closing
-	vkDeviceWaitIdle(logical_device);
-}
-
-void	App::cleanupSwapChain() {
-	// Remove msaa resources
-	vkDestroyImageView(logical_device, color_image_view, nullptr);
-	vkDestroyImage(logical_device, color_image, nullptr);
-	vkFreeMemory(logical_device, color_image_memory, nullptr);
-
-	// Remove depth handler
-	vkDestroyImageView(logical_device, depth_image_view, nullptr);
-	vkDestroyImage(logical_device, depth_image, nullptr);
-	vkFreeMemory(logical_device, depth_image_memory, nullptr);
-	
-	// Remove frame buffers
-	for (size_t i = 0; i < swap_chain_frame_buffers.size(); ++i) {
-		vkDestroyFramebuffer(logical_device, swap_chain_frame_buffers[i], nullptr);
-	}
-
-	// Destroy image view instances
-	for (size_t i = 0; i < swap_chain_image_views.size(); ++i) {
-		vkDestroyImageView(logical_device, swap_chain_image_views[i], nullptr);
-	}
-
-	// Remove swap chain handler
-	vkDestroySwapchainKHR(logical_device, swap_chain, nullptr);
-}
-
-void	App::cleanup() {
+App::~App() {
 	cleanupSwapChain();
 
 	// Remove texture image
@@ -160,6 +112,52 @@ void	App::cleanup() {
 	// Remove vk surface && vk instance
 	vkDestroySurfaceKHR(vk_instance, vk_surface, nullptr);
 	vkDestroyInstance(vk_instance, nullptr);
+}
+
+/* ========================================================================== */
+
+void	App::run() {
+	while (window.alive()) {
+		// Poll events while not pressing x...
+		window.await();
+		drawFrame();
+	}
+
+	// Wait for logical device to finish executing everything before closing
+	vkDeviceWaitIdle(logical_device);
+}
+
+void	App::toggleFrameBufferResized(bool resized) {
+	frame_buffer_resized = resized;
+}
+
+/* ========================================================================== */
+/*                                   PRIVATE                                  */
+/* ========================================================================== */
+
+void	App::cleanupSwapChain() {
+	// Remove msaa resources
+	vkDestroyImageView(logical_device, color_image_view, nullptr);
+	vkDestroyImage(logical_device, color_image, nullptr);
+	vkFreeMemory(logical_device, color_image_memory, nullptr);
+
+	// Remove depth handler
+	vkDestroyImageView(logical_device, depth_image_view, nullptr);
+	vkDestroyImage(logical_device, depth_image, nullptr);
+	vkFreeMemory(logical_device, depth_image_memory, nullptr);
+	
+	// Remove frame buffers
+	for (size_t i = 0; i < swap_chain_frame_buffers.size(); ++i) {
+		vkDestroyFramebuffer(logical_device, swap_chain_frame_buffers[i], nullptr);
+	}
+
+	// Destroy image view instances
+	for (size_t i = 0; i < swap_chain_image_views.size(); ++i) {
+		vkDestroyImageView(logical_device, swap_chain_image_views[i], nullptr);
+	}
+
+	// Remove swap chain handler
+	vkDestroySwapchainKHR(logical_device, swap_chain, nullptr);
 }
 
 /**
@@ -2273,3 +2271,5 @@ void	DestroyDebugUtilsMessengerEXT(
 		func(instance, debug_messenger, p_allocator);
 	}
 }
+
+} // namespace scop
