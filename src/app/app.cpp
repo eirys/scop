@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 14:58:22 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 17:55:45 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,9 +127,6 @@ void	App::run() {
 	vkDeviceWaitIdle(logical_device);
 }
 
-void	App::toggleFrameBufferResized(bool resized) {
-	frame_buffer_resized = resized;
-}
 
 /* ========================================================================== */
 /*                                   PRIVATE                                  */
@@ -145,7 +142,7 @@ void	App::cleanupSwapChain() {
 	vkDestroyImageView(logical_device, depth_image_view, nullptr);
 	vkDestroyImage(logical_device, depth_image, nullptr);
 	vkFreeMemory(logical_device, depth_image_memory, nullptr);
-	
+
 	// Remove frame buffers
 	for (size_t i = 0; i < swap_chain_frame_buffers.size(); ++i) {
 		vkDestroyFramebuffer(logical_device, swap_chain_frame_buffers[i], nullptr);
@@ -872,7 +869,15 @@ void	App::createGraphicsPipeline() {
 	dynamic_state.dynamicStateCount = static_cast<uint32_t>(dynamic_states.size());
 	dynamic_state.pDynamicStates = dynamic_states.data();
 
-	// Pipeline layout setup
+	// Pipeline layout setups
+	// Push constants setup (DISABLED)
+	/*
+	VkPushConstantRange	push_constant_range{};
+	push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+	push_constant_range.offset = 0;
+	push_constant_range.size = sizeof(PushConstantData);
+	*/
+
 	VkPipelineLayoutCreateInfo	pipeline_layout_info{};
 	pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	pipeline_layout_info.setLayoutCount = 1;
@@ -1167,9 +1172,9 @@ void	App::drawFrame() {
 	if (
 		result == VK_ERROR_OUT_OF_DATE_KHR ||
 		result == VK_SUBOPTIMAL_KHR ||
-		frame_buffer_resized
+		window.resized()
 	) {
-		frame_buffer_resized = false;
+		window.toggleFrameBufferResized(false);
 		recreateSwapChain();
 	} else if (result != VK_SUCCESS) {
 		throw std::runtime_error("failed to present swapchain image");
@@ -1561,12 +1566,13 @@ void	App::createDescriptorSets() {
 
 	// Populate descriptors
 	for (size_t i = 0; i < max_frames_in_flight; ++i) {
-		// Uniform buffers
+		// Uniform buffer
 		VkDescriptorBufferInfo	buffer_info{};
 		buffer_info.buffer = uniform_buffers[i];
 		buffer_info.offset = 0;
 		buffer_info.range = sizeof(UniformBufferObject);
 
+		// Texture sampler
 		VkDescriptorImageInfo	image_info{};
 		image_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 		image_info.imageView = texture_image_view;
@@ -2058,7 +2064,7 @@ void	App::generateMipmaps(
 	if (!(properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT)) {
 		throw std::runtime_error("texture image format doesn't support linear blitting");
 	}
-	
+
 	VkCommandBuffer	command_buffer = beginSingleTimeCommands();
 
 	VkImageMemoryBarrier	barrier{};
@@ -2227,6 +2233,10 @@ void	App::createColorResources() {
 		VK_IMAGE_ASPECT_COLOR_BIT,
 		1
 	);
+}
+
+void	App::toggleColorShift() {
+	toggle_color_shift = !toggle_color_shift;
 }
 
 /* ========================================================================== */

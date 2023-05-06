@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:42 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 15:37:54 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 17:43:47 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ Window::Window() {
 
 	// handle resizing
 	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+	glfwSetKeyCallback(window, );
+	
 }
 
 Window::~Window() {
@@ -70,12 +72,22 @@ bool	Window::alive() const {
 	return !glfwWindowShouldClose(window);
 }
 
+bool	Window::resized() const {
+	return frame_buffer_resized;
+}
+
 GLFWwindow*	Window::getWindow() {
 	return window;
 }
 
 GLFWwindow const*	Window::getWindow() const {
 	return window;
+}
+
+/* ========================================================================== */
+
+void	Window::toggleFrameBufferResized(bool is_resized) {
+	frame_buffer_resized = is_resized;
 }
 
 /* ========================================================================== */
@@ -92,8 +104,32 @@ void	framebufferResizeCallback(
 ) {
 	(void)width;
 	(void)height;
-	auto	app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));
-	app->toggleFrameBufferResized(true);
+	auto	handler = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+	handler->toggleFrameBufferResized(true);
+}
+
+/**
+ * Function callback when a key is pressed
+*/
+void	keyCallback(
+	GLFWwindow* window,
+	int key,
+	int scancode,
+	int action,
+	int mods
+) {
+	(void)window;
+	(void)scancode;
+	(void)mods;
+
+	if (key != GLFW_KEY_SPACE) {
+		return;
+	}
+
+	if (action == GLFW_PRESS) {
+		// TODO: shift color
+		scop::App::toggleColorShift();
+	}
 }
 
 } // namespace scop

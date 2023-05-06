@@ -1,22 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   obj_parser.cpp                                     :+:      :+:    :+:   */
+/*   parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/04 21:29:54 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 17:08:11 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "obj_parser.hpp"
+#include "parser.hpp"
 
 /* ========================================================================== */
 /*                                   PUBLIC                                   */
 /* ========================================================================== */
 
-Model	ObjParser::parseFile(const std::string& file_name) {
+Model	Parser::parseFile(const std::string& file_name) {
 	Model	model_object;
 	size_t	nb_lines = 0;
 	
@@ -37,10 +37,10 @@ Model	ObjParser::parseFile(const std::string& file_name) {
 /*                                   PRIVATE                                  */
 /* ========================================================================== */
 
-void	ObjParser::processLine() {
+void	Parser::processLine() {
 	std::getline(file, current_line);
 }
 
-void	ObjParser::getNextToken() {
+void	Parser::getNextToken() {
 	
 }

@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 16:11:12 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 17:42:46 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,11 @@ public:
 		std::vector<VkPresentModeKHR>	present_modes;
 	};
 
+	struct PushConstantData {
+		scop::Vect2		offset;
+		scop::Vect3		color;
+	};
+
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
 	/* ========================================================================= */
@@ -104,7 +109,6 @@ public:
 	/* ========================================================================= */
 
 	void	run();
-	void	toggleFrameBufferResized(bool resized);
 
 private:
 	/* ========================================================================= */
@@ -120,9 +124,9 @@ private:
 	static constexpr int			max_frames_in_flight = 2;
 
 	#ifndef NDEBUG
-	const bool						enable_validation_layers = false;
+	static constexpr bool			enable_validation_layers = false;
 	#else
-	const bool						enable_validation_layers = true;
+	static constexpr bool			enable_validation_layers = true;
 	#endif
 
 	/* ========================================================================= */
@@ -189,7 +193,7 @@ private:
 	VkDeviceMemory					color_image_memory;
 	VkImageView						color_image_view;
 
-	bool							frame_buffer_resized = false;
+	bool							toggle_color_shift = false;
 	uint32_t						current_frame = 0;
 
 	/* ========================================================================= */
@@ -332,6 +336,7 @@ private:
 	) const;
 	VkSampleCountFlagBits			getMaxUsableSampleCount() const;
 	void							createColorResources();
+	static void						toggleColorShift();
 
 	static VKAPI_ATTR
 	VkBool32 VKAPI_CALL				debugCallback(
