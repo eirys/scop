@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 17:55:45 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 18:24:06 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@
 #endif
 
 namespace scop {
+
+bool		App::toggle_color_shift = false;
 
 /* ========================================================================== */
 /*                                   PUBLIC                                   */
@@ -127,6 +129,10 @@ void	App::run() {
 	vkDeviceWaitIdle(logical_device);
 }
 
+void	App::toggleColorShift() {
+	toggle_color_shift = !toggle_color_shift;
+	std::cout << "Pressed a key" << __NL;
+}
 
 /* ========================================================================== */
 /*                                   PRIVATE                                  */
@@ -870,13 +876,11 @@ void	App::createGraphicsPipeline() {
 	dynamic_state.pDynamicStates = dynamic_states.data();
 
 	// Pipeline layout setups
-	// Push constants setup (DISABLED)
-	/*
-	VkPushConstantRange	push_constant_range{};
-	push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
-	push_constant_range.offset = 0;
-	push_constant_range.size = sizeof(PushConstantData);
-	*/
+	// Push constants setup
+	// VkPushConstantRange	push_constant_range{};
+	// push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+	// push_constant_range.offset = 0;
+	// push_constant_range.size = sizeof(PushConstantData);
 
 	VkPipelineLayoutCreateInfo	pipeline_layout_info{};
 	pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -2233,10 +2237,6 @@ void	App::createColorResources() {
 		VK_IMAGE_ASPECT_COLOR_BIT,
 		1
 	);
-}
-
-void	App::toggleColorShift() {
-	toggle_color_shift = !toggle_color_shift;
 }
 
 /* ========================================================================== */

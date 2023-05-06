@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 17:42:46 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 18:23:45 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,8 @@ public:
 
 	/* ========================================================================= */
 
-	void	run();
+	void			run();
+	static void		toggleColorShift();
 
 private:
 	/* ========================================================================= */
@@ -193,7 +194,7 @@ private:
 	VkDeviceMemory					color_image_memory;
 	VkImageView						color_image_view;
 
-	bool							toggle_color_shift = false;
+	static bool						toggle_color_shift;
 	uint32_t						current_frame = 0;
 
 	/* ========================================================================= */
@@ -336,7 +337,6 @@ private:
 	) const;
 	VkSampleCountFlagBits			getMaxUsableSampleCount() const;
 	void							createColorResources();
-	static void						toggleColorShift();
 
 	static VKAPI_ATTR
 	VkBool32 VKAPI_CALL				debugCallback(

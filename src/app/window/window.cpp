@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:42 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 17:43:47 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 18:20:23 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ Window::Window() {
 
 	// handle resizing
 	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
-	glfwSetKeyCallback(window, );
+	glfwSetKeyCallback(window, keyCallback);
 	
 }
 
