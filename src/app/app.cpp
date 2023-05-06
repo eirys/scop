@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 11:38:23 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 11:44:49 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ void	App::initWindow() {
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
 	// create a window pointer
-	window = glfwCreateWindow(width, height, "Vulkan", nullptr, nullptr);
+	window = glfwCreateWindow(width, height, "Etran's cute lil app", nullptr, nullptr);
 
 	// set pointer to window to `this` instance pointer
 	glfwSetWindowUserPointer(window, this);
