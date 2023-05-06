@@ -6,28 +6,38 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/06 17:08:11 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 23:55:34 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parser.hpp"
+
+namespace scop {
 
 /* ========================================================================== */
 /*                                   PUBLIC                                   */
 /* ========================================================================== */
 
 Model	Parser::parseFile(const std::string& file_name) {
-	Model	model_object;
-	size_t	nb_lines = 0;
-	
+	std::ifstream	file;
+	Model			model_object;
+
 	file.open(file_name);
 	if (!file.is_open()) {
 		throw std::invalid_argument("Could not open file " + file_name);
 	}
 
 	while (file.good()) {
-		++nb_lines;
-		processLine();
+		std::getline(file, line);
+		if (!processLine(model_object)) {
+			throw std::invalid_argument(
+				"Error parsing file " +
+				file_name +
+				" at line " +
+				std::to_string(current_line)
+			);
+		}
+		++current_line;
 	}
 
 	return model_object;
@@ -37,10 +47,29 @@ Model	Parser::parseFile(const std::string& file_name) {
 /*                                   PRIVATE                                  */
 /* ========================================================================== */
 
-void	Parser::processLine() {
-	std::getline(file, current_line);
+bool	Parser::processLine(Model& model) {
+	current_pos = 0;
+
+	LineType	line_type = getLineType();
+	if (line_type == UNKNOWN) {
+		return false;
+	}
+
+	skipWhitespace();
+	return true;
 }
 
-void	Parser::getNextToken() {
-	
+void	Parser::getLineType() {
+
 }
+
+void	Parser::getNextToken(TokenType type) {
+	// token = line.substr(current_pos);
+}
+
+void	Parser::skipWhitespace() {
+	static constexpr char*	whitespaces = " \t";
+	current_pos = line.find_first_not_of(whitespaces, current_pos);
+}
+
+} // namespace scop

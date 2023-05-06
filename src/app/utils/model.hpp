@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 19:23:53 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 17:08:51 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 22:48:58 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,30 +17,38 @@
 # include <vector>
 
 # include "vector.hpp"
-# include "vertex.hpp"
+
+namespace scop {
 
 class Model {
 public:
+	/* ========================================================================= */
+	/*                                HELPER CLASS                               */
+	/* ========================================================================= */
 
-	struct Face {
-		std::vector<scop::Vect3>	vertex_indices;
+	struct Triangle {
+		scop::Vect3	vertex_indices;
+		scop::Vect3	normal_indices;
 	};
+
+	/* ========================================================================= */
+	/*                                  METHODS                                  */
+	/* ========================================================================= */
+
+	Model() = default;
+	~Model() = default;
+	Model(const Model& x) = default;
+	Model&	operator=(const Model& x) = default;
 
 private:
 	/* ========================================================================= */
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
 
-	/**
-	 * Vertices of the model
-	*/
-	std::vector<Vertex>		vertices;
-
-	/**
-	 * 
-	*/
-	std::vector<uint32_t>	indices;
+	std::vector<Triangle>	triangles;
 
 }; // class Model
+
+} // namespace scop
 
 #endif

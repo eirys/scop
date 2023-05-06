@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 13:54:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 18:41:25 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 22:45:26 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,22 +168,13 @@ struct Vect2 {
 	}
 }; // struct Vect2
 
-struct Vect4 {
-
-	float	x;
-	float	y;
-	float	z;
-	float	w;
-
-}; // struct Vect4
-
 } // namespace scop
 
 namespace std {
 
 template<>
 struct hash<scop::Vect3> {
-	size_t	operator()(const scop::Vect3& vect) const {
+	inline size_t	operator()(const scop::Vect3& vect) const {
 		return (
 			hash<float>()(vect.x) ^
 			hash<float>()(vect.y) ^
@@ -194,7 +185,7 @@ struct hash<scop::Vect3> {
 
 template<>
 struct hash<scop::Vect2> {
-	size_t	operator()(const scop::Vect2& vect) const {
+	inline size_t	operator()(const scop::Vect2& vect) const {
 		return (
 			hash<float>()(vect.x) ^
 			hash<float>()(vect.y)
