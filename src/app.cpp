@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/05 16:30:52 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 11:38:23 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ void	App::initVulkan() {
 	createDescriptorSetLayout();
 	createGraphicsPipeline();
 	createCommandPool();
+	createColorResources();
 	createDepthResources();
 	createFrameBuffers();
 	createTextureImage();
@@ -104,6 +105,11 @@ void	App::mainLoop() {
 }
 
 void	App::cleanupSwapChain() {
+	// Remove msaa resources
+	vkDestroyImageView(logical_device, color_image_view, nullptr);
+	vkDestroyImage(logical_device, color_image, nullptr);
+	vkFreeMemory(logical_device, color_image_memory, nullptr);
+
 	// Remove depth handler
 	vkDestroyImageView(logical_device, depth_image_view, nullptr);
 	vkDestroyImage(logical_device, depth_image, nullptr);
@@ -307,6 +313,7 @@ void	App::pickPhysicalDevice() {
 	for (const VkPhysicalDevice& device: devices) {
 		if (isDeviceSuitable(device)) {
 			physical_device = device;
+			msaa_samples = getMaxUsableSampleCount();
 			break;
 		}
 	}
@@ -681,18 +688,32 @@ void	App::createRenderPass() {
 	// Color attachment creation
 	VkAttachmentDescription	color_attachment{};
 	color_attachment.format = swap_chain_image_format;
-	color_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
+	color_attachment.samples = msaa_samples;
 	color_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 	color_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 	color_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 	color_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 	color_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	color_attachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+	color_attachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+	// Resolve multisampled image to regular image (
+	// 	VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
+	// 	-> VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+	// )
+	VkAttachmentDescription	color_attachment_resolve{};
+	color_attachment_resolve.format = swap_chain_image_format;
+	color_attachment_resolve.samples = VK_SAMPLE_COUNT_1_BIT;
+	color_attachment_resolve.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	color_attachment_resolve.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+	color_attachment_resolve.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	color_attachment_resolve.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	color_attachment_resolve.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	color_attachment_resolve.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
 	// Depth attachment creation
 	VkAttachmentDescription	depth_attachment{};
 	depth_attachment.format = findDepthFormat();
-	depth_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
+	depth_attachment.samples = msaa_samples;
 	depth_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 	depth_attachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 	depth_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -709,15 +730,21 @@ void	App::createRenderPass() {
 	depth_attachment_ref.attachment = 1;
 	depth_attachment_ref.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
+	VkAttachmentReference	color_attachment_resolve_ref{};
+	color_attachment_resolve_ref.attachment = 2;
+	color_attachment_resolve_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
 	VkSubpassDescription	subpass{};
 	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 	subpass.colorAttachmentCount = 1;
 	subpass.pColorAttachments = &color_attachment_ref;
 	subpass.pDepthStencilAttachment = &depth_attachment_ref;
+	subpass.pResolveAttachments = &color_attachment_resolve_ref;
 
-	std::array<VkAttachmentDescription, 2>	attachments = {
+	std::array<VkAttachmentDescription, 3>	attachments = {
 		color_attachment,
-		depth_attachment
+		depth_attachment,
+		color_attachment_resolve
 	};
 
 	// Subpass dependency
@@ -820,7 +847,7 @@ void	App::createGraphicsPipeline() {
 	VkPipelineMultisampleStateCreateInfo	multisampling{};
 	multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
 	multisampling.sampleShadingEnable = VK_FALSE;
-	multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+	multisampling.rasterizationSamples = msaa_samples;
 	multisampling.minSampleShading = 1.0f;
 	multisampling.pSampleMask = nullptr;
 	multisampling.alphaToCoverageEnable = VK_FALSE;
@@ -960,9 +987,10 @@ VkShaderModule	App::createShaderModule(const std::vector<char>& code) {
 void	App::createFrameBuffers() {
 	swap_chain_frame_buffers.resize(swap_chain_image_views.size());
 	for (size_t i = 0; i < swap_chain_image_views.size(); ++i) {
-		std::array<VkImageView, 2>	attachments = {
-			swap_chain_image_views[i],
-			depth_image_view
+		std::array<VkImageView, 3>	attachments = {
+			color_image_view,
+			depth_image_view,
+			swap_chain_image_views[i]
 		};
 
 		// Create frame buffer from image view, associate with a render pass
@@ -1253,6 +1281,7 @@ void	App::recreateSwapChain() {
 
 	createSwapChain();
 	createImageViews();
+	createColorResources();
 	createDepthResources();
 	createFrameBuffers();
 }
@@ -1486,23 +1515,24 @@ void	App::createUniformBuffers() {
 */
 void	App::updateUniformBuffer(uint32_t current_image) {
 	// Ensure 90deg rotation/sec
-	// static auto	start_time = std::chrono::high_resolution_clock::now();
+	static auto	start_time = std::chrono::high_resolution_clock::now();
 
-	// auto	current_time = std::chrono::high_resolution_clock::now();
-	// float	time = std::chrono::duration<float, std::chrono::seconds::period>(
-	// 				current_time - start_time
-	// 			).count();
+	auto	current_time = std::chrono::high_resolution_clock::now();
+	float	time = std::chrono::duration<float, std::chrono::seconds::period>(
+					current_time - start_time
+				).count();
 
 	UniformBufferObject	ubo{};
 
 	// Define model: continuous rotation around z axis
-	// ubo.model = scop::rotate(
-	// 	time * scop::utils::radians(90.0f),	// rotation angle
-	// 	scop::Vect3(0.0f, 0.0f, 1.0f)		// axis (z axis)
-	// );
+	ubo.model = scop::rotate(
+		time * scop::utils::radians(90.0f),	// rotation angle
+		scop::Vect3(0.0f, 0.0f, 1.0f)		// axis (z axis)
+	);
 
 	// Model: static
-	ubo.model = scop::Mat4(1.0f);
+	// ubo.model = scop::Mat4(1.0f);
+
 	// Define view transformation: above, 45deg angle
 	ubo.view = scop::lookAt(
 		scop::Vect3(2.0f, 2.0f, 2.0f),		// eye position
@@ -1655,6 +1685,7 @@ void	App::createTextureImage() {
 		tex_width,
 		tex_height,
 		mip_levels,
+		VK_SAMPLE_COUNT_1_BIT,
 		VK_FORMAT_R8G8B8A8_SRGB,
 		VK_IMAGE_TILING_OPTIMAL,
 		VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
@@ -1700,6 +1731,7 @@ void	App::createImage(
 	uint32_t width,
 	uint32_t height,
 	uint32_t mip_level,
+	VkSampleCountFlagBits num_samples,
 	VkFormat format,
 	VkImageTiling tiling,
 	VkImageUsageFlags usage,
@@ -1720,7 +1752,7 @@ void	App::createImage(
 	image_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	image_info.usage = usage;
 	image_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-	image_info.samples = VK_SAMPLE_COUNT_1_BIT;
+	image_info.samples = num_samples;
 	image_info.flags = 0;
 
 	if (vkCreateImage(logical_device, &image_info, nullptr, &image) != VK_SUCCESS) {
@@ -1933,6 +1965,7 @@ void	App::createDepthResources() {
 		swap_chain_extent.width,
 		swap_chain_extent.height,
 		1,
+		msaa_samples,
 		depth_format,
 		VK_IMAGE_TILING_OPTIMAL,
 		VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
@@ -2174,6 +2207,57 @@ void	App::generateMipmaps(
 	endSingleTimeCommands(command_buffer);
 }
 
+/**
+ * Retrieve max sample count for MSAA (multisample antialiasing)
+*/
+VkSampleCountFlagBits	App::getMaxUsableSampleCount() const {
+	VkPhysicalDeviceProperties	properties;
+	vkGetPhysicalDeviceProperties(physical_device, &properties);
+
+	VkSampleCountFlags	count =
+		properties.limits.framebufferColorSampleCounts &
+		properties.limits.framebufferDepthSampleCounts;
+
+	VkSampleCountFlagBits	values[] = {
+		VK_SAMPLE_COUNT_64_BIT,
+		VK_SAMPLE_COUNT_32_BIT,
+		VK_SAMPLE_COUNT_16_BIT,
+		VK_SAMPLE_COUNT_8_BIT,
+		VK_SAMPLE_COUNT_4_BIT,
+		VK_SAMPLE_COUNT_2_BIT
+	};
+
+	for (VkSampleCountFlagBits value : values) {
+		if (count & value) {
+			return value;
+		}
+	}
+	return VK_SAMPLE_COUNT_1_BIT;
+}
+
+/**
+ * Create color buffer for MSAA
+*/
+void	App::createColorResources() {
+	createImage(
+		swap_chain_extent.width,
+		swap_chain_extent.height,
+		1,
+		msaa_samples,
+		swap_chain_image_format,
+		VK_IMAGE_TILING_OPTIMAL,
+		VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+		color_image,
+		color_image_memory
+	);
+	color_image_view = createImageView(
+		color_image,
+		swap_chain_image_format,
+		VK_IMAGE_ASPECT_COLOR_BIT,
+		1
+	);
+}
 
 /* ========================================================================== */
 /*                                    OTHER                                   */

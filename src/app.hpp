@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/05 16:17:26 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 11:17:41 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,6 +174,11 @@ private:
 	VkDeviceMemory					depth_image_memory;
 	VkImageView						depth_image_view;
 
+	VkSampleCountFlagBits			msaa_samples;
+	VkImage							color_image;
+	VkDeviceMemory					color_image_memory;
+	VkImageView						color_image_view;
+
 	bool							frame_buffer_resized = false;
 	uint32_t						current_frame = 0;
 
@@ -288,6 +293,7 @@ private:
 		uint32_t width,
 		uint32_t height,
 		uint32_t mip_level,
+		VkSampleCountFlagBits num_samples,
 		VkFormat format,
 		VkImageTiling tiling,
 		VkImageUsageFlags usage,
@@ -332,6 +338,8 @@ private:
 		int32_t tex_height,
 		uint32_t mip_level
 	) const;
+	VkSampleCountFlagBits					getMaxUsableSampleCount() const;
+	void									createColorResources();
 
 }; // class App
 
