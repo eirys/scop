@@ -6,7 +6,7 @@
 #    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/05/06 12:49:51 by eli              ###   ########.fr        #
+#    Updated: 2023/05/06 15:59:36 by eli              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -45,11 +45,15 @@ INC_FILES	:=	$(TOOLS_DIR)/utils.hpp \
 				$(TOOLS_DIR)/vector.hpp \
 				$(UTILS_DIR)/vertex.hpp \
 				$(UTILS_DIR)/uniform_buffer_object.hpp \
+				$(UTILS_DIR)/model.hpp \
+				$(UTILS_DIR)/parser.hpp \
 				$(WINDOW_DIR)/window.hpp \
 				$(APP_DIR)/app.hpp
 
 SRC_FILES	:=	main.cpp \
 				$(WINDOW_DIR)/window.cpp \
+				$(UTILS_DIR)/model.cpp \
+				$(UTILS_DIR)/parser.cpp \
 				$(APP_DIR)/app.cpp
 
 INC			:=	$(addprefix	$(SRC_DIR)/,$(INC_FILES))
