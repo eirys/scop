@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 11:17:41 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 12:19:44 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,15 +99,15 @@ private:
 	/*                               CONST MEMBERS                               */
 	/* ========================================================================= */
 
-	const uint32_t					width = 800;
-	const uint32_t					height = 600;
+	static constexpr uint32_t		width = 800;
+	static constexpr uint32_t		height = 600;
 	const std::vector<const char*>	validation_layers = {
 		"VK_LAYER_KHRONOS_validation"
 	};
 	const std::vector<const char*>	device_extensions = {
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
-	const int						max_frames_in_flight = 2;
+	static constexpr int			max_frames_in_flight = 2;
 
 	#ifndef NDEBUG
 	const bool						enable_validation_layers = false;

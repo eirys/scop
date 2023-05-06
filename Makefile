@@ -6,7 +6,7 @@
 #    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/05/06 12:09:00 by eli              ###   ########.fr        #
+#    Updated: 2023/05/06 12:34:44 by eli              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,8 +26,12 @@ LIB_DIR		:=	lib
 # subdirectories
 APP_DIR		:=	app
 TOOLS_DIR	:=	tools
+UTILS_DIR	:=	$(APP_DIR)/utils
 
-OBJ_SUBDIRS	:=	$(addprefix $(OBJ_DIR)/,$(APP_DIR) $(TOOLS_DIR))
+OBJ_SUBDIRS	:=	$(addprefix $(OBJ_DIR)/,\
+				$(APP_DIR) \
+				$(TOOLS_DIR) \
+				$(UTILS_DIR))
 
 # external libraries
 STB_PATH	:=	$(LIB_DIR)/stb
@@ -37,8 +41,8 @@ TOL_PATH	:=	$(LIB_DIR)/tol
 INC_FILES	:=	$(TOOLS_DIR)/utils.hpp \
 				$(TOOLS_DIR)/matrix.hpp \
 				$(TOOLS_DIR)/vector.hpp \
-				$(APP_DIR)/vertex.hpp \
-				$(APP_DIR)/uniform_buffer_object.hpp \
+				$(UTILS_DIR)/vertex.hpp \
+				$(UTILS_DIR)/uniform_buffer_object.hpp \
 				$(APP_DIR)/app.hpp
 
 SRC_FILES	:=	main.cpp \
@@ -60,11 +64,13 @@ EXTRA		:=	-Wall -Werror -Wextra
 CFLAGS		:=	-std=c++17 \
 				-I./$(SRC_DIR)/$(APP_DIR) \
 				-I./$(SRC_DIR)/$(TOOLS_DIR) \
+				-I./$(SRC_DIR)/$(UTILS_DIR) \
 				-I./$(STB_PATH) \
 				-I./${TOL_PATH} \
 				-O3 \
 				-DNDEBUG \
 				-D__VERBOSE
+
 LDFLAGS		:=	-lglfw \
 				-lvulkan \
 				-ldl \
@@ -73,6 +79,7 @@ LDFLAGS		:=	-lglfw \
 				-lXxf86vm \
 				-lXrandr \
 				-lXi
+
 ifdef school
 	GLSLC	:=	~/my_sgoinfre/glslc
 else

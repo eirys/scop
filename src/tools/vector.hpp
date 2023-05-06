@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 13:54:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/04 21:33:30 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/06 12:24:53 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,7 @@ struct Vect3 {
 	bool	operator==(const Vect3& rhs) const {
 		return x == rhs.x && y == rhs.y && z == rhs.z;
 	}
-};
+}; // struct Vect3
 
 struct Vect2 {
 	/* ========================================================================= */
@@ -166,7 +166,7 @@ struct Vect2 {
 	bool	operator==(const Vect2& rhs) const {
 		return x == rhs.x && y == rhs.y;
 	}
-};
+}; // struct Vect2
 
 } // namespace scop
 
