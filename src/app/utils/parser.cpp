@@ -6,13 +6,21 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/06 23:55:34 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/07 10:46:17 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parser.hpp"
 
+/**
+ * TODO:
+ * 
+ * 1. Recup les vertex/texture/norm coord
+ * 2. Definir chq triangles
+*/
+
 namespace scop {
+namespace obj {
 
 /* ========================================================================== */
 /*                                   PUBLIC                                   */
@@ -59,8 +67,8 @@ bool	Parser::processLine(Model& model) {
 	return true;
 }
 
-void	Parser::getLineType() {
-
+Parser::LineType	Parser::getLineType() {
+	return UNKNOWN;
 }
 
 void	Parser::getNextToken(TokenType type) {
@@ -68,8 +76,9 @@ void	Parser::getNextToken(TokenType type) {
 }
 
 void	Parser::skipWhitespace() {
-	static constexpr char*	whitespaces = " \t";
+	static constexpr char	whitespaces[] = " \t";
 	current_pos = line.find_first_not_of(whitespaces, current_pos);
 }
 
+} // namespace obj
 } // namespace scop

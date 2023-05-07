@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/26 15:25:04 by etran             #+#    #+#             */
-/*   Updated: 2023/05/04 12:31:43 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/07 10:53:34 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,14 @@
 # define VERTEX_HPP
 
 // Graphics
-# ifndef GLFW_INCLUDE_VULKAN
-#  define GLFW_INCLUDE_VULKAN
-# endif
+# include <vulkan/vulkan.h>
 
 // Std
 # include <array>
 
 # include "vector.hpp"
 
+namespace scop {
 struct Vertex {
 	/* ========================================================================= */
 	/*                               CLASS MEMBERS                               */
@@ -31,6 +30,7 @@ struct Vertex {
 	scop::Vect3		pos;
 	scop::Vect3		color;
 	scop::Vect2		tex_coord;
+	// scop::Vect3		normal;
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
@@ -83,14 +83,15 @@ struct Vertex {
 			tex_coord == rhs.tex_coord
 		);
 	}
-
 }; // struct Vertex
+
+} // namespace scop
 
 namespace std {
 
 	template<>
-	struct hash<Vertex> {
-		size_t	operator()(const Vertex& vertex) const {
+	struct hash<scop::Vertex> {
+		size_t	operator()(const scop::Vertex& vertex) const {
 			return (
 				(hash<scop::Vect3>()(vertex.pos) ^
 				(hash<scop::Vect3>()(vertex.color) << 1)) >> 1 ^

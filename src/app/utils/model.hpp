@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 19:23:53 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 22:48:58 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/07 10:54:29 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,11 @@
 
 // Std
 # include <vector>
+# include <array>
+# include <map>
 
 # include "vector.hpp"
+# include "vertex.hpp"
 
 namespace scop {
 
@@ -26,9 +29,14 @@ public:
 	/*                                HELPER CLASS                               */
 	/* ========================================================================= */
 
-	struct Triangle {
-		scop::Vect3	vertex_indices;
-		scop::Vect3	normal_indices;
+	// struct Triangle {
+	// 	std::array<uin32_t, 3>			vertex_indices;
+	// 	std::array<uin32_t, 3>			texture_indices;
+	// 	std::array<uin32_t, 3>			normal_indices;
+	// };
+
+	struct Material {
+
 	};
 
 	/* ========================================================================= */
@@ -45,7 +53,11 @@ private:
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
 
-	std::vector<Triangle>	triangles;
+	std::vector<Vertex>						vertices;
+
+	// std::vector<Vect3>					vectors;
+	// std::vector<Triangle>				triangles;
+	// std::map<std::string, std::string>	textures;
 
 }; // class Model
 

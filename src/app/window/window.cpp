@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:42 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 18:26:13 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/07 08:28:41 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,7 @@ void	keyCallback(
 		return;
 	}
 	if (action == GLFW_PRESS) {
-		scop::App::toggleColorShift();
+		scop::App::toggleTexture();
 	}
 }
 

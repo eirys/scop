@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 22:46:37 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/07 08:28:26 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,7 @@ public:
 	/* ========================================================================= */
 
 	void			run();
-	static void		toggleColorShift();
+	static void		toggleTexture();
 
 private:
 	/* ========================================================================= */
@@ -192,7 +192,7 @@ private:
 	VkDeviceMemory					color_image_memory;
 	VkImageView						color_image_view;
 
-	static bool						toggle_color_shift;
+	static bool						texture_enabled;
 	uint32_t						current_frame = 0;
 
 	/* ========================================================================= */
@@ -283,7 +283,9 @@ private:
 	);
 	void							createDescriptorPool();
 	void							createDescriptorSets();
-	void							createTextureImage();
+	void							createTextureImage(
+		const char* path
+	);
 	void							createImage(
 		uint32_t width,
 		uint32_t height,
@@ -325,7 +327,7 @@ private:
 	bool							hasStencilCompotent(
 		VkFormat format
 	) const;
-	void							loadModel();
+	void							loadModel(const char* path);
 	void							generateMipmaps(
 		VkImage image,
 		VkFormat image_format,

@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:02:06 by etran             #+#    #+#             */
-/*   Updated: 2023/05/06 23:55:25 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/07 08:24:46 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,16 +20,26 @@
 # include "model.hpp"
 
 namespace scop {
+namespace obj {
+
+enum SymbolType {
+	
+};
 
 enum TokenType {
-
+	INT,
+	FLOAT,
+	CHARACTER,
+	STRING,
+	SYMBOL,
+	UNDEFINED
 };
 
 enum LineType {
 	VERTEX_COOORD,
 	TEXTURE_COORD,
 	NORMAL_COORD,
-	MATERIAL_NAME,
+	COMMAND_NAME,
 	GROUP_NAME,
 	UNKNOWN
 };
@@ -68,12 +78,23 @@ private:
 	/* ======================================================================== */
 
 	bool				processLine(Model& model);
-	void				getLineType();
+	LineType			getLineType();
 	void				getNextToken(TokenType type);
 	void				skipWhitespace();
 
-};
+}; // class Parser
 
+} // namespace obj
+
+namespace mtl {
+
+/**
+ * Parser for .mtl files.
+*/
+class Parser {
+}; // class Parser
+
+} // namespace mtl
 } // namespace scop
 
 #endif

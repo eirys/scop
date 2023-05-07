@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 14:23:35 by eli               #+#    #+#             */
-/*   Updated: 2023/05/03 16:17:56 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/07 08:16:43 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@
 # endif
 
 namespace scop {
-
 namespace utils {
 
 inline float	radians(float degrees) {
@@ -31,7 +30,6 @@ inline float	radians(float degrees) {
 }
 
 } // namespace utils
-
 } // namespace scop
 
 #endif

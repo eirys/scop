@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 21:49:28 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/07 08:29:09 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 
 namespace scop {
 
-bool		App::toggle_color_shift = false;
+bool		App::texture_enabled = true;
 
 /* ========================================================================== */
 /*                                   PUBLIC                                   */
@@ -46,10 +46,10 @@ App::App() {
 	createColorResources();
 	createDepthResources();
 	createFrameBuffers();
-	createTextureImage();
+	createTextureImage(SCOP_TEXTURE_FILE_VIKING_PNG);
 	createTextureImageView();
 	createTextureSampler();
-	loadModel();
+	loadModel(SCOP_MODEL_FILE_VIKING_OBJ);
 	createVertexBuffer();
 	createIndexBuffer();
 	createUniformBuffers();
@@ -131,8 +131,8 @@ void	App::run() {
 
 /* ========================================================================== */
 
-void	App::toggleColorShift() {
-	toggle_color_shift = !toggle_color_shift;
+void	App::toggleTexture() {
+	texture_enabled = !texture_enabled;
 }
 
 /* ========================================================================== */
@@ -1520,7 +1520,7 @@ void	App::updateUniformBuffer(uint32_t current_image) {
 	);
 	// Invert y axis (OpenGL has y axis inverted)
 	ubo.proj[5] *= -1;
-	ubo.is_textured = toggle_color_shift;
+	ubo.is_textured = texture_enabled;
 
 	memcpy(uniform_buffers_mapped[current_image], &ubo, sizeof(ubo));
 }
@@ -1609,12 +1609,14 @@ void	App::createDescriptorSets() {
 /**
  * Texture loader
 */
-void	App::createTextureImage() {
+void	App::createTextureImage(
+	const char* path
+) {
 	int	tex_width, tex_height, tex_channels;
 
 	// Load image
 	stbi_uc*	pixels = stbi_load(
-		SCOP_TEXTURE_FILE_VIKING_PNG,
+		path,
 		&tex_width,
 		&tex_height,
 		&tex_channels,
@@ -1999,7 +2001,7 @@ bool	App::hasStencilCompotent(VkFormat format) const {
 	);
 }
 
-void	App::loadModel() {
+void	App::loadModel(const char* path) {
 	tinyobj::attrib_t					attributes;
 	std::vector<tinyobj::shape_t>		shapes;
 	std::vector<tinyobj::material_t>	materials;
@@ -2011,7 +2013,7 @@ void	App::loadModel() {
 		&materials,
 		&warn,
 		&err,
-		SCOP_MODEL_FILE_VIKING_OBJ
+		path
 	);
 	if (!ret) {
 		throw std::runtime_error(warn + err);
