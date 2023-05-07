@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/07 08:28:26 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/07 20:23:48 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,12 +120,12 @@ private:
 	const std::vector<const char*>	device_extensions = {
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
-	static constexpr int			max_frames_in_flight = 2;
+	const int						max_frames_in_flight = 2;
 
 	#ifndef NDEBUG
-	static constexpr bool			enable_validation_layers = false;
+	const bool						enable_validation_layers = false;
 	#else
-	static constexpr bool			enable_validation_layers = true;
+	const bool						enable_validation_layers = true;
 	#endif
 
 	/* ========================================================================= */
@@ -162,7 +162,7 @@ private:
 	std::vector<VkSemaphore>		render_finished_semaphores;
 	std::vector<VkFence>			in_flight_fences;
 
-	std::vector<Vertex>				vertices;
+	std::vector<scop::Vertex>		vertices;
 	std::vector<uint32_t>			indices;
 
 	VkBuffer						vertex_buffer;

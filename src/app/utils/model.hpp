@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 19:23:53 by eli               #+#    #+#             */
-/*   Updated: 2023/05/07 10:54:29 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/07 21:03:34 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,14 +29,11 @@ public:
 	/*                                HELPER CLASS                               */
 	/* ========================================================================= */
 
-	// struct Triangle {
-	// 	std::array<uin32_t, 3>			vertex_indices;
-	// 	std::array<uin32_t, 3>			texture_indices;
-	// 	std::array<uin32_t, 3>			normal_indices;
-	// };
+	struct Triangle {
+		std::array<uin32_t, 3>			vertex_indices;
+		std::array<uin32_t, 3>			texture_indices;
 
-	struct Material {
-
+		// std::array<uin32_t, 3>			normal_indices;
 	};
 
 	/* ========================================================================= */
@@ -48,16 +45,24 @@ public:
 	Model(const Model& x) = default;
 	Model&	operator=(const Model& x) = default;
 
+	/* ========================================================================= */
+
+	const std::vector<Vect3>&			getVertexCoords() const;
+	const std::vector<Vect2>&			getTextureCoords() const;
+	const std::vector<Triangle>&		getTriangles() const;
+
+	// const std::vector<Vect3>&			getNormalCoords() const;
+
 private:
 	/* ========================================================================= */
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
 
-	std::vector<Vertex>						vertices;
+	std::vector<Vect3>					vertex_coords;
+	std::vector<Vect2>					texture_coords;
+	std::vector<Triangle>				triangles;
 
-	// std::vector<Vect3>					vectors;
-	// std::vector<Triangle>				triangles;
-	// std::map<std::string, std::string>	textures;
+	// std::vector<Vect3>					normal_coords;
 
 }; // class Model
 

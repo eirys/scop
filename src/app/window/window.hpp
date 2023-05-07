@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:36 by eli               #+#    #+#             */
-/*   Updated: 2023/05/06 18:21:45 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/07 20:24:27 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,9 +46,9 @@ public:
 	/*                               CONST MEMBERS                               */
 	/* ========================================================================= */
 
-	static constexpr uint32_t		width = 800;
-	static constexpr uint32_t		height = 600;
-	static constexpr const char*	window_title = "Etran's cute lil app";
+	const uint32_t		width = 800;
+	const uint32_t		height = 600;
+	const const char*	window_title = "Etran's cute lil app";
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */

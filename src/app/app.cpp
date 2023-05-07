@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/07 08:29:09 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/07 19:23:31 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -779,8 +779,8 @@ void	App::createGraphicsPipeline() {
 
 	// Vertex data input handler
 	VkPipelineVertexInputStateCreateInfo	vertex_input_info{};
-	auto	binding_description = Vertex::getBindingDescription();
-	auto	attribute_descriptions = Vertex::getAttributeDescriptions();
+	auto	binding_description = scop::Vertex::getBindingDescription();
+	auto	attribute_descriptions = scop::Vertex::getAttributeDescriptions();
 
 	vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 	vertex_input_info.vertexBindingDescriptionCount = 1;
@@ -2019,11 +2019,11 @@ void	App::loadModel(const char* path) {
 		throw std::runtime_error(warn + err);
 	}
 
-	std::unordered_map<Vertex, uint32_t>	unique_vertices{};
+	std::unordered_map<scop::Vertex, uint32_t>	unique_vertices{};
 
 	for (const auto& shape: shapes) {
 		for (const auto& index: shape.mesh.indices) {
-			Vertex	vertex{};
+			scop::Vertex	vertex{};
 
 			vertex.pos = {
 				attributes.vertices[3 * index.vertex_index + 0],

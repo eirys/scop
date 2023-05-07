@@ -6,18 +6,14 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/07 10:46:17 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/07 22:49:42 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parser.hpp"
-
-/**
- * TODO:
- * 
- * 1. Recup les vertex/texture/norm coord
- * 2. Definir chq triangles
-*/
+// TODO Remove
+#include <iostream>
+#include "utils.hpp"
 
 namespace scop {
 namespace obj {
@@ -26,59 +22,98 @@ namespace obj {
 /*                                   PUBLIC                                   */
 /* ========================================================================== */
 
-Model	Parser::parseFile(const std::string& file_name) {
+scop::Model	Parser::parseFile(const std::string& file_name) {
 	std::ifstream	file;
-	Model			model_object;
 
 	file.open(file_name);
 	if (!file.is_open()) {
 		throw std::invalid_argument("Could not open file " + file_name);
 	}
 
-	while (file.good()) {
+	for (size_t current_line = 0; file.good(); ++current_line) {
 		std::getline(file, line);
-		if (!processLine(model_object)) {
+
+		try {
+			processLine();
+		} catch (const Parser::parse_error& error) {
 			throw std::invalid_argument(
-				"Error parsing file " +
+				"Error while parsing '" +
 				file_name +
-				" at line " +
-				std::to_string(current_line)
+				"' at line " +
+				std::to_string(current_line) +
+				": " +
+				error.what()
 			);
 		}
-		++current_line;
 	}
 
-	return model_object;
+	return model_output;
 }
 
 /* ========================================================================== */
 /*                                   PRIVATE                                  */
 /* ========================================================================== */
 
-bool	Parser::processLine(Model& model) {
-	current_pos = 0;
-
-	LineType	line_type = getLineType();
-	if (line_type == UNKNOWN) {
-		return false;
+void	Parser::processLine() {
+	if (line.empty()) {
+		return;
 	}
 
-	skipWhitespace();
+	// Check line beginning
+	current_pos = 0;
+	getNextToken();
+
+	for (size_t i = 0; i < NB_LINE_TYPES; ++i) {
+		if (token == line_begin[i]) {
+			return (this->*parseLineFun[i])();
+		}
+	}
+	throw Parser::parse_error("undefined line type");
+}
+
+void	Parser::parseCoords() {
+}
+
+void	Parser::parseFace() {
+}
+
+void	Parser::skipComment() {
+}
+
+/* ========================================================================== */
+
+/**
+ * Retrieve word.
+ * Returns false if line is empty.
+*/
+bool	Parser::getNextToken() {
+	if (current_pos == std::string::npos) {
+		return false;
+	}
+	size_t	next_word_pos = line.find_first_of(cs_whitespaces, current_pos);
+	token = line.substr(current_pos, next_word_pos - current_pos);
+	current_pos = next_word_pos;
 	return true;
 }
 
-Parser::LineType	Parser::getLineType() {
-	return UNKNOWN;
-}
-
-void	Parser::getNextToken(TokenType type) {
-	// token = line.substr(current_pos);
-}
-
 void	Parser::skipWhitespace() {
-	static constexpr char	whitespaces[] = " \t";
-	current_pos = line.find_first_not_of(whitespaces, current_pos);
+	current_pos = line.find_first_not_of(cs_whitespaces, current_pos);
+}
+
+void	Parser::parseNumber() {
+	
 }
 
 } // namespace obj
 } // namespace scop
+
+// TODO remove
+int main() {
+	scop::obj::Parser	parser;
+
+	try {
+	parser.parseFile("testfile");
+	} catch (const std::exception& e) {
+		std::cerr << e.what() <<__NL;
+	}
+}

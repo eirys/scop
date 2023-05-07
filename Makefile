@@ -6,7 +6,7 @@
 #    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/05/06 22:28:36 by eli              ###   ########.fr        #
+#    Updated: 2023/05/07 22:44:18 by eli              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -79,7 +79,8 @@ CFLAGS		:=	-std=c++17 \
 				-I./$(STB_PATH) \
 				-I./${TOL_PATH} \
 				-O3 \
-				-DNDEBUG
+				-DNDEBUG \
+				-D__DEBUG
 
 LDFLAGS		:=	-lglfw \
 				-lvulkan \
