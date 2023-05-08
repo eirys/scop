@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/07 19:23:31 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/08 15:27:13 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -400,7 +400,7 @@ void	App::createLogicalDevice() {
 		queue_create_info.queueFamilyIndex = queue_family;
 		queue_create_info.queueCount = 1;
 		queue_create_info.pQueuePriorities = &queue_priority;
-		queue_create_infos.push_back(queue_create_info);
+		queue_create_infos.emplace_back(queue_create_info);
 	}
 
 	// Enable device features
@@ -1224,7 +1224,7 @@ std::vector<const char*>	App::getRequiredExtensions() {
 	std::vector<const char*>	extensions(glfw_extensions, glfw_extensions + glfw_extension_count);
 
 	if (enable_validation_layers) {
-		extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+		extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 	}
 	return extensions;
 }
@@ -2038,9 +2038,9 @@ void	App::loadModel(const char* path) {
 
 			if (unique_vertices.count(vertex) == 0) {
 				unique_vertices[vertex] = static_cast<uint32_t>(vertices.size());
-				vertices.push_back(vertex);
+				vertices.emplace_back(vertex);
 			}
-			indices.push_back(unique_vertices[vertex]);
+			indices.emplace_back(unique_vertices[vertex]);
 		}
 	}
 }

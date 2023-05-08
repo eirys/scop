@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:02:06 by etran             #+#    #+#             */
-/*   Updated: 2023/05/07 22:49:29 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/08 18:01:33 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,14 +17,15 @@
 # include <fstream>
 # include <string>
 
-// # include "model.hpp"
+# include "model.hpp"
+# include "vertex.hpp"
 
 # define NB_LINE_TYPES 4
 
 namespace scop {
 
 // TODO remove
-class Model {};
+// class Model {};
 
 namespace obj {
 
@@ -41,12 +42,32 @@ enum TokenType {
 	TOKEN_UNKNOWN
 };
 
+# define VERTEX		1 << 2 // 4
+# define TEXTURE	1 << 1 // 2
+# define NORMAL		1 << 0 // 1
+
+// enum Format {
+// 	FORMAT_V = VERTEX,
+// 	FORMAT_VT = VERTEX | TEXTURE,
+// 	FORMAT_VN = VERTEX | NORMAL,
+// 	FORMAT_VTN = VERTEX | TEXTURE | NORMAL
+// };
+
+// enum LineType {
+// 	LINE_VERTEX_COORD,
+// 	// LINE_NORMAL_COORD,
+// 	LINE_TEXTURE_COORD,
+// 	LINE_FACE,
+// 	LINE_COMMENT
+// };
+
 /**
  * Parser for .obj files.
 */
 class Parser {
 public:
-	typedef		enum TokenType					TokenType;
+	// typedef		enum Format				Format;
+	typedef		enum TokenType			TokenType;
 	typedef		void (Parser::*ParseFunction)();
 
 	/* ========================================================================= */
@@ -69,17 +90,19 @@ public:
 	 * List of possible line type in .obj file.
 	*/
 	const std::string	line_begin[NB_LINE_TYPES] = {
-		"#",
 		"v",
+		// "vn",
 		"vt",
-		"f"
+		"f",
+		"#"
 	};
 
 	ParseFunction		parseLineFun[NB_LINE_TYPES] = {
-		&Parser::skipComment,
-		&Parser::parseCoords,
-		&Parser::parseCoords,
-		&Parser::parseFace
+		&Parser::parseVertex,
+		// &Parser::parseCoords,
+		&Parser::parseTexture,
+		&Parser::parseFace,
+		&Parser::skipComment
 	};
 
 	// const char*		line_vertex_cooord		= "v";
@@ -107,12 +130,14 @@ public:
 	/*                                 EXCEPTION                                 */
 	/* ========================================================================= */
 
-	class parse_error: public std::exception {
+	class parse_error: public std::out_of_range {
 		public:
-			parse_error() : error_msg("undefined error") {}
-			parse_error(const std::string& error_msg): error_msg(error_msg) {}
+			parse_error(): std::out_of_range("Error"), error_msg("undefined error") {}
+			parse_error(const std::string& error_msg):
+				std::out_of_range("Error"),
+				error_msg(error_msg) {}
 
-			const char* what() const throw() {
+			const char* what() const noexcept override {
 				return error_msg.c_str();
 			}
 
@@ -125,6 +150,8 @@ private:
 	/*                               CLASS MEMBERS                              */
 	/* ======================================================================== */
 
+//TODO remove public
+public:
 	scop::Model			model_output;
 	std::string			line;
 	std::string			token;
@@ -133,13 +160,20 @@ private:
 	/* ======================================================================== */
 
 	void				processLine();
-	void				parseCoords();
+
+	void				parseTexture();
+	void				parseVertex();
 	void				parseFace();
 	void				skipComment();
 
-	bool				getNextToken();
+	bool				getWord();
 	void				skipWhitespace();
-	void				parseNumber();
+	TokenType			checkNumberType(const std::string& word) const;
+	void				checkJunkAfterNumber(
+		const std::string& word,
+		size_t pos
+	) const;
+	uint8_t				getFormat() const;
 
 }; // class Parser
 

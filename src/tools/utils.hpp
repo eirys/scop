@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 14:23:35 by eli               #+#    #+#             */
-/*   Updated: 2023/05/07 22:50:13 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/08 10:48:55 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 # ifdef __DEBUG
 #  define LOG(X) std::cerr << X << __NL
 # else
-#  define LOG(X) (void)
+#  define LOG(X)
 # endif
 
 namespace scop {
