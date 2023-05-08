@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 19:23:53 by eli               #+#    #+#             */
-/*   Updated: 2023/05/08 18:07:19 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/08 20:32:31 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,7 @@ public:
 	struct Triangle {
 		std::array<uint32_t, 3>			vertex_indices;
 		std::array<uint32_t, 2>			texture_indices;
-
-		// std::array<uint32_t, 3>			normal_indices;
+		std::array<uint32_t, 3>			normal_indices;
 	};
 
 	/* ========================================================================= */

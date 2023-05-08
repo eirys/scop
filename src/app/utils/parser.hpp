@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:02:06 by etran             #+#    #+#             */
-/*   Updated: 2023/05/08 18:01:33 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/08 23:06:27 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,18 @@
 # define PARSER_HPP
 
 // Std
-# include <fstream>
 # include <string>
 
 # include "model.hpp"
 # include "vertex.hpp"
 
-# define NB_LINE_TYPES 4
+# define VERTEX			1 << 2 // 4
+# define TEXTURE		1 << 1 // 2
+# define NORMAL			1 << 0 // 1
+
+# define NB_LINE_TYPES	10
 
 namespace scop {
-
-// TODO remove
-// class Model {};
-
 namespace obj {
 
 /**
@@ -35,38 +34,17 @@ namespace obj {
 enum TokenType {
 	TOKEN_INT,
 	TOKEN_FLOAT,
-	TOKEN_STRING,
-	TOKEN_HASH,
-	TOKEN_SLASH,
-	TOKEN_WHITESPACE,
-	TOKEN_UNKNOWN
+	// TOKEN_STRING,
+	// TOKEN_HASH,
+	// TOKEN_SLASH,
+	// TOKEN_UNKNOWN
 };
-
-# define VERTEX		1 << 2 // 4
-# define TEXTURE	1 << 1 // 2
-# define NORMAL		1 << 0 // 1
-
-// enum Format {
-// 	FORMAT_V = VERTEX,
-// 	FORMAT_VT = VERTEX | TEXTURE,
-// 	FORMAT_VN = VERTEX | NORMAL,
-// 	FORMAT_VTN = VERTEX | TEXTURE | NORMAL
-// };
-
-// enum LineType {
-// 	LINE_VERTEX_COORD,
-// 	// LINE_NORMAL_COORD,
-// 	LINE_TEXTURE_COORD,
-// 	LINE_FACE,
-// 	LINE_COMMENT
-// };
 
 /**
  * Parser for .obj files.
 */
 class Parser {
 public:
-	// typedef		enum Format				Format;
 	typedef		enum TokenType			TokenType;
 	typedef		void (Parser::*ParseFunction)();
 
@@ -91,27 +69,29 @@ public:
 	*/
 	const std::string	line_begin[NB_LINE_TYPES] = {
 		"v",
-		// "vn",
+		"vn",
 		"vt",
 		"f",
-		"#"
+		"#",
+		"mtllib",	// TODO
+		"usemtl", 	// TODO
+		"o",		// TODO
+		"g",		// TODO
+		"s"			// TODO
 	};
 
 	ParseFunction		parseLineFun[NB_LINE_TYPES] = {
 		&Parser::parseVertex,
-		// &Parser::parseCoords,
+		&Parser::parseVertex,
 		&Parser::parseTexture,
 		&Parser::parseFace,
+		&Parser::skipComment,
+		&Parser::skipComment,
+		&Parser::skipComment,
+		&Parser::skipComment,
+		&Parser::skipComment,
 		&Parser::skipComment
 	};
-
-	// const char*		line_vertex_cooord		= "v";
-	// const char*		line_texture_coord		= "vt";
-	// const char*		line_face_descriptor	= "f";
-	// const char*	line_normal_coord;			= "vn"
-	// const char*	line_material_descriptor;	= "mtllib, newmtl, usemtl"
-	// const char*	line_option;				= "s (smooth shading)"
-	// const char*	line_group_name;			= "o (object name), g (group name) ..."
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
@@ -130,12 +110,10 @@ public:
 	/*                                 EXCEPTION                                 */
 	/* ========================================================================= */
 
-	class parse_error: public std::out_of_range {
+	class parse_error: public std::exception {
 		public:
-			parse_error(): std::out_of_range("Error"), error_msg("undefined error") {}
-			parse_error(const std::string& error_msg):
-				std::out_of_range("Error"),
-				error_msg(error_msg) {}
+			parse_error(): error_msg("undefined error") {}
+			parse_error(const std::string& error_msg): error_msg(error_msg) {}
 
 			const char* what() const noexcept override {
 				return error_msg.c_str();
@@ -150,30 +128,29 @@ private:
 	/*                               CLASS MEMBERS                              */
 	/* ======================================================================== */
 
-//TODO remove public
-public:
 	scop::Model			model_output;
+	size_t				current_pos;
 	std::string			line;
 	std::string			token;
-	size_t				current_pos = 0;
 
 	/* ======================================================================== */
 
 	void				processLine();
 
-	void				parseTexture();
 	void				parseVertex();
+	void				parseTexture();
+	void				parseNormal();
 	void				parseFace();
-	void				skipComment();
 
 	bool				getWord();
-	void				skipWhitespace();
+	void				skipComment() noexcept;
+	void				skipWhitespace() noexcept;
 	TokenType			checkNumberType(const std::string& word) const;
 	void				checkJunkAfterNumber(
 		const std::string& word,
 		size_t pos
 	) const;
-	uint8_t				getFormat() const;
+	uint8_t				getFormat() const noexcept;
 
 }; // class Parser
 

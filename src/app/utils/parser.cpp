@@ -6,19 +6,18 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/08 18:25:51 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/08 23:04:55 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parser.hpp"
-#include <memory>
+#include "utils.hpp"	// LOG
 
-// TODO Remove
-#include <iostream>
-#include "utils.hpp"
-#include <vector>
-#include <optional>
-#include <algorithm>
+#include <iostream>		// cerr
+#include <fstream>		// ifstream
+#include <vector>		// vector
+#include <optional>		// optional
+#include <algorithm>	// count
 
 namespace scop {
 namespace obj {
@@ -40,9 +39,6 @@ scop::Model	Parser::parseFile(const std::string& file_name) {
 
 		try {
 			processLine();
-			if (current_pos != std::string::npos) {
-				throw Parser::parse_error("unexpected token");
-			}
 		} catch (const Parser::parse_error& error) {
 			throw std::invalid_argument(
 				"Error while parsing '" + file_name +
@@ -63,12 +59,26 @@ void	Parser::processLine() {
 	if (line.empty()) {
 		return skipComment();
 	}
-
 	current_pos = 0;
+
+	// Check line type
 	getWord();
 	for (size_t i = 0; i < NB_LINE_TYPES; ++i) {
 		if (token == line_begin[i]) {
-			return (this->*parseLineFun[i])();
+			skipWhitespace();
+			try {
+				(this->*parseLineFun[i])();
+			} catch (const std::out_of_range& oor) {
+				throw Parser::parse_error("value overflow");
+			}
+			if (current_pos != std::string::npos) {
+				if (line[current_pos] == '#') {
+					skipComment();
+				} else {
+					throw Parser::parse_error("unexpected token");
+				}
+			}
+			return;
 		}
 	}
 	throw Parser::parse_error("undefined line type");
@@ -76,39 +86,59 @@ void	Parser::processLine() {
 
 /**
  * Format expected:
- * "	vx vy vz"
+ * "vx vy vz "
+ * 
+ * Retrieves a vertex.
 */
 void	Parser::parseVertex() {
 	scop::Vect3	vertex;
 
 	for (size_t i = 0; i < 3; ++i) {
-		skipWhitespace();
 		if (!getWord())
 			throw Parser::parse_error("expecting 3 coordinates");
 		checkNumberType(token);
 		vertex[i] = std::stof(token);
-		// LOG(vertex[i]);
+		skipWhitespace();
 	}
 	// model_output.addVertex(vertex);
 }
 
 /**
  * Format expected:
- * "	vx vy"
+ * "vx vy "
+ * 
  * Retrieves a texture coordinates.
 */
 void	Parser::parseTexture() {
 	scop::Vect2	texture;
 
 	for (size_t i = 0; i < 2; ++i) {
-		skipWhitespace();
 		if (!getWord())
 			throw Parser::parse_error("expecting 2 coordinates");
 		checkNumberType(token);
 		texture[i] = std::stof(token);
-		// LOG(texture[i]);
+		skipWhitespace();
 	}
 	// model_output.addTexture(texture);
+}
+
+/**
+ * Format expected:
+ * "vx vy vz "
+ * 
+ * Retrieves a normal.
+*/
+void	Parser::parseNormal() {
+	scop::Vect3	normal;
+
+	for (size_t i = 0; i < 3; ++i) {
+		if (!getWord())
+			throw Parser::parse_error("expecting 3 coordinates");
+		checkNumberType(token);
+		normal[i] = std::stof(token);
+		skipWhitespace();
+	}
+	// model_output.addNormal(vertex);
 }
 
 /**
@@ -122,15 +152,11 @@ void	Parser::parseTexture() {
 */
 void	Parser::parseFace() {
 	std::vector<std::array<uint32_t, 3>>	indices;
-
-	std::optional<size_t>	nb_indices;
-	std::optional<uint8_t>	format;
+	std::optional<uint8_t>					format;
 
 	// Parse all indices chunks
-	while (current_pos != std::string::npos) {
-		skipWhitespace();
-		getWord();
-
+	skipWhitespace();
+	while (getWord()) {
 		// Verify nb indices
 		size_t	nb_slashes = std::count(token.begin(), token.end(), '/');
 		if (nb_slashes > 2) {
@@ -162,27 +188,37 @@ void	Parser::parseFace() {
 			}
 		}
 		indices.emplace_back(index);
+		skipWhitespace();
 	}
 
 	if (indices.size() < 3) {
 		throw Parser::parse_error("expecting at least 3 vertices");
 	}
 
-	for (const auto& index: indices) {
-		LOG(index[0] << " " << index[1] << " " << index[2]);
+	size_t	nb_triangles = indices.size() - 2;
+	for (size_t i = 0; i < nb_triangles; ++i) {
+		Model::Triangle	triangle{};
+
+		triangle.vertex_indices = {
+			indices[0][0],
+			indices[i + 1][0],
+			indices[i + 2][0]
+		};
+		if (format.value() & TEXTURE) {
+			triangle.texture_indices = {
+				indices[0][1],
+				indices[i + 1][1],
+			};
+		}
+		if (format.value() & NORMAL) {
+			triangle.normal_indices = {
+				indices[0][2],
+				indices[i + 1][2],
+				indices[i + 2][2]
+			};
+		}
+		// model.addTriangle(triangle);
 	}
-
-// 	size_t	nb_triangles = indices.size() - 2;
-// 	for (size_t i = 0; i < nb_triangles; ++i) {
-// 		Model::Triangle	triangle{};
-
-// 		triangle.vertex_indices[0] = indices[i][0].value();
-// 	}
-}
-
-
-void	Parser::skipComment() {
-	current_pos = std::string::npos;
 }
 
 /* ========================================================================== */
@@ -202,7 +238,11 @@ bool	Parser::getWord() {
 	return true;
 }
 
-void	Parser::skipWhitespace() {
+void	Parser::skipComment() noexcept {
+	current_pos = std::string::npos;
+}
+
+void	Parser::skipWhitespace() noexcept {
 	current_pos = line.find_first_not_of(cs_whitespaces, current_pos);
 }
 
@@ -247,7 +287,7 @@ void	Parser::checkJunkAfterNumber(const std::string& word, size_t pos) const {
 	}
 }
 
-uint8_t	Parser::getFormat() const {
+uint8_t	Parser::getFormat() const noexcept {
 	size_t	first_slash = token.find(cs_slash);
 	size_t	last_slash = token.rfind(cs_slash);
 
@@ -272,6 +312,7 @@ int main() {
 	try {
 		typedef scop::obj::TokenType TokenType;
 
+		// parser.parseFile("/home/eli/random/cube.obj");
 		parser.parseFile("testfile");
 	} catch (const std::exception& e) {
 		std::cerr << e.what() <<__NL;
