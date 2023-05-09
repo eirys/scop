@@ -6,22 +6,24 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/08 15:27:13 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/09 10:01:33 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "app.hpp"
 #include "matrix.hpp"
+#include "model.hpp"
+#include "parser.hpp"
 
 #ifndef STB_IMAGE_IMPLEMENTATION
 # define STB_IMAGE_IMPLEMENTATION
 # include "stb_image.h"
 #endif
 
-#ifndef TINYOBJLOADER_IMPLEMENTATION
-# define TINYOBJLOADER_IMPLEMENTATION
-# include "tiny_obj_loader.h"
-#endif
+// #ifndef TINYOBJLOADER_IMPLEMENTATION
+// # define TINYOBJLOADER_IMPLEMENTATION
+// # include "tiny_obj_loader.h"
+// #endif
 
 namespace scop {
 
@@ -1519,7 +1521,7 @@ void	App::updateUniformBuffer(uint32_t current_image) {
 		10.0f								// far view plane
 	);
 	// Invert y axis (OpenGL has y axis inverted)
-	ubo.proj[5] *= -1;
+	// ubo.proj[5] *= -1;
 	ubo.is_textured = texture_enabled;
 
 	memcpy(uniform_buffers_mapped[current_image], &ubo, sizeof(ubo));
@@ -2002,6 +2004,23 @@ bool	App::hasStencilCompotent(VkFormat format) const {
 }
 
 void	App::loadModel(const char* path) {
+	scop::obj::Parser	parser;
+	scop::Model	model = parser.parseFile(path);
+
+	std::unordered_map<scop::Vertex, uint32_t>	unique_vertices{};
+	const auto&	model_vertices = model.getVertexCoords();
+	const auto&	model_triangles = model.getTriangles();
+
+	// Retrieve unique vertices
+	// for (const auto& vertex: vertices) {
+	for (size_t i = 0; i < vertices.size(); ++i) {
+		if (unique_vertices.count(vertices[i]) == 0) {
+			unique_vertices[vertices[i]] = ;
+		}
+	}
+	// Generate index buffer
+
+	/*
 	tinyobj::attrib_t					attributes;
 	std::vector<tinyobj::shape_t>		shapes;
 	std::vector<tinyobj::material_t>	materials;
@@ -2018,9 +2037,7 @@ void	App::loadModel(const char* path) {
 	if (!ret) {
 		throw std::runtime_error(warn + err);
 	}
-
 	std::unordered_map<scop::Vertex, uint32_t>	unique_vertices{};
-
 	for (const auto& shape: shapes) {
 		for (const auto& index: shape.mesh.indices) {
 			scop::Vertex	vertex{};
@@ -2043,6 +2060,7 @@ void	App::loadModel(const char* path) {
 			indices.emplace_back(unique_vertices[vertex]);
 		}
 	}
+	*/
 }
 
 /**

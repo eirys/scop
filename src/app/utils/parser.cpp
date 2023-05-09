@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/08 23:04:55 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/09 09:55:05 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -306,15 +306,14 @@ uint8_t	Parser::getFormat() const noexcept {
 } // namespace scop
 
 // TODO remove
-int main() {
-	scop::obj::Parser	parser;
+// int main() {
+// 	scop::obj::Parser	parser;
 
-	try {
-		typedef scop::obj::TokenType TokenType;
+// 	try {
+// 		typedef scop::obj::TokenType TokenType;
 
-		// parser.parseFile("/home/eli/random/cube.obj");
-		parser.parseFile("testfile");
-	} catch (const std::exception& e) {
-		std::cerr << e.what() <<__NL;
-	}
-}
+// 		parser.parseFile("/home/eli/random/cube.obj");
+// 	} catch (const std::exception& e) {
+// 		std::cerr << e.what() <<__NL;
+// 	}
+// }
