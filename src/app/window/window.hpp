@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:36 by eli               #+#    #+#             */
-/*   Updated: 2023/05/07 20:24:27 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/09 17:51:46 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ public:
 
 	const uint32_t		width = 800;
 	const uint32_t		height = 600;
-	const const char*	window_title = "Etran's cute lil app";
+	const char*			window_title = "Etran's cute lil app";
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */

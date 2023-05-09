@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/09 09:55:05 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/09 22:34:22 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,7 +151,6 @@ void	Parser::parseNormal() {
  * Retrives at least one triangle.
 */
 void	Parser::parseFace() {
-	std::vector<std::array<uint32_t, 3>>	indices;
 	std::optional<uint8_t>					format;
 
 	// Parse all indices chunks
@@ -171,7 +170,8 @@ void	Parser::parseFace() {
 		}
 
 		// Extract expected indices from chunk
-		std::array<uint32_t, 3>	index{};
+		// std::array<uint32_t, 3>	index{};
+		Model::Index	index{};
 
 		size_t	begin_pos = 0;
 		for (size_t i = 0; i < 3; ++i) {
@@ -187,38 +187,38 @@ void	Parser::parseFace() {
 				begin_pos += 1;
 			}
 		}
-		indices.emplace_back(index);
+		// indices.emplace_back(index);
+		model_output.addIndex(index);
 		skipWhitespace();
 	}
-
-	if (indices.size() < 3) {
+	if (model_output.getIndices().size() < 3) {
 		throw Parser::parse_error("expecting at least 3 vertices");
 	}
 
-	size_t	nb_triangles = indices.size() - 2;
-	for (size_t i = 0; i < nb_triangles; ++i) {
-		Model::Triangle	triangle{};
+	// size_t	nb_triangles = indices.size() - 2;
+	// for (size_t i = 0; i < nb_triangles; ++i) {
+	// 	Model::Triangle	triangle{};
 
-		triangle.vertex_indices = {
-			indices[0][0],
-			indices[i + 1][0],
-			indices[i + 2][0]
-		};
-		if (format.value() & TEXTURE) {
-			triangle.texture_indices = {
-				indices[0][1],
-				indices[i + 1][1],
-			};
-		}
-		if (format.value() & NORMAL) {
-			triangle.normal_indices = {
-				indices[0][2],
-				indices[i + 1][2],
-				indices[i + 2][2]
-			};
-		}
+	// 	triangle.vertex_indices = {
+	// 		indices[0][0],
+	// 		indices[i + 1][0],
+	// 		indices[i + 2][0]
+	// 	};
+	// 	if (format.value() & TEXTURE) {
+	// 		triangle.texture_indices = {
+	// 			indices[0][1],
+	// 			indices[i + 1][1],
+	// 		};
+	// 	}
+	// 	if (format.value() & NORMAL) {
+	// 		triangle.normal_indices = {
+	// 			indices[0][2],
+	// 			indices[i + 1][2],
+	// 			indices[i + 2][2]
+	// 		};
+	// 	}
 		// model.addTriangle(triangle);
-	}
+	// }
 }
 
 /* ========================================================================== */

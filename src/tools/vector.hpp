@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 13:54:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/08 15:31:45 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/09 21:40:45 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,9 @@ struct Vect3 {
 	/* ========================================================================= */
 
 	Vect3() = default;
+	~Vect3() = default;
 	Vect3(const Vect3& other) = default;
 	Vect3& operator=(const Vect3& rhs) = default;
-	~Vect3() = default;
 
 	Vect3(float new_x, float new_y, float new_z): x(new_x), y(new_y), z(new_z) {}
 
@@ -119,6 +119,7 @@ struct Vect3 {
 	bool	operator==(const Vect3& rhs) const {
 		return x == rhs.x && y == rhs.y && z == rhs.z;
 	}
+
 }; // struct Vect3
 
 struct Vect2 {
@@ -172,6 +173,7 @@ struct Vect2 {
 	bool	operator==(const Vect2& rhs) const {
 		return x == rhs.x && y == rhs.y;
 	}
+
 }; // struct Vect2
 
 } // namespace scop

@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/09 10:01:33 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/09 22:36:46 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -2008,17 +2008,28 @@ void	App::loadModel(const char* path) {
 	scop::Model	model = parser.parseFile(path);
 
 	std::unordered_map<scop::Vertex, uint32_t>	unique_vertices{};
+
 	const auto&	model_vertices = model.getVertexCoords();
-	const auto&	model_triangles = model.getTriangles();
+	const auto& model_textures = model.getTextureCoords();
+	const auto& model_normals = model.getNormalCoords();
+	const auto& model_indices = model.getIndices();
+	// const auto&	model_triangles = model.getTriangles();
 
 	// Retrieve unique vertices
-	// for (const auto& vertex: vertices) {
-	for (size_t i = 0; i < vertices.size(); ++i) {
-		if (unique_vertices.count(vertices[i]) == 0) {
-			unique_vertices[vertices[i]] = ;
+	for (const auto& index: model_indices) {
+		scop::Vertex	vertex{};
+
+		vertex.pos = model_vertices[index.vertex - 1];
+		vertex.tex_coord = model_textures[index.texture - 1];
+		// vertex.normal = model_normals[index.normal_index];
+		vertex.color = { 1.0, 1.0, 1.0 };
+
+		if (unique_vertices.count(vertex) == 0) {
+			unique_vertices[vertex] = static_cast<uint32_t>(vertices.size());
+			vertices.emplace_back(vertex);
 		}
+		indices.emplace_back(unique_vertices[vertex]);
 	}
-	// Generate index buffer
 
 	/*
 	tinyobj::attrib_t					attributes;
