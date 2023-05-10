@@ -3,3 +3,5 @@ scop
 .vscode
 img
 shaders/*.spv
+a.out
+testfile
