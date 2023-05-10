@@ -6,7 +6,7 @@
 #    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/05/07 22:44:18 by eli              ###   ########.fr        #
+#    Updated: 2023/05/10 14:12:03 by eli              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -71,7 +71,8 @@ SHD_BIN		:=	$(addsuffix .spv,$(SHD))
 # compiler
 CXX			:=	c++
 EXTRA		:=	-Wall -Werror -Wextra
-CFLAGS		:=	-std=c++17 \
+CFLAGS		:=	$(EXTRA) \
+				-std=c++17 \
 				-I./$(SRC_DIR)/$(APP_DIR) \
 				-I./$(SRC_DIR)/$(TOOLS_DIR) \
 				-I./$(SRC_DIR)/$(UTILS_DIR) \

@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/09 22:38:15 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/10 14:14:15 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,7 +120,7 @@ private:
 	const std::vector<const char*>	device_extensions = {
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
-	const int						max_frames_in_flight = 2;
+	const size_t					max_frames_in_flight = 2;
 
 	#ifndef NDEBUG
 	const bool						enable_validation_layers = false;

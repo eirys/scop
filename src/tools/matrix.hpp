@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 14:11:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/04 21:31:54 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/10 14:13:37 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,12 @@ struct Mat4 {
 
 	Mat4() {
 		bzero(mat, 16 * sizeof(float));
+	}
+
+	Mat4(const Mat4& other) {
+		for (size_t i = 0; i < 16; ++i) {
+			mat[i] = other.mat[i];
+		}
 	}
 
 	Mat4(float x) {

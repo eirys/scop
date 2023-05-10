@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/09 22:36:46 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/10 14:22:02 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -1240,6 +1240,9 @@ VKAPI_ATTR VkBool32 VKAPI_CALL	App::debugCallback(
 	const VkDebugUtilsMessengerCallbackDataEXT* p_callback_data,
 	void* p_user_data
 ) {
+	(void)message_severity;
+	(void)message_type;
+	(void)p_user_data;
 	std::cerr << "[validation layer] " << p_callback_data->pMessage << std::endl;
 	return VK_FALSE;
 }
@@ -1521,7 +1524,7 @@ void	App::updateUniformBuffer(uint32_t current_image) {
 		10.0f								// far view plane
 	);
 	// Invert y axis (OpenGL has y axis inverted)
-	// ubo.proj[5] *= -1;
+	ubo.proj[5] *= -1;
 	ubo.is_textured = texture_enabled;
 
 	memcpy(uniform_buffers_mapped[current_image], &ubo, sizeof(ubo));
@@ -1798,6 +1801,7 @@ void	App::transitionImageLayout(
 	VkImageLayout new_layout,
 	uint32_t mip_level
 ) const {
+	(void)format;
 	VkCommandBuffer	command_buffer = beginSingleTimeCommands();
 
 	// Create image memory barrier to synchronize proper access to resources
@@ -2011,16 +2015,18 @@ void	App::loadModel(const char* path) {
 
 	const auto&	model_vertices = model.getVertexCoords();
 	const auto& model_textures = model.getTextureCoords();
-	const auto& model_normals = model.getNormalCoords();
+	// const auto& model_normals = model.getNormalCoords();
 	const auto& model_indices = model.getIndices();
-	// const auto&	model_triangles = model.getTriangles();
 
-	// Retrieve unique vertices
+	// Retrieve unique vertices:
 	for (const auto& index: model_indices) {
 		scop::Vertex	vertex{};
 
 		vertex.pos = model_vertices[index.vertex - 1];
-		vertex.tex_coord = model_textures[index.texture - 1];
+		vertex.tex_coord = {
+			model_textures[index.texture - 1].x,
+			1.0f - model_textures[index.texture - 1].y
+		};
 		// vertex.normal = model_normals[index.normal_index];
 		vertex.color = { 1.0, 1.0, 1.0 };
 

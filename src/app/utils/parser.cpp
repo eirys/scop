@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/09 22:34:22 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/10 14:34:20 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ void	Parser::processLine() {
  * Retrieves a vertex.
 */
 void	Parser::parseVertex() {
-	scop::Vect3	vertex;
+	scop::Vect3	vertex{};
 
 	for (size_t i = 0; i < 3; ++i) {
 		if (!getWord())
@@ -100,7 +100,7 @@ void	Parser::parseVertex() {
 		vertex[i] = std::stof(token);
 		skipWhitespace();
 	}
-	// model_output.addVertex(vertex);
+	model_output.addVertex(vertex);
 }
 
 /**
@@ -110,7 +110,7 @@ void	Parser::parseVertex() {
  * Retrieves a texture coordinates.
 */
 void	Parser::parseTexture() {
-	scop::Vect2	texture;
+	scop::Vect2	texture{};
 
 	for (size_t i = 0; i < 2; ++i) {
 		if (!getWord())
@@ -119,7 +119,7 @@ void	Parser::parseTexture() {
 		texture[i] = std::stof(token);
 		skipWhitespace();
 	}
-	// model_output.addTexture(texture);
+	model_output.addTexture(texture);
 }
 
 /**
@@ -129,7 +129,7 @@ void	Parser::parseTexture() {
  * Retrieves a normal.
 */
 void	Parser::parseNormal() {
-	scop::Vect3	normal;
+	scop::Vect3	normal{};
 
 	for (size_t i = 0; i < 3; ++i) {
 		if (!getWord())
@@ -138,7 +138,7 @@ void	Parser::parseNormal() {
 		normal[i] = std::stof(token);
 		skipWhitespace();
 	}
-	// model_output.addNormal(vertex);
+	model_output.addNormal(normal);
 }
 
 /**
@@ -170,7 +170,6 @@ void	Parser::parseFace() {
 		}
 
 		// Extract expected indices from chunk
-		// std::array<uint32_t, 3>	index{};
 		Model::Index	index{};
 
 		size_t	begin_pos = 0;
@@ -181,44 +180,18 @@ void	Parser::parseFace() {
 				if (checkNumberType(index_str) != TOKEN_INT) {
 					throw Parser::parse_error("expecting integer index");
 				}
-				index[i] = std::stoul(index_str);
+				index[i] = std::stoi(index_str);
 				begin_pos = end_pos + 1;
 			} else {
 				begin_pos += 1;
 			}
 		}
-		// indices.emplace_back(index);
 		model_output.addIndex(index);
 		skipWhitespace();
 	}
 	if (model_output.getIndices().size() < 3) {
 		throw Parser::parse_error("expecting at least 3 vertices");
 	}
-
-	// size_t	nb_triangles = indices.size() - 2;
-	// for (size_t i = 0; i < nb_triangles; ++i) {
-	// 	Model::Triangle	triangle{};
-
-	// 	triangle.vertex_indices = {
-	// 		indices[0][0],
-	// 		indices[i + 1][0],
-	// 		indices[i + 2][0]
-	// 	};
-	// 	if (format.value() & TEXTURE) {
-	// 		triangle.texture_indices = {
-	// 			indices[0][1],
-	// 			indices[i + 1][1],
-	// 		};
-	// 	}
-	// 	if (format.value() & NORMAL) {
-	// 		triangle.normal_indices = {
-	// 			indices[0][2],
-	// 			indices[i + 1][2],
-	// 			indices[i + 2][2]
-	// 		};
-	// 	}
-		// model.addTriangle(triangle);
-	// }
 }
 
 /* ========================================================================== */
@@ -312,7 +285,7 @@ uint8_t	Parser::getFormat() const noexcept {
 // 	try {
 // 		typedef scop::obj::TokenType TokenType;
 
-// 		parser.parseFile("/home/eli/random/cube.obj");
+// 		scop::Model model = parser.parseFile("/home/eli/random/cube.obj");
 // 	} catch (const std::exception& e) {
 // 		std::cerr << e.what() <<__NL;
 // 	}

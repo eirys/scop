@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 13:54:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/09 21:40:45 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/10 14:02:50 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,11 @@ struct Vect3 {
 	/*                                  METHODS                                  */
 	/* ========================================================================= */
 
-	Vect3() = default;
 	~Vect3() = default;
 	Vect3(const Vect3& other) = default;
 	Vect3& operator=(const Vect3& rhs) = default;
 
+	Vect3(): x(0), y(0), z(0) {}
 	Vect3(float new_x, float new_y, float new_z): x(new_x), y(new_y), z(new_z) {}
 
 	/* ACCESSORS =============================================================== */
@@ -134,11 +134,11 @@ struct Vect2 {
 	/*                                  METHODS                                  */
 	/* ========================================================================= */
 
-	Vect2() = default;
 	Vect2(const Vect2& other) = default;
 	Vect2& operator=(const Vect2& rhs) = default;
 	~Vect2() = default;
 
+	Vect2(): x(0), y(0) {}
 	Vect2(float x, float y): x(x), y(y) {}
 
 	/* ACCESSORS =============================================================== */
