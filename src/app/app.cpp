@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/10 14:22:02 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/10 19:42:53 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -818,7 +818,7 @@ void	App::createGraphicsPipeline() {
 	rasterizer.depthBiasClamp = 0.0f;
 	rasterizer.depthBiasSlopeFactor = 0.0f;
 
-	// Disable multisampling
+	// Multisampling
 	VkPipelineMultisampleStateCreateInfo	multisampling{};
 	multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
 	multisampling.sampleShadingEnable = VK_FALSE;
@@ -2010,7 +2010,6 @@ bool	App::hasStencilCompotent(VkFormat format) const {
 void	App::loadModel(const char* path) {
 	scop::obj::Parser	parser;
 	scop::Model	model = parser.parseFile(path);
-
 	std::unordered_map<scop::Vertex, uint32_t>	unique_vertices{};
 
 	const auto&	model_vertices = model.getVertexCoords();
@@ -2027,9 +2026,8 @@ void	App::loadModel(const char* path) {
 			model_textures[index.texture - 1].x,
 			1.0f - model_textures[index.texture - 1].y
 		};
+		utils::generateVibrantColor(vertex.color.x, vertex.color.y, vertex.color.z);
 		// vertex.normal = model_normals[index.normal_index];
-		vertex.color = { 1.0, 1.0, 1.0 };
-
 		if (unique_vertices.count(vertex) == 0) {
 			unique_vertices[vertex] = static_cast<uint32_t>(vertices.size());
 			vertices.emplace_back(vertex);

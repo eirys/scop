@@ -18,5 +18,4 @@ void main() {
 	out_color = ubo.is_textured ?
 		texture(tex_sampler, frag_tex_coord) :
 		vec4(frag_color, 1.0);
-	// out_color = texture(tex_sampler, frag_tex_coord);
 }
