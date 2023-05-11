@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 03:53:55 by eli               #+#    #+#             */
-/*   Updated: 2023/05/11 15:39:27 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 17:22:59 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,6 @@ int main(int ac, char** av) {
 			texture_path = av[2];
 		} else if (ac > 3) {
 			throw std::invalid_argument("Too many arguments");
-		} else { 
-			//TODO: remove
-			throw std::invalid_argument("No texture path provided");
 		}
 
 	// TODO: process file names

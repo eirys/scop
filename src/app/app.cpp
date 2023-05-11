@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/11 15:09:26 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 18:00:49 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,12 +62,10 @@ App::~App() {
 	cleanupSwapChain();
 
 	// Remove texture image
-	if (loaded_texture_file) {
-		vkDestroySampler(logical_device, texture_sampler, nullptr);
-		vkDestroyImageView(logical_device, texture_image_view, nullptr);
-		vkDestroyImage(logical_device, texture_image, nullptr);
-		vkFreeMemory(logical_device, texture_image_memory, nullptr);
-	}
+	vkDestroySampler(logical_device, texture_sampler, nullptr);
+	vkDestroyImageView(logical_device, texture_image_view, nullptr);
+	vkDestroyImage(logical_device, texture_image, nullptr);
+	vkFreeMemory(logical_device, texture_image_memory, nullptr);
 
 	// Remove graphics pipeline
 	vkDestroyPipeline(logical_device, graphics_pipeline, nullptr);
@@ -2016,24 +2014,28 @@ void	App::loadModel(const std::string& path) {
 	const auto&	model_vertices = model.getVertexCoords();
 	const auto& model_textures = model.getTextureCoords();
 	// const auto& model_normals = model.getNormalCoords();
-	const auto& model_indices = model.getIndices();
+	// const auto& model_indices = model.getIndices();
+	const auto& model_triangles = model.getTriangles();
 
 	// Retrieve unique vertices:
-	for (const auto& index: model_indices) {
-		scop::Vertex	vertex{};
+	// for (const auto& index: model_indices) {
+	for (const auto& triangle: model_triangles) {
+		for (const auto& index: triangle.indices) {
+			scop::Vertex	vertex{};
 
-		vertex.pos = model_vertices[index.vertex - 1];
-		vertex.tex_coord = {
-			model_textures[index.texture - 1].x,
-			1.0f - model_textures[index.texture - 1].y
-		};
-		utils::generateVibrantColor(vertex.color.x, vertex.color.y, vertex.color.z);
-		// vertex.normal = model_normals[index.normal_index];
-		if (unique_vertices.count(vertex) == 0) {
-			unique_vertices[vertex] = static_cast<uint32_t>(vertices.size());
-			vertices.emplace_back(vertex);
+			vertex.pos = model_vertices[index.vertex];
+			vertex.tex_coord = {
+				model_textures[index.texture].x,
+				1.0f - model_textures[index.texture].y
+			};
+			utils::generateVibrantColor(vertex.color.x, vertex.color.y, vertex.color.z);
+			// vertex.normal = model_normals[index.normal_index];
+			if (unique_vertices.count(vertex) == 0) {
+				unique_vertices[vertex] = static_cast<uint32_t>(vertices.size());
+				vertices.emplace_back(vertex);
+			}
+			indices.emplace_back(unique_vertices[vertex]);
 		}
-		indices.emplace_back(unique_vertices[vertex]);
 	}
 }
 
@@ -2287,11 +2289,13 @@ void	App::updateFragmentPart(
 void	App::createTextureHandle(
 	const std::string& path
 ) {
-	if (path.empty())
-		return;
-
-	loaded_texture_file = true;
-	createTextureImage(path.c_str());
+	std::string	file;
+	if (path.empty()) {
+		file = SCOP_TEXTURE_FILE_HAMSTER_JPG;
+	} else {
+		file = path;
+	}
+	createTextureImage(file.c_str());
 	createTextureImageView();
 	createTextureSampler();
 }

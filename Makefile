@@ -6,7 +6,7 @@
 #    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/05/11 15:41:19 by eli              ###   ########.fr        #
+#    Updated: 2023/05/11 17:50:47 by eli              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -77,6 +77,7 @@ CFLAGS		:=	$(EXTRA) \
 				-I./$(STB_PATH) \
 				-O3 \
 				-DNDEBUG \
+				-g \
 				-D__DEBUG
 
 LDFLAGS		:=	-lglfw \
@@ -121,10 +122,10 @@ test: all
 .PHONY: clean
 clean:
 	${RM} $(OBJ_DIR)
-	${RM} $(SHD_BIN)
 
 .PHONY: fclean
 fclean: clean
+	${RM} $(SHD_BIN)
 	${RM} $(NAME)
 
 .PHONY: re

@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/10 14:34:20 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 17:59:39 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -191,6 +191,31 @@ void	Parser::parseFace() {
 	}
 	if (model_output.getIndices().size() < 3) {
 		throw Parser::parse_error("expecting at least 3 vertices");
+	}
+	// Add triangles
+
+	const auto&	indices = model_output.getIndices();
+	size_t	nb_triangles = indices.size() - 2;
+	for (size_t i = 0; i < nb_triangles; ++i) {
+		Model::Triangle	triangle{};
+
+		triangle.indices[0] = {
+			.vertex = indices[0].vertex - 1,
+			.texture = indices[0].texture - 1,
+			.normal = indices[0].normal - 1
+		};
+		triangle.indices[1] = {
+			.vertex = indices[i + 1].vertex - 1,
+			.texture = indices[i + 1].texture - 1,
+			.normal = indices[i + 1].normal - 1
+		};
+		triangle.indices[2] = {
+			.vertex = indices[i + 2].vertex - 1,
+			.texture = indices[i + 2].texture - 1,
+			.normal = indices[i + 2].normal - 1
+		};
+
+		model_output.addTriangle(triangle);
 	}
 }
 

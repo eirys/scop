@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/11 15:08:47 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 17:23:56 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,9 +141,6 @@ private:
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
 
-	// const std::string				texture_file;
-	// const std::string				model_file;
-
 	scop::Window					window;
 	VkInstance						vk_instance;
 	VkDebugUtilsMessengerEXT		debug_messenger;
@@ -163,7 +160,6 @@ private:
 
 	VkRenderPass					render_pass;
 
-	VkDescriptorSetLayout			descriptor_set_layout;
 	VkPipelineLayout				pipeline_layout;
 	VkPipeline						graphics_pipeline;
 
@@ -182,6 +178,7 @@ private:
 	VkBuffer						index_buffer;
 	VkDeviceMemory					index_buffer_memory;
 
+	VkDescriptorSetLayout			descriptor_set_layout;
 	VkDescriptorPool				descriptor_pool;
 	std::vector<VkDescriptorSet>	descriptor_sets;
 
@@ -189,7 +186,6 @@ private:
 	std::vector<VkDeviceMemory>		uniform_buffers_memory;
 	std::vector<void*>				uniform_buffers_mapped;
 
-	bool							loaded_texture_file = false;
 	uint32_t						mip_levels;
 	VkImage							texture_image;
 	VkDeviceMemory					texture_image_memory;
