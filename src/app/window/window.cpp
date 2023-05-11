@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:42 by eli               #+#    #+#             */
-/*   Updated: 2023/05/07 08:28:41 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 11:05:17 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ Window::Window() {
 	window = glfwCreateWindow(width, height, window_title, nullptr, nullptr);
 
 	// set pointer to window to `this` instance pointer
+	// so we can access it from the callback functions
 	glfwSetWindowUserPointer(window, this);
 
 	// handle resizing
@@ -121,11 +122,27 @@ void	keyCallback(
 	(void)scancode;
 	(void)mods;
 
+	// Ignore everything but space
 	if (key != GLFW_KEY_SPACE) {
 		return;
 	}
+
+	// On key press
 	if (action == GLFW_PRESS) {
+		static auto	key_pressed = std::chrono::steady_clock::now();
+		auto	now = std::chrono::steady_clock::now();
+		auto	duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+			now - key_pressed
+		);
+
+		// Avoid key spamming
+		if (duration < std::chrono::milliseconds(2000)) {
+			return;
+		}
 		scop::App::toggleTexture();
+
+		// Update last key press
+		key_pressed = now;
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/10 19:42:53 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 13:13:14 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,14 +20,10 @@
 # include "stb_image.h"
 #endif
 
-// #ifndef TINYOBJLOADER_IMPLEMENTATION
-// # define TINYOBJLOADER_IMPLEMENTATION
-// # include "tiny_obj_loader.h"
-// #endif
-
 namespace scop {
 
-bool		App::texture_enabled = true;
+bool							App::texture_enabled = true;
+std::optional<App::time_point>	App::texture_enabled_start;
 
 /* ========================================================================== */
 /*                                   PUBLIC                                   */
@@ -135,6 +131,9 @@ void	App::run() {
 
 void	App::toggleTexture() {
 	texture_enabled = !texture_enabled;
+	texture_enabled_start.emplace(
+		std::chrono::high_resolution_clock::now()
+	);
 }
 
 /* ========================================================================== */
@@ -1428,12 +1427,12 @@ uint32_t	App::findMemoryType(
 */
 void	App::createDescriptorSetLayout() {
 	// Uniform buffer layout: used during vertex shading
-	VkDescriptorSetLayoutBinding	ubo_layout_binding{};
-	ubo_layout_binding.binding = 0;
-	ubo_layout_binding.descriptorCount = 1;
-	ubo_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	ubo_layout_binding.pImmutableSamplers = nullptr;
-	ubo_layout_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+	VkDescriptorSetLayoutBinding	ubo_layout_binding_vertex{};
+	ubo_layout_binding_vertex.binding = 0;
+	ubo_layout_binding_vertex.descriptorCount = 1;
+	ubo_layout_binding_vertex.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	ubo_layout_binding_vertex.pImmutableSamplers = nullptr;
+	ubo_layout_binding_vertex.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
 	// Sampler descriptor layout: used during fragment shading
 	VkDescriptorSetLayoutBinding	sampler_layout_binding{};
@@ -1443,9 +1442,18 @@ void	App::createDescriptorSetLayout() {
 	sampler_layout_binding.pImmutableSamplers = nullptr;
 	sampler_layout_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-	std::array<VkDescriptorSetLayoutBinding, 2>	bindings = {
-		ubo_layout_binding,
-		sampler_layout_binding
+	// Uniform buffer layout: used during fragment shading
+	VkDescriptorSetLayoutBinding	ubo_layout_binding_fragment{};
+	ubo_layout_binding_fragment.binding = 2;
+	ubo_layout_binding_fragment.descriptorCount = 1;
+	ubo_layout_binding_fragment.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	ubo_layout_binding_fragment.pImmutableSamplers = nullptr;
+	ubo_layout_binding_fragment.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+	std::array<VkDescriptorSetLayoutBinding, 3>	bindings = {
+		ubo_layout_binding_vertex,
+		sampler_layout_binding,
+		ubo_layout_binding_fragment
 	};
 
 	VkDescriptorSetLayoutCreateInfo	layout_info{};
@@ -1492,40 +1500,12 @@ void	App::createUniformBuffers() {
 */
 void	App::updateUniformBuffer(uint32_t current_image) {
 	// Ensure 90deg rotation/sec
-	static auto	start_time = std::chrono::high_resolution_clock::now();
-
-	auto	current_time = std::chrono::high_resolution_clock::now();
-	float	time = std::chrono::duration<float, std::chrono::seconds::period>(
-					current_time - start_time
-				).count();
 
 	UniformBufferObject	ubo{};
+	time_point	current_time = std::chrono::high_resolution_clock::now();
 
-	// Define model: continuous rotation around z axis
-	ubo.model = scop::rotate(
-		time * scop::utils::radians(90.0f),	// rotation angle
-		scop::Vect3(0.0f, 0.0f, 1.0f)		// axis (z axis)
-	);
-	// Model: static
-	// ubo.model = scop::Mat4(1.0f);
-
-	// Define view transformation: above, 45deg angle
-	ubo.view = scop::lookAt(
-		scop::Vect3(2.0f, 2.0f, 2.0f),		// eye position
-		scop::Vect3(0.0f, 0.0f, 0.0f),		// center position
-		scop::Vect3(0.0f, 0.0f, 1.0f)		// up axis (z axis)
-	);
-	// Define persp. projection (clip space?)
-	ubo.proj = scop::perspective(
-		scop::utils::radians(45.0f),		// FOV angle
-		swap_chain_extent.width				// aspect ratio
-		/ static_cast<float>(swap_chain_extent.height),
-		0.1f,								// near view plane
-		10.0f								// far view plane
-	);
-	// Invert y axis (OpenGL has y axis inverted)
-	ubo.proj[5] *= -1;
-	ubo.is_textured = texture_enabled;
+	updateVertexPart(ubo, current_time);
+	updateFragmentPart(ubo, current_time);
 
 	memcpy(uniform_buffers_mapped[current_image], &ubo, sizeof(ubo));
 }
@@ -1534,11 +1514,13 @@ void	App::updateUniformBuffer(uint32_t current_image) {
  * Handler for descriptor sets (like command pool)
 */
 void	App::createDescriptorPool() {
-	std::array<VkDescriptorPoolSize, 2>	pool_sizes{};
+	std::array<VkDescriptorPoolSize, 3>	pool_sizes{};
 	pool_sizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	pool_sizes[0].descriptorCount = static_cast<uint32_t>(max_frames_in_flight);
 	pool_sizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 	pool_sizes[1].descriptorCount = static_cast<uint32_t>(max_frames_in_flight);
+	pool_sizes[2].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	pool_sizes[2].descriptorCount = static_cast<uint32_t>(max_frames_in_flight);
 
 	VkDescriptorPoolCreateInfo	pool_info{};
 	pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -1568,10 +1550,10 @@ void	App::createDescriptorSets() {
 	// Populate descriptors
 	for (size_t i = 0; i < max_frames_in_flight; ++i) {
 		// Uniform buffer
-		VkDescriptorBufferInfo	ubo_info{};
-		ubo_info.buffer = uniform_buffers[i];
-		ubo_info.offset = 0;
-		ubo_info.range = sizeof(UniformBufferObject);
+		VkDescriptorBufferInfo	ubo_info_vertex{};
+		ubo_info_vertex.buffer = uniform_buffers[i];
+		ubo_info_vertex.offset = 0;
+		ubo_info_vertex.range = UniformBufferObject::vertex_shader_part;
 
 		// Texture sampler
 		VkDescriptorImageInfo	image_info{};
@@ -1579,15 +1561,21 @@ void	App::createDescriptorSets() {
 		image_info.imageView = texture_image_view;
 		image_info.sampler = texture_sampler;
 
+		// Uniform buffer
+		VkDescriptorBufferInfo	ubo_info_fragment{};
+		ubo_info_fragment.buffer = uniform_buffers[i];
+		ubo_info_fragment.offset = UniformBufferObject::vertex_shader_part;
+		ubo_info_fragment.range = UniformBufferObject::fragment_shader_part;
+
 		// Update buffer using descriptor write
-		std::array<VkWriteDescriptorSet, 2>	descriptor_writes{};
+		std::array<VkWriteDescriptorSet, 3>	descriptor_writes{};
 		descriptor_writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		descriptor_writes[0].dstSet = descriptor_sets[i];
 		descriptor_writes[0].dstBinding = 0;
 		descriptor_writes[0].dstArrayElement = 0;
 		descriptor_writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 		descriptor_writes[0].descriptorCount = 1;
-		descriptor_writes[0].pBufferInfo = &ubo_info;
+		descriptor_writes[0].pBufferInfo = &ubo_info_vertex;
 		descriptor_writes[0].pImageInfo = nullptr;
 		descriptor_writes[0].pTexelBufferView = nullptr;
 
@@ -1600,6 +1588,16 @@ void	App::createDescriptorSets() {
 		descriptor_writes[1].pBufferInfo = nullptr;
 		descriptor_writes[1].pImageInfo = &image_info;
 		descriptor_writes[1].pTexelBufferView = nullptr;
+
+		descriptor_writes[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptor_writes[2].dstSet = descriptor_sets[i];
+		descriptor_writes[2].dstBinding = 2;
+		descriptor_writes[2].dstArrayElement = 0;
+		descriptor_writes[2].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		descriptor_writes[2].descriptorCount = 1;
+		descriptor_writes[2].pBufferInfo = &ubo_info_fragment;
+		descriptor_writes[2].pImageInfo = nullptr;
+		descriptor_writes[2].pTexelBufferView = nullptr;
 
 		vkUpdateDescriptorSets(
 			logical_device,
@@ -2034,48 +2032,6 @@ void	App::loadModel(const char* path) {
 		}
 		indices.emplace_back(unique_vertices[vertex]);
 	}
-
-	/*
-	tinyobj::attrib_t					attributes;
-	std::vector<tinyobj::shape_t>		shapes;
-	std::vector<tinyobj::material_t>	materials;
-	std::string							warn, err;
-
-	bool	ret = tinyobj::LoadObj(
-		&attributes,
-		&shapes,
-		&materials,
-		&warn,
-		&err,
-		path
-	);
-	if (!ret) {
-		throw std::runtime_error(warn + err);
-	}
-	std::unordered_map<scop::Vertex, uint32_t>	unique_vertices{};
-	for (const auto& shape: shapes) {
-		for (const auto& index: shape.mesh.indices) {
-			scop::Vertex	vertex{};
-
-			vertex.pos = {
-				attributes.vertices[3 * index.vertex_index + 0],
-				attributes.vertices[3 * index.vertex_index + 1],
-				attributes.vertices[3 * index.vertex_index + 2]
-			};
-			vertex.tex_coord = {
-				attributes.texcoords[2 * index.texcoord_index + 0],
-				1.0f - attributes.texcoords[2 * index.texcoord_index + 1]
-			};
-			vertex.color = { 1.0f, 1.0f, 1.0f };
-
-			if (unique_vertices.count(vertex) == 0) {
-				unique_vertices[vertex] = static_cast<uint32_t>(vertices.size());
-				vertices.emplace_back(vertex);
-			}
-			indices.emplace_back(unique_vertices[vertex]);
-		}
-	}
-	*/
 }
 
 /**
@@ -2264,6 +2220,65 @@ void	App::createColorResources() {
 		VK_IMAGE_ASPECT_COLOR_BIT,
 		1
 	);
+}
+
+void	App::updateVertexPart(
+	UniformBufferObject& ubo,
+	time_point current_time
+) {
+	static time_point	start_time = std::chrono::high_resolution_clock::now();
+	float	time = std::chrono::duration<float, std::chrono::seconds::period>(
+		current_time - start_time
+	).count();
+
+	// Define model: continuous rotation around z axis
+	ubo.model = scop::rotate(
+		time * scop::utils::radians(90.0f),	// rotation angle
+		scop::Vect3(0.0f, 0.0f, 1.0f)		// axis (z axis)
+	);
+	// Model: static
+	// ubo.model = scop::Mat4(1.0f);
+
+	// Define view transformation: above, 45deg angle
+	ubo.view = scop::lookAt(
+		scop::Vect3(2.0f, 2.0f, 2.0f),		// eye position
+		scop::Vect3(0.0f, 0.0f, 0.0f),		// center position
+		scop::Vect3(0.0f, 0.0f, 1.0f)		// up axis (z axis)
+	);
+	// Define persp. projection (clip space?)
+	ubo.proj = scop::perspective(
+		scop::utils::radians(45.0f),		// FOV angle
+		swap_chain_extent.width				// aspect ratio
+		/ static_cast<float>(swap_chain_extent.height),
+		0.1f,								// near view plane
+		10.0f								// far view plane
+	);
+	// Invert y axis (because y axis is inverted in Vulkan)
+	ubo.proj[5] *= -1;
+}
+
+void	App::updateFragmentPart(
+	UniformBufferObject& ubo,
+	time_point current_time
+) {
+	ubo.texture_enabled = texture_enabled;
+
+	// Only udpate if it was recently toggled
+	if (texture_enabled_start.has_value()) {
+		// Transition from 0 to 1 in 2 second
+		float	time =
+			std::chrono::duration<float, std::chrono::milliseconds::period>(
+				current_time - texture_enabled_start.value()
+			).count() / transition_duration;
+		ubo.texture_mix = texture_enabled ? time : 1.0f - time;
+
+		// Reset texture_enabled_start if time is up
+		if (time >= 1.0f) {
+			texture_enabled_start.reset();
+		}
+	} else {
+		ubo.texture_mix = -1.0f;
+	}
 }
 
 /* ========================================================================== */

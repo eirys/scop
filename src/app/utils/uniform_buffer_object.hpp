@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 20:12:41 by eli               #+#    #+#             */
-/*   Updated: 2023/05/07 08:17:56 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 12:45:00 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,25 @@
 
 namespace scop {
 struct UniformBufferObject {
+	/* ========================================================================= */
+	/*                               CLASS MEMBERS                               */
+	/* ========================================================================= */
+
+	/* VERTEX SHADER =========================================================== */
 	alignas(16) scop::Mat4	model;
 	alignas(16) scop::Mat4	view;
 	alignas(16) scop::Mat4	proj;
-	bool					is_textured;
+
+	/* FRAGMENT SHADER ========================================================= */
+	bool	texture_enabled;
+	float	texture_mix;
+
+	/* ========================================================================= */
+	/*                               STATIC MEMBERS                              */
+	/* ========================================================================= */
+
+	static constexpr size_t	vertex_shader_part = 3 * sizeof(scop::Mat4);
+	static constexpr size_t	fragment_shader_part = sizeof(bool) + sizeof(float);
 };
 } // namespace scop
 

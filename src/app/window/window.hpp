@@ -6,17 +6,12 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:36 by eli               #+#    #+#             */
-/*   Updated: 2023/05/09 17:51:46 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 10:57:50 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef WINDOW_HPP
 # define WINDOW_HPP
-
-// Graphics
-# ifndef GLFW_INCLUDE_VULKAN
-#  define GLFW_INCLUDE_VULKAN
-# endif
 
 // Window handler
 # include <GLFW/glfw3.h>

@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/10 14:14:15 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 13:02:19 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,12 @@ void	DestroyDebugUtilsMessengerEXT(
 class App {
 public:
 	/* ========================================================================= */
+	/*                                  TYPEDEF                                  */
+	/* ========================================================================= */
+
+	typedef	std::chrono::high_resolution_clock::time_point	time_point;
+
+	/* ========================================================================= */
 	/*                               HELPER OBJECTS                              */
 	/* ========================================================================= */
 
@@ -121,6 +127,7 @@ private:
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
 	const size_t					max_frames_in_flight = 2;
+	const float						transition_duration = 1000.0f;	// ms
 
 	#ifndef NDEBUG
 	const bool						enable_validation_layers = false;
@@ -192,7 +199,11 @@ private:
 	VkDeviceMemory					color_image_memory;
 	VkImageView						color_image_view;
 
-	static bool						texture_enabled;
+	static
+	bool							texture_enabled;
+	static
+	std::optional<time_point>		texture_enabled_start;
+
 	uint32_t						current_frame = 0;
 
 	/* ========================================================================= */
@@ -337,6 +348,14 @@ private:
 	) const;
 	VkSampleCountFlagBits			getMaxUsableSampleCount() const;
 	void							createColorResources();
+	void							updateVertexPart(
+		UniformBufferObject& ubo,
+		time_point current_time
+	);
+	void							updateFragmentPart(
+		UniformBufferObject& ubo,
+		time_point current_time
+	);
 
 	static VKAPI_ATTR
 	VkBool32 VKAPI_CALL				debugCallback(
