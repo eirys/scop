@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/11 18:00:49 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 21:41:54 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -2014,11 +2014,9 @@ void	App::loadModel(const std::string& path) {
 	const auto&	model_vertices = model.getVertexCoords();
 	const auto& model_textures = model.getTextureCoords();
 	// const auto& model_normals = model.getNormalCoords();
-	// const auto& model_indices = model.getIndices();
 	const auto& model_triangles = model.getTriangles();
 
 	// Retrieve unique vertices:
-	// for (const auto& index: model_indices) {
 	for (const auto& triangle: model_triangles) {
 		for (const auto& index: triangle.indices) {
 			scop::Vertex	vertex{};
@@ -2030,6 +2028,7 @@ void	App::loadModel(const std::string& path) {
 			};
 			utils::generateVibrantColor(vertex.color.x, vertex.color.y, vertex.color.z);
 			// vertex.normal = model_normals[index.normal_index];
+
 			if (unique_vertices.count(vertex) == 0) {
 				unique_vertices[vertex] = static_cast<uint32_t>(vertices.size());
 				vertices.emplace_back(vertex);

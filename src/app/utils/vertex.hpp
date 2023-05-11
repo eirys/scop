@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/26 15:25:04 by etran             #+#    #+#             */
-/*   Updated: 2023/05/09 21:22:01 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 21:29:15 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,6 @@ struct Vertex {
 	bool	operator==(const Vertex& rhs) const {
 		return (
 			pos == rhs.pos &&
-			color == rhs.color &&
 			tex_coord == rhs.tex_coord
 		);
 	}

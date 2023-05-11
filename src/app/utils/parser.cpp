@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/11 17:59:39 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 21:41:22 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,7 +151,8 @@ void	Parser::parseNormal() {
  * Retrives at least one triangle.
 */
 void	Parser::parseFace() {
-	std::optional<uint8_t>					format;
+	std::optional<uint8_t>			format;
+	std::vector<Model::Index>		indices;
 
 	// Parse all indices chunks
 	skipWhitespace();
@@ -171,7 +172,6 @@ void	Parser::parseFace() {
 
 		// Extract expected indices from chunk
 		Model::Index	index{};
-
 		size_t	begin_pos = 0;
 		for (size_t i = 0; i < 3; ++i) {
 			if (format.value() & (1 << i)) {
@@ -186,15 +186,18 @@ void	Parser::parseFace() {
 				begin_pos += 1;
 			}
 		}
+		if (index.vertex == 0) {
+			throw Parser::parse_error("expecting vertex index");
+		}
 		model_output.addIndex(index);
+		indices.emplace_back(index);
 		skipWhitespace();
 	}
-	if (model_output.getIndices().size() < 3) {
+	if (indices.size() < 3) {
 		throw Parser::parse_error("expecting at least 3 vertices");
 	}
-	// Add triangles
 
-	const auto&	indices = model_output.getIndices();
+	// Add triangles
 	size_t	nb_triangles = indices.size() - 2;
 	for (size_t i = 0; i < nb_triangles; ++i) {
 		Model::Triangle	triangle{};
@@ -214,7 +217,6 @@ void	Parser::parseFace() {
 			.texture = indices[i + 2].texture - 1,
 			.normal = indices[i + 2].normal - 1
 		};
-
 		model_output.addTriangle(triangle);
 	}
 }
