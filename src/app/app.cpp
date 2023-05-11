@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/11 13:13:14 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 14:09:42 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -2265,7 +2265,7 @@ void	App::updateFragmentPart(
 
 	// Only udpate if it was recently toggled
 	if (texture_enabled_start.has_value()) {
-		// Transition from 0 to 1 in 2 second
+		// Transition from 0 to 1 in 0.3 second
 		float	time =
 			std::chrono::duration<float, std::chrono::milliseconds::period>(
 				current_time - texture_enabled_start.value()

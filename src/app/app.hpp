@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/11 13:02:19 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 14:09:48 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,7 @@ private:
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
 	const size_t					max_frames_in_flight = 2;
-	const float						transition_duration = 1000.0f;	// ms
+	const float						transition_duration = 300.0f;	// ms
 
 	#ifndef NDEBUG
 	const bool						enable_validation_layers = false;

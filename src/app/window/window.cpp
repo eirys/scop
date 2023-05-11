@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:42 by eli               #+#    #+#             */
-/*   Updated: 2023/05/11 11:05:17 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 14:09:14 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,8 @@ void	keyCallback(
 	int action,
 	int mods
 ) {
+	using std::chrono::steady_clock;
+
 	(void)window;
 	(void)scancode;
 	(void)mods;
@@ -129,14 +131,15 @@ void	keyCallback(
 
 	// On key press
 	if (action == GLFW_PRESS) {
-		static auto	key_pressed = std::chrono::steady_clock::now();
-		auto	now = std::chrono::steady_clock::now();
-		auto	duration = std::chrono::duration_cast<std::chrono::milliseconds>(
-			now - key_pressed
-		);
+		static steady_clock::time_point	key_pressed;
 
+		steady_clock::time_point	now = steady_clock::now();
+		steady_clock::duration	duration =
+			std::chrono::duration_cast<std::chrono::milliseconds>(
+				now - key_pressed
+			);
 		// Avoid key spamming
-		if (duration < std::chrono::milliseconds(2000)) {
+		if (duration < Window::spam_delay) {
 			return;
 		}
 		scop::App::toggleTexture();
