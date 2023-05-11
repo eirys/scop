@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/11 14:09:42 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 15:09:26 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,10 @@ std::optional<App::time_point>	App::texture_enabled_start;
 /*                                   PUBLIC                                   */
 /* ========================================================================== */
 
-App::App() {
+App::App(
+	const std::string& model_file,
+	const std::string& texture_file
+): window(model_file) {
 	createInstance();
 	setupDebugMessenger();
 	createSurface();
@@ -44,10 +47,8 @@ App::App() {
 	createColorResources();
 	createDepthResources();
 	createFrameBuffers();
-	createTextureImage(SCOP_TEXTURE_FILE_VIKING_PNG);
-	createTextureImageView();
-	createTextureSampler();
-	loadModel(SCOP_MODEL_FILE_VIKING_OBJ);
+	createTextureHandle(texture_file);
+	loadModel(model_file);
 	createVertexBuffer();
 	createIndexBuffer();
 	createUniformBuffers();
@@ -61,10 +62,12 @@ App::~App() {
 	cleanupSwapChain();
 
 	// Remove texture image
-	vkDestroySampler(logical_device, texture_sampler, nullptr);
-	vkDestroyImageView(logical_device, texture_image_view, nullptr);
-	vkDestroyImage(logical_device, texture_image, nullptr);
-	vkFreeMemory(logical_device, texture_image_memory, nullptr);
+	if (loaded_texture_file) {
+		vkDestroySampler(logical_device, texture_sampler, nullptr);
+		vkDestroyImageView(logical_device, texture_image_view, nullptr);
+		vkDestroyImage(logical_device, texture_image, nullptr);
+		vkFreeMemory(logical_device, texture_image_memory, nullptr);
+	}
 
 	// Remove graphics pipeline
 	vkDestroyPipeline(logical_device, graphics_pipeline, nullptr);
@@ -2005,9 +2008,9 @@ bool	App::hasStencilCompotent(VkFormat format) const {
 	);
 }
 
-void	App::loadModel(const char* path) {
+void	App::loadModel(const std::string& path) {
 	scop::obj::Parser	parser;
-	scop::Model	model = parser.parseFile(path);
+	scop::Model	model = parser.parseFile(path.c_str());
 	std::unordered_map<scop::Vertex, uint32_t>	unique_vertices{};
 
 	const auto&	model_vertices = model.getVertexCoords();
@@ -2279,6 +2282,18 @@ void	App::updateFragmentPart(
 	} else {
 		ubo.texture_mix = -1.0f;
 	}
+}
+
+void	App::createTextureHandle(
+	const std::string& path
+) {
+	if (path.empty())
+		return;
+
+	loaded_texture_file = true;
+	createTextureImage(path.c_str());
+	createTextureImageView();
+	createTextureSampler();
 }
 
 /* ========================================================================== */

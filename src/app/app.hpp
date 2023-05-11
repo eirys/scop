@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/11 14:09:48 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 15:08:47 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,10 +105,12 @@ public:
 	/*                                  METHODS                                  */
 	/* ========================================================================= */
 
-	App();
+	App(const std::string& model_file, const std::string& texture_file);
 	~App();
+
+	App() = delete;
 	App(const App& x) = delete;
-	App&	operator=(const App& rhs) = delete;
+	App& operator=(const App& rhs) = delete;
 
 	/* ========================================================================= */
 
@@ -126,18 +128,21 @@ private:
 	const std::vector<const char*>	device_extensions = {
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
-	const size_t					max_frames_in_flight = 2;
-	const float						transition_duration = 300.0f;	// ms
+	static constexpr size_t			max_frames_in_flight = 2;
+	static constexpr float			transition_duration = 300.0f;	// ms
 
 	#ifndef NDEBUG
-	const bool						enable_validation_layers = false;
+	static constexpr bool			enable_validation_layers = false;
 	#else
-	const bool						enable_validation_layers = true;
+	static constexpr bool			enable_validation_layers = true;
 	#endif
 
 	/* ========================================================================= */
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
+
+	// const std::string				texture_file;
+	// const std::string				model_file;
 
 	scop::Window					window;
 	VkInstance						vk_instance;
@@ -184,6 +189,7 @@ private:
 	std::vector<VkDeviceMemory>		uniform_buffers_memory;
 	std::vector<void*>				uniform_buffers_mapped;
 
+	bool							loaded_texture_file = false;
 	uint32_t						mip_levels;
 	VkImage							texture_image;
 	VkDeviceMemory					texture_image_memory;
@@ -338,7 +344,9 @@ private:
 	bool							hasStencilCompotent(
 		VkFormat format
 	) const;
-	void							loadModel(const char* path);
+	void							loadModel(
+		const std::string& path
+	);
 	void							generateMipmaps(
 		VkImage image,
 		VkFormat image_format,
@@ -355,6 +363,9 @@ private:
 	void							updateFragmentPart(
 		UniformBufferObject& ubo,
 		time_point current_time
+	);
+	void							createTextureHandle(
+		const std::string& path
 	);
 
 	static VKAPI_ATTR

@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:36 by eli               #+#    #+#             */
-/*   Updated: 2023/05/11 14:08:42 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 14:27:50 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,16 +44,17 @@ public:
 
 	static constexpr uint32_t		width = 800;
 	static constexpr uint32_t		height = 600;
-	static constexpr char			window_title[] = "Etran's cute lil app";
+	static constexpr char			title[] = "Etran's Scop: ";
 	static constexpr std::chrono::milliseconds	spam_delay = std::chrono::milliseconds(500);
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
 	/* ========================================================================= */
 
-	Window();
+	Window(const std::string& model_name);
 	~Window();
 
+	Window() = delete;
 	Window(const Window& x) = delete;
 	Window& operator=(const Window& rhs) = delete;
 

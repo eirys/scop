@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 14:23:35 by eli               #+#    #+#             */
-/*   Updated: 2023/05/10 19:41:37 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 14:14:46 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,12 +30,6 @@ namespace utils {
 
 inline float	radians(float degrees) {
 	return degrees * M_PI / 180;
-}
-
-inline bool		isCharset(char c, const std::string charset) {
-	if (charset.find(c) != std::string::npos)
-		return true;
-	return false;
 }
 
 inline float	generateRandomFloat() {
