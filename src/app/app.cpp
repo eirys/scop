@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/11 21:41:54 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 22:43:02 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -2245,7 +2245,7 @@ void	App::updateVertexPart(
 
 	// Define view transformation: above, 45deg angle
 	ubo.view = scop::lookAt(
-		scop::Vect3(2.0f, 2.0f, 2.0f),		// eye position
+		scop::Vect3(1.6f, 2.0f, 1.6f),		// eye position
 		scop::Vect3(0.0f, 0.0f, 0.0f),		// center position
 		scop::Vect3(0.0f, 0.0f, 1.0f)		// up axis (z axis)
 	);
