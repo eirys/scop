@@ -6,7 +6,7 @@
 #    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/05/10 14:12:03 by eli              ###   ########.fr        #
+#    Updated: 2023/05/11 15:41:19 by eli              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,20 +24,19 @@ SHD_DIR		:=	shaders
 LIB_DIR		:=	lib
 
 # subdirectories
-APP_DIR		:=	app
 TOOLS_DIR	:=	tools
-WINDOW_DIR	:=	$(APP_DIR)/window
+APP_DIR		:=	app
+SUBMOD_DIR	:=	$(APP_DIR)/submodules
 UTILS_DIR	:=	$(APP_DIR)/utils
 
 OBJ_SUBDIRS	:=	$(addprefix $(OBJ_DIR)/,\
 				$(APP_DIR) \
 				$(TOOLS_DIR) \
-				$(WINDOW_DIR) \
+				$(SUBMOD_DIR) \
 				$(UTILS_DIR))
 
 # external libraries
 STB_PATH	:=	$(LIB_DIR)/stb
-TOL_PATH	:=	$(LIB_DIR)/tol
 
 # cpp files
 INC_FILES	:=	$(TOOLS_DIR)/utils.hpp \
@@ -47,16 +46,14 @@ INC_FILES	:=	$(TOOLS_DIR)/utils.hpp \
 				$(UTILS_DIR)/uniform_buffer_object.hpp \
 				$(UTILS_DIR)/model.hpp \
 				$(UTILS_DIR)/parser.hpp \
-				$(WINDOW_DIR)/window.hpp \
+				$(SUBMOD_DIR)/window.hpp \
 				$(APP_DIR)/app.hpp
-
 
 SRC_FILES	:=	main.cpp \
 				$(UTILS_DIR)/model.cpp \
 				$(UTILS_DIR)/parser.cpp \
-				$(WINDOW_DIR)/window.cpp \
+				$(SUBMOD_DIR)/window.cpp \
 				$(APP_DIR)/app.cpp
-
 
 INC			:=	$(addprefix	$(SRC_DIR)/,$(INC_FILES))
 SRC			:=	$(addprefix $(SRC_DIR)/,$(SRC_FILES))
@@ -76,9 +73,8 @@ CFLAGS		:=	$(EXTRA) \
 				-I./$(SRC_DIR)/$(APP_DIR) \
 				-I./$(SRC_DIR)/$(TOOLS_DIR) \
 				-I./$(SRC_DIR)/$(UTILS_DIR) \
-				-I./$(SRC_DIR)/$(WINDOW_DIR) \
+				-I./$(SRC_DIR)/$(SUBMOD_DIR) \
 				-I./$(STB_PATH) \
-				-I./${TOL_PATH} \
 				-O3 \
 				-DNDEBUG \
 				-D__DEBUG

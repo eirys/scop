@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:36 by eli               #+#    #+#             */
-/*   Updated: 2023/05/11 14:27:50 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 15:42:26 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,9 @@
 
 // Window handler
 # include <GLFW/glfw3.h>
+
+// Std
+# include <string>
 # include <chrono>
 
 namespace scop {

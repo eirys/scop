@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:42 by eli               #+#    #+#             */
-/*   Updated: 2023/05/11 14:27:32 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 15:43:21 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ namespace scop {
 /* ========================================================================== */
 
 Window::Window(const std::string& model_name) {
+	const std::string	window_title = title + model_name;
+	
 	// initialize glfw
 	glfwInit();
 
@@ -27,7 +29,7 @@ Window::Window(const std::string& model_name) {
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
 	// create a window pointer
-	window = glfwCreateWindow(width, height, title + model_name, nullptr, nullptr);
+	window = glfwCreateWindow(width, height, window_title.c_str(), nullptr, nullptr);
 
 	// set pointer to window to `this` instance pointer
 	// so we can access it from the callback functions
