@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/11 21:41:22 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 23:43:20 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,9 @@ scop::Model	Parser::parseFile(const std::string& file_name) {
 		}
 	}
 
+	// Fix empty indices in face
+	fixMissingIndices();
+
 	return model_output;
 }
 
@@ -87,7 +90,7 @@ void	Parser::processLine() {
 /**
  * Format expected:
  * "vx vy vz "
- * 
+ *
  * Retrieves a vertex.
 */
 void	Parser::parseVertex() {
@@ -106,7 +109,7 @@ void	Parser::parseVertex() {
 /**
  * Format expected:
  * "vx vy "
- * 
+ *
  * Retrieves a texture coordinates.
 */
 void	Parser::parseTexture() {
@@ -125,7 +128,7 @@ void	Parser::parseTexture() {
 /**
  * Format expected:
  * "vx vy vz "
- * 
+ *
  * Retrieves a normal.
 */
 void	Parser::parseNormal() {
@@ -157,6 +160,8 @@ void	Parser::parseFace() {
 	// Parse all indices chunks
 	skipWhitespace();
 	while (getWord()) {
+		// LOG("token: " << token);
+
 		// Verify nb indices
 		size_t	nb_slashes = std::count(token.begin(), token.end(), '/');
 		if (nb_slashes > 2) {
@@ -176,13 +181,16 @@ void	Parser::parseFace() {
 		for (size_t i = 0; i < 3; ++i) {
 			if (format.value() & (1 << i)) {
 				size_t	end_pos = token.find(cs_slash, begin_pos);
+				if (end_pos == std::string::npos) {
+					end_pos = token.size();
+				}
 				std::string	index_str = token.substr(begin_pos, end_pos - begin_pos);
 				if (checkNumberType(index_str) != TOKEN_INT) {
 					throw Parser::parse_error("expecting integer index");
 				}
 				index[i] = std::stoi(index_str);
 				begin_pos = end_pos + 1;
-			} else {
+			} else if (nb_slashes) {
 				begin_pos += 1;
 			}
 		}
@@ -193,32 +201,22 @@ void	Parser::parseFace() {
 		indices.emplace_back(index);
 		skipWhitespace();
 	}
+
+	// TODO: Replace occurence of -1 by last element of corresponding list
+	// for (auto& index : indices) {
+	// 	for (size_t i = 0; i < 3; ++i) {
+	// 		if (index[i] == -1) {
+	// 			index[i] = indices.back()[i];
+	// 		}
+	// 	}
+	// }
+
 	if (indices.size() < 3) {
 		throw Parser::parse_error("expecting at least 3 vertices");
 	}
 
-	// Add triangles
-	size_t	nb_triangles = indices.size() - 2;
-	for (size_t i = 0; i < nb_triangles; ++i) {
-		Model::Triangle	triangle{};
-
-		triangle.indices[0] = {
-			.vertex = indices[0].vertex - 1,
-			.texture = indices[0].texture - 1,
-			.normal = indices[0].normal - 1
-		};
-		triangle.indices[1] = {
-			.vertex = indices[i + 1].vertex - 1,
-			.texture = indices[i + 1].texture - 1,
-			.normal = indices[i + 1].normal - 1
-		};
-		triangle.indices[2] = {
-			.vertex = indices[i + 2].vertex - 1,
-			.texture = indices[i + 2].texture - 1,
-			.normal = indices[i + 2].normal - 1
-		};
-		model_output.addTriangle(triangle);
-	}
+	// Store triangles
+	storeTriangles(indices);
 }
 
 /* ========================================================================== */
@@ -302,6 +300,45 @@ uint8_t	Parser::getFormat() const noexcept {
 	}
 }
 
+void	Parser::storeTriangles(
+	const std::vector<Model::Index>& indices
+) {
+	size_t	nb_triangles = indices.size() - 2;
+	for (size_t i = 0; i < nb_triangles; ++i) {
+		Model::Triangle	triangle{};
+
+		triangle.indices[0] = {
+			.vertex = indices[0].vertex - 1,
+			.texture = indices[0].texture - 1,
+			.normal = indices[0].normal - 1
+		};
+		triangle.indices[1] = {
+			.vertex = indices[i + 1].vertex - 1,
+			.texture = indices[i + 1].texture - 1,
+			.normal = indices[i + 1].normal - 1
+		};
+		triangle.indices[2] = {
+			.vertex = indices[i + 2].vertex - 1,
+			.texture = indices[i + 2].texture - 1,
+			.normal = indices[i + 2].normal - 1
+		};
+		model_output.addTriangle(triangle);
+	}
+}
+
+/**
+ * Check if there are missing indices,
+ * and add dummies.
+*/
+void	Parser::fixMissingIndices() {
+	if (model_output.getTextureCoords().empty()) {
+		model_output.setDefaultTextureCoords();
+	}
+	if (model_output.getNormalCoords().empty()) {
+		model_output.setDefaultNormalCoords();
+	}
+}
+
 } // namespace obj
 } // namespace scop
 
@@ -312,7 +349,7 @@ uint8_t	Parser::getFormat() const noexcept {
 // 	try {
 // 		typedef scop::obj::TokenType TokenType;
 
-// 		scop::Model model = parser.parseFile("/home/eli/random/cube.obj");
+// 		scop::Model model = parser.parseFile("/home/eli/random/42.obj");
 // 	} catch (const std::exception& e) {
 // 		std::cerr << e.what() <<__NL;
 // 	}

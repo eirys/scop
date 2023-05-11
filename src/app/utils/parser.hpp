@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:02:06 by etran             #+#    #+#             */
-/*   Updated: 2023/05/11 19:44:03 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 23:18:33 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,9 @@
 # include "model.hpp"
 # include "vertex.hpp"
 
-# define VERTEX			1 << 2 // 4
+# define VERTEX			1 << 0 // 1
 # define TEXTURE		1 << 1 // 2
-# define NORMAL			1 << 0 // 1
+# define NORMAL			1 << 2 // 4
 
 # define NB_LINE_TYPES	10
 
@@ -152,6 +152,10 @@ private:
 		size_t pos
 	) const;
 	uint8_t				getFormat() const noexcept;
+	void				storeTriangles(
+		const std::vector<Model::Index>& indices
+	);
+	void				fixMissingIndices();
 
 }; // class Parser
 

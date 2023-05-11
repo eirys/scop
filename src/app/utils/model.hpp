@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 19:23:53 by eli               #+#    #+#             */
-/*   Updated: 2023/05/11 17:41:56 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 23:34:25 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,14 @@ public:
 		std::array<Index, 3>		indices;
 	};
 
+	const std::vector<Vect2>		default_texture_coords = {
+		{ 0.0f, 0.0f },
+		{ 1.0f, 0.0f },
+		{ 1.0f, 1.0f },
+		{ 0.0f, 1.0f }
+	};
+	const std::vector<Vect3>		default_normal_coords = {};	// TODO
+
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
 	/* ========================================================================= */
@@ -73,11 +81,14 @@ public:
 	void								addIndex(const Index& index);
 	void								addTriangle(const Triangle& triangle);
 
-	const std::vector<Vect3>&			getVertexCoords() const;
-	const std::vector<Vect2>&			getTextureCoords() const;
-	const std::vector<Vect3>&			getNormalCoords() const;
-	const std::vector<Index>&			getIndices() const;
-	const std::vector<Triangle>&		getTriangles() const;
+	void								setDefaultTextureCoords();
+	void								setDefaultNormalCoords();
+
+	const std::vector<Vect3>&			getVertexCoords() const noexcept;
+	const std::vector<Vect2>&			getTextureCoords() const noexcept;
+	const std::vector<Vect3>&			getNormalCoords() const noexcept;
+	const std::vector<Index>&			getIndices() const noexcept;
+	const std::vector<Triangle>&		getTriangles() const noexcept;
 
 private:
 	/* ========================================================================= */

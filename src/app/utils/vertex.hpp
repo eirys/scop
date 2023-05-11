@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/26 15:25:04 by etran             #+#    #+#             */
-/*   Updated: 2023/05/11 21:29:15 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 23:09:05 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,16 @@ struct Vertex {
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
 	/* ========================================================================= */
+
+	/* CONSTRUCTOR ============================================================= */
+
+	Vertex() = default;
+	Vertex(const Vertex&) = default;
+	Vertex(Vertex&&) = default;
+	Vertex&	operator=(const Vertex&) = default;
+	~Vertex() = default;
+
+	/* HELPER FUNCTIONS ======================================================== */
 
 	/**
 	 * Expliciting to vulkan how to pass data to vertex shader.

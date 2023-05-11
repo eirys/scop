@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 19:23:47 by eli               #+#    #+#             */
-/*   Updated: 2023/05/11 17:34:08 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/11 23:41:40 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,25 +38,46 @@ void	Model::addIndex(const Index& index) {
 	indices.emplace_back(index);
 }
 
+void	Model::setDefaultTextureCoords() {
+	texture_coords = default_texture_coords;
+
+	size_t	i = 0;
+	for (auto& triangle: triangles) {
+		if (i++ % 2) {
+			triangle.indices[0].texture = 0;
+			triangle.indices[1].texture = 1;
+			triangle.indices[2].texture = 2;
+		} else {
+			triangle.indices[0].texture = 0;
+			triangle.indices[1].texture = 2;
+			triangle.indices[2].texture = 3;
+		}
+	}
+}
+
+void	Model::setDefaultNormalCoords() {
+	normal_coords = default_normal_coords;
+}
+
 /* ========================================================================== */
 
-const std::vector<Vect3>&	Model::getVertexCoords() const {
+const std::vector<Vect3>&	Model::getVertexCoords() const noexcept {
 	return vertex_coords;
 }
 
-const std::vector<Vect2>&	Model::getTextureCoords() const {
+const std::vector<Vect2>&	Model::getTextureCoords() const noexcept {
 	return texture_coords;
 }
 
-const std::vector<Model::Triangle>&	Model::getTriangles() const {
+const std::vector<Model::Triangle>&	Model::getTriangles() const noexcept {
 	return triangles;
 }
 
-const std::vector<Vect3>&	Model::getNormalCoords() const {
+const std::vector<Vect3>&	Model::getNormalCoords() const noexcept {
 	return normal_coords;
 }
 
-const std::vector<Model::Index>&	Model::getIndices() const {
+const std::vector<Model::Index>&	Model::getIndices() const noexcept {
 	return indices;
 }
 

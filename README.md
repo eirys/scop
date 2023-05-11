@@ -1,2 +1,5 @@
 # scop
-Discovering how to use Vulkan with a small graphic project.
+A simple graphics `.obj` renderer, made with Vulkan.
+
+## Usage
+`./scop filepath {texturepath}`

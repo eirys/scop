@@ -6,7 +6,7 @@
 #    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/05/11 17:50:47 by eli              ###   ########.fr        #
+#    Updated: 2023/05/11 22:44:53 by eli              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -76,8 +76,8 @@ CFLAGS		:=	$(EXTRA) \
 				-I./$(SRC_DIR)/$(SUBMOD_DIR) \
 				-I./$(STB_PATH) \
 				-O3 \
-				-DNDEBUG \
 				-g \
+				-DNDEBUG \
 				-D__DEBUG
 
 LDFLAGS		:=	-lglfw \
