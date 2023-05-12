@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
+#    By: etran <etran@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/05/12 22:17:23 by eli              ###   ########.fr        #
+#    Updated: 2023/05/12 23:31:37 by etran            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -62,6 +62,7 @@ SRC_FILES	:=	main.cpp \
 				$(MODEL_DIR)/model.cpp \
 				$(MODEL_DIR)/parser.cpp \
 				$(IMG_DIR)/ppm_loader.cpp \
+				$(IMG_DIR)/image_handler.cpp \
 				$(SUBMOD_DIR)/window.cpp \
 				$(APP_DIR)/app.cpp
 
