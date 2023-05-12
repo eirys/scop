@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/12 23:31:31 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/12 23:51:33 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,15 +34,19 @@
 # include <cassert>
 # include <chrono>
 # include <unordered_map>
+# include <memory>
 
 # include "window.hpp"
 # include "utils.hpp"
 # include "vertex.hpp"
 # include "uniform_buffer_object.hpp"
+# include "image_handler.hpp"
+# include "ppm_loader.hpp"
 
 # define SCOP_VERTEX_SHADER_BINARY		"shaders/vert.spv"
 # define SCOP_FRAGMENT_SHADER_BINARY	"shaders/frag.spv"
 # define SCOP_TEXTURE_FILE_HAMSTER_JPG	"textures/hammy.jpg"
+# define SCOP_TEXTURE_FILE_HAMSTER_PPM	"textures/hammy.ppm"
 
 # define SCOP_MODEL_FILE_VIKING_OBJ		"models/viking_room.obj"
 # define SCOP_TEXTURE_FILE_VIKING_PNG	"textures/viking_room.png"
@@ -141,6 +145,8 @@ private:
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
 
+	std::unique_ptr<scop::ImageLoader>	image_loader;
+
 	scop::Window					window;
 	VkInstance						vk_instance;
 	VkDebugUtilsMessengerEXT		debug_messenger;
@@ -207,7 +213,6 @@ private:
 	std::optional<time_point>		texture_enabled_start;
 
 	uint32_t						current_frame = 0;
-	// std::unique_ptr<char>			pixels;
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
@@ -294,9 +299,7 @@ private:
 	);
 	void							createDescriptorPool();
 	void							createDescriptorSets();
-	void							createTextureImage(
-		const char* path
-	);
+	void							createTextureImage();
 	void							createImage(
 		uint32_t width,
 		uint32_t height,
@@ -358,7 +361,7 @@ private:
 		UniformBufferObject& ubo,
 		time_point current_time
 	);
-	void							createTextureHandle(
+	void							createTextureLoader(
 		const std::string& path
 	);
 

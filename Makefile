@@ -6,7 +6,7 @@
 #    By: etran <etran@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/05/12 23:31:37 by etran            ###   ########.fr        #
+#    Updated: 2023/05/12 23:36:44 by etran            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -120,14 +120,18 @@ tmp:
 	$(CXX) $(CFLAGS) $(wildcard src/$(IMG_DIR)/*.cpp)
 
 $(NAME): $(SHD_BIN) $(OBJ)
-	$(CXX) $(CFLAGS) $(OBJ) -o $(NAME) $(LDFLAGS)
+	@echo "Creating $(NAME)..."
+	@$(CXX) $(CFLAGS) $(OBJ) -o $(NAME) $(LDFLAGS)
+	@echo "Done"
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(INC)
 	@mkdir -p $(OBJ_DIR) $(OBJ_SUBDIRS)
-	$(CXX) $(CFLAGS) -c $< -o $@ $(LDFLAGS)
+	@echo "Compiling file $<..."
+	@$(CXX) $(CFLAGS) -c $< -o $@ $(LDFLAGS)
 
 $(SHD_DIR)/%.spv: $(SHD_DIR)/shader.%
-	$(GLSLC) $< -o $@
+	@echo "Compiling shader $<..."
+	@$(GLSLC) $< -o $@
 
 .PHONY: test
 test: all

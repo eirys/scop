@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/12 23:31:31 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 00:15:03 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,10 @@
 #include "model.hpp"
 #include "parser.hpp"
 
-#ifndef STB_IMAGE_IMPLEMENTATION
-# define STB_IMAGE_IMPLEMENTATION
-# include "stb_image.h"
-#endif
+// #ifndef STB_IMAGE_IMPLEMENTATION
+// # define STB_IMAGE_IMPLEMENTATION
+// # include "stb_image.h"
+// #endif
 
 namespace scop {
 
@@ -33,6 +33,7 @@ App::App(
 	const std::string& model_file,
 	const std::string& texture_file
 ): window(model_file) {
+	createTextureLoader(texture_file);
 	createInstance();
 	setupDebugMessenger();
 	createSurface();
@@ -47,7 +48,9 @@ App::App(
 	createColorResources();
 	createDepthResources();
 	createFrameBuffers();
-	createTextureHandle(texture_file);
+	createTextureImage();
+	createTextureImageView();
+	createTextureSampler();
 	loadModel(model_file);
 	createVertexBuffer();
 	createIndexBuffer();
@@ -1593,31 +1596,32 @@ void	App::createDescriptorSets() {
 /**
  * Texture loader
 */
-void	App::createTextureImage(
-	const char* path
-) {
-	int	tex_width, tex_height, tex_channels;
+void	App::createTextureImage() {
+	// int	tex_width, tex_height, tex_channels;
 
 	// Load image
-	stbi_uc*	pixels = stbi_load(
-		path,
-		&tex_width,
-		&tex_height,
-		&tex_channels,
-		STBI_rgb_alpha
-	);
-	if (!pixels) {
-		throw std::runtime_error("failed to load texture image");
-	}
+	// stbi_uc*	pixels = stbi_load(
+	// 	path,
+	// 	&tex_width,
+	// 	&tex_height,
+	// 	&tex_channels,
+	// 	STBI_rgb_alpha
+	// );
+
+	scop::Image	image = image_loader->load();
+
+	// if (!pixels) {
+		// throw std::runtime_error("failed to load texture image");
+	// }
 
 	mip_levels = 1 + static_cast<uint32_t>(
 		std::floor(std::log2(std::max(
-			tex_width,
-			tex_height
+			image.getWidth(),
+			image.getHeight()
 		)))
 	);
 
-	VkDeviceSize	image_size = tex_width * tex_height * 4;
+	VkDeviceSize	image_size = image.getWidth() * image.getHeight() * 4;
 	VkBuffer		staging_buffer;
 	VkDeviceMemory	staging_buffer_memory;
 
@@ -1632,16 +1636,16 @@ void	App::createTextureImage(
 	// Map buffer, copy image load into buffer
 	void*	data;
 	vkMapMemory(logical_device, staging_buffer_memory, 0, image_size, 0, &data);
-	memcpy(data, pixels, static_cast<size_t>(image_size));
+	memcpy(data, image.getPixels(), static_cast<size_t>(image_size));
 	vkUnmapMemory(logical_device, staging_buffer_memory);
 
 	// Free image loaded
-	stbi_image_free(pixels);
+	// stbi_image_free(pixels);
 
 	// Create texture image to be filled
 	createImage(
-		tex_width,
-		tex_height,
+		image.getWidth(),
+		image.getHeight(),
 		mip_levels,
 		VK_SAMPLE_COUNT_1_BIT,
 		VK_FORMAT_R8G8B8A8_SRGB,
@@ -1665,16 +1669,16 @@ void	App::createTextureImage(
 	copyBufferToImage(
 		staging_buffer,
 		texture_image,
-		static_cast<uint32_t>(tex_width),
-		static_cast<uint32_t>(tex_height)
+		static_cast<uint32_t>(image.getWidth()),
+		static_cast<uint32_t>(image.getHeight())
 	);
 
 	// Fill mipmaps images (directly handled by gpu)
 	generateMipmaps(
 		texture_image,
 		VK_FORMAT_R8G8B8A8_SRGB,
-		tex_width,
-		tex_height,
+		image.getWidth(),
+		image.getHeight(),
 		mip_levels
 	);
 
@@ -2265,18 +2269,25 @@ void	App::updateFragmentPart(
 	}
 }
 
-void	App::createTextureHandle(
-	const std::string& path
-) {
+void	App::createTextureLoader(const std::string& path) {
 	std::string	file;
 	if (path.empty()) {
-		file = SCOP_TEXTURE_FILE_HAMSTER_JPG;
+		file = SCOP_TEXTURE_FILE_HAMSTER_PPM;
 	} else {
+		// Only handle ppm files for now
+		size_t	extension_pos = path.rfind('.');
+		if (extension_pos == std::string::npos) {
+			throw std::invalid_argument(
+				"No extention found for texture file (must be .ppm)"
+			);
+		} else if (path.find(".ppm") == std::string::npos) {
+			throw std::invalid_argument(
+				"Texture file must be a ppm file (.ppm)"
+			);
+		}
 		file = path;
 	}
-	createTextureImage(file.c_str());
-	createTextureImageView();
-	createTextureSampler();
+	image_loader = std::make_unique<scop::PpmLoader>(file);
 }
 
 /* ========================================================================== */

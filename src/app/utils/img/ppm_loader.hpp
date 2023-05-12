@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 13:57:01 by eli               #+#    #+#             */
-/*   Updated: 2023/05/12 23:30:57 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 00:43:18 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ public:
 	/*                                  METHODS                                  */
 	/* ========================================================================= */
 
-	PpmLoader(const char* path);
+	PpmLoader(const std::string& path);
 
 	~PpmLoader() = default;
 
@@ -80,6 +80,8 @@ private:
 	bool		skipWhitespace() noexcept;
 	bool		skipComment() noexcept;
 	void		ignoreChunk() noexcept;
+
+	constexpr uint32_t	createPixel(uint8_t alpha, uint8_t r, uint8_t g, uint8_t b) const noexcept;
 
 	/* ========================================================================= */
 	/*                                 EXCEPTION                                 */

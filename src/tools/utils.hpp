@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 14:23:35 by eli               #+#    #+#             */
-/*   Updated: 2023/05/12 23:31:31 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 00:53:46 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <random>
 # include <fstream>
 # include <vector>
+# include <iostream>
 
 # define __NL '\n'
 
@@ -31,9 +32,21 @@ namespace scop {
 namespace utils {
 
 /**
+ * Determine endianness of the system.
+ * 
+ * If true, the system is big endian.
+*/
+const bool	big_endian = []() -> bool {
+	const int	value = 0x01;
+	const void*	address = static_cast<const void *>(&value);
+	const unsigned char*	least_significant_address = static_cast<const unsigned char*>(address);
+	return *least_significant_address != 0x01;
+}();
+
+/**
  * Converts degrees to radians.
 */
-inline float	radians(float degrees) {
+inline float	radians(float degrees) noexcept {
 	return degrees * M_PI / 180;
 }
 

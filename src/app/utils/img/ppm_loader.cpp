@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 15:00:15 by eli               #+#    #+#             */
-/*   Updated: 2023/05/12 23:29:33 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 01:32:19 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ namespace scop {
 /*                                   PUBLIC                                   */
 /* ========================================================================== */
 
-PpmLoader::PpmLoader(const char* _path):
+PpmLoader::PpmLoader(const std::string& _path):
 	base(_path, ImageType::PPM) {
 		base::data = utils::readFile(_path);
 }
@@ -81,6 +81,12 @@ void	PpmLoader::parseHeader() {
 	if (!skipWhitespace()) {
 		throw PpmParseError("expecting whitespace");
 	}
+	if (max_color > std::numeric_limits<uint8_t>::max()) {
+		throw PpmParseError("max color value is too high, expecting 8 bits (255)");
+	}
+
+	LOG("Width: " << base::width << __NL <<
+	"Height: " << base::height);
 }
 
 PpmLoader::Pixels	PpmLoader::parseBodyP3() {
@@ -92,36 +98,33 @@ PpmLoader::Pixels	PpmLoader::parseBodyP3() {
  * Parses the image body of a P6 file.
 */
 PpmLoader::Pixels	PpmLoader::parseBodyP6() {
-	auto	readExcept = [this]() -> uint32_t {
+	auto	readExcept = [this]() -> uint8_t {
 		if (cursor > base::data.size()) {
 			throw PpmParseError("unexpected end of file");
 		}
-		return static_cast<uint32_t>(base::data[cursor++]);
+		return static_cast<uint8_t>(base::data[cursor++]);
 	};
 
-	PpmLoader::Pixels	pixels;
+	PpmLoader::Pixels	pixels(base::width * base::height * sizeof(uint32_t));
 	size_t	row = 0;
+
 	// For each line, read 3 * width bytes
-	while (
-		cursor < base::data.size() &&
-		base::data[cursor] != '\n' &&
-		base::data[cursor] != '\r'
-	) {
-		uint32_t	r, g, b;
+	while (cursor < base::data.size()) {
+		uint8_t	r, g, b;
 
 		for (size_t i = 0; i < base::width; ++i) {
 			r = readExcept();
 			g = readExcept();
 			b = readExcept();
+			uint32_t	pixel = createPixel(r, g, b, 255);
+			pixels.emplace_back(pixel);
 		}
-		pixels.emplace_back(r);
-		pixels.emplace_back(g);
-		pixels.emplace_back(b);
 		++row;
 	}
 	if (row != base::height) {
 		throw PpmParseError("invalid number of rows");
 	}
+	LOG("Finished parsing body");
 	return pixels;
 }
 
@@ -171,7 +174,7 @@ uint32_t	PpmLoader::expectNumber() {
 		base::data.cbegin() + start,
 		base::data.cbegin() + cursor + 1
 	);
-	return std::stoi(str);
+	return std::stoul(str);
 }
 
 /* ========================================================================== */
@@ -230,15 +233,36 @@ void	PpmLoader::ignoreChunk() noexcept {
 	while (skipComment() || skipWhitespace()) { ; }
 }
 
+/**
+ * Creates a pixel from the given values, depending on the endianness.
+*/
+constexpr uint32_t	PpmLoader::createPixel(
+	uint8_t red,
+	uint8_t green,
+	uint8_t blue,
+	uint8_t alpha
+) const noexcept {
+	// if (utils::big_endian) {
+		// return (alpha << 24) | (red << 16) | (green << 8) | blue;
+	// } else {
+		// return red << 24 | green << 16 | blue << 8 | alpha;
+	// }
+		// return red << 24 | green << 16 | blue << 8 | alpha;
+		// return (alpha << 24) | (red << 16) | (green << 8) | blue;
+		// return blue << 24 | green << 16 | red << 8 | alpha;
+		// return alpha << 24 | blue << 16 | green << 8 | red;
+}
+
 } // namespace scop
 
-#include <iostream>
-int main() {
-	try {
+//TODO remove
+// #include <iostream>
+// int main() {
+// 	try {
 
-	scop::PpmLoader	loader("/home/eli/random/hammy.ppm");
-	loader.load();
-	} catch (const std::exception& e) {
-		std::cerr << e.what() << std::endl;
-	}
-}
+// 	scop::PpmLoader	loader("textures/hammy.ppm");
+// 	loader.load();
+// 	} catch (const std::exception& e) {
+// 		std::cerr << e.what() << std::endl;
+// 	}
+// }

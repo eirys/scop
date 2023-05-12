@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 10:12:47 by eli               #+#    #+#             */
-/*   Updated: 2023/05/12 23:31:31 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 00:16:06 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ protected:
 	/*                                  METHODS                                  */
 	/* ========================================================================= */
 
-	ImageLoader(const char* path, ImageType type): path(path), type(type) {}
+	ImageLoader(const std::string& path, ImageType type): path(path), type(type) {}
 
 	ImageLoader() = delete;
 	ImageLoader(const ImageLoader& x) = delete;
