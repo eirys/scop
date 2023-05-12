@@ -6,7 +6,7 @@
 #    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/05/12 16:09:49 by eli              ###   ########.fr        #
+#    Updated: 2023/05/12 20:51:26 by eli              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,7 +27,7 @@ LIB_DIR		:=	lib
 TOOLS_DIR	:=	tools
 APP_DIR		:=	app
 SUBMOD_DIR	:=	$(APP_DIR)/submodules
-MODEL_DIR	:=	$(APP_DIR)/models
+MODEL_DIR	:=	$(APP_DIR)/model
 UTILS_DIR	:=	$(APP_DIR)/utils
 IMG_DIR		:=	$(UTILS_DIR)/img
 
@@ -82,6 +82,8 @@ CFLAGS		:=	$(EXTRA) \
 				-I./$(SRC_DIR)/$(TOOLS_DIR) \
 				-I./$(SRC_DIR)/$(UTILS_DIR) \
 				-I./$(SRC_DIR)/$(SUBMOD_DIR) \
+				-I./$(SRC_DIR)/$(MODEL_DIR) \
+				-I./$(SRC_DIR)/$(IMG_DIR) \
 				-I./$(STB_PATH) \
 				-O3 \
 				-g \

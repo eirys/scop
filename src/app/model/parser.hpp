@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:02:06 by etran             #+#    #+#             */
-/*   Updated: 2023/05/12 16:06:58 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/12 20:47:34 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,9 +44,38 @@ enum TokenType {
  * Parser for .obj files.
 */
 class Parser {
+public:
+	/* ========================================================================= */
+	/*                                  METHODS                                  */
+	/* ========================================================================= */
+
+	Parser() = default;
+	~Parser() = default;
+
+	Parser(const Parser& x) = delete;
+	Parser(Parser&& x) = delete;
+	Parser&	operator=(const Parser& x) = delete;
+
+	/* ========================================================================= */
+
+	Model			parseFile(const std::string& file_name);
+
 private:
+	/* ========================================================================= */
+	/*                                  TYPEDEF                                  */
+	/* ========================================================================= */
+
 	typedef		enum TokenType			TokenType;
 	typedef		void (Parser::*ParseFunction)();
+
+	/* ======================================================================== */
+	/*                               CLASS MEMBERS                              */
+	/* ======================================================================== */
+
+	Model				model_output;
+	size_t				current_pos;
+	std::string			line;
+	std::string			token;
 
 	/* ========================================================================= */
 	/*                               CONST MEMBERS                               */
@@ -93,30 +122,13 @@ private:
 		&Parser::skipComment
 	};
 
-public:
-	/* ========================================================================= */
-	/*                                  METHODS                                  */
-	/* ========================================================================= */
-
-	Parser() = default;
-	~Parser() = default;
-
-	Parser(const Parser& x) = delete;
-	Parser(Parser&& x) = delete;
-	Parser&	operator=(const Parser& x) = delete;
-
-	/* ========================================================================= */
-
-	Model			parseFile(const std::string& file_name);
-	
-private:
 	/* ========================================================================= */
 	/*                                 EXCEPTION                                 */
 	/* ========================================================================= */
 
 	class parse_error: public std::exception {
 		public:
-			parse_error(): error_msg("undefined error") {}
+			parse_error() = delete;
 			parse_error(const std::string& error_msg): error_msg(error_msg) {}
 
 			const char* what() const noexcept override {
@@ -126,15 +138,6 @@ private:
 		private:
 			const std::string	error_msg;
 	};
-
-	/* ======================================================================== */
-	/*                               CLASS MEMBERS                              */
-	/* ======================================================================== */
-
-	Model				model_output;
-	size_t				current_pos;
-	std::string			line;
-	std::string			token;
 
 	/* ======================================================================== */
 

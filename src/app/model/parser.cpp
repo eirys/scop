@@ -6,14 +6,13 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/12 16:07:06 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/12 21:16:16 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parser.hpp"
 #include "utils.hpp"	// LOG
 
-#include <iostream>		// cerr
 #include <fstream>		// ifstream
 #include <vector>		// vector
 #include <optional>		// optional
@@ -160,8 +159,6 @@ void	Parser::parseFace() {
 	// Parse all indices chunks
 	skipWhitespace();
 	while (getWord()) {
-		// LOG("token: " << token);
-
 		// Verify nb indices
 		size_t	nb_slashes = std::count(token.begin(), token.end(), '/');
 		if (nb_slashes > 2) {
@@ -343,6 +340,7 @@ void	Parser::fixMissingIndices() {
 } // namespace scop
 
 // TODO remove
+// #include <iostream>		// cerr
 // int main() {
 // 	scop::obj::Parser	parser;
 
