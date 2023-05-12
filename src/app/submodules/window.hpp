@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:36 by eli               #+#    #+#             */
-/*   Updated: 2023/05/11 15:42:26 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/12 11:32:01 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ public:
 
 	Window() = delete;
 	Window(const Window& x) = delete;
+	Window(Window&& x) = delete;
 	Window& operator=(const Window& rhs) = delete;
 
 	void							retrieveSize(int& width, int& height) const;

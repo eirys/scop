@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/11 17:23:56 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/12 15:32:53 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@
 # include <set>
 # include <limits>
 # include <algorithm>
-# include <fstream>
 # include <cassert>
 # include <chrono>
 # include <unordered_map>
@@ -110,6 +109,7 @@ public:
 
 	App() = delete;
 	App(const App& x) = delete;
+	App(App&& x) = delete;
 	App& operator=(const App& rhs) = delete;
 
 	/* ========================================================================= */
@@ -253,9 +253,6 @@ private:
 	) const;
 	void							createRenderPass();
 	void							createGraphicsPipeline();
-	static std::vector<char>		readFile(
-		const std::string& filename
-	);
 	VkShaderModule					createShaderModule(
 		const std::vector<char>& code
 	);

@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 19:23:53 by eli               #+#    #+#             */
-/*   Updated: 2023/05/11 23:34:25 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/12 16:05:06 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 # include "vertex.hpp"
 
 namespace scop {
+namespace obj {
 
 class Model {
 public:
@@ -71,6 +72,7 @@ public:
 	Model() = default;
 	~Model() = default;
 	Model(const Model& x) = default;
+	Model(Model&& x) = default;
 	Model&	operator=(const Model& x) = default;
 
 	/* ========================================================================= */
@@ -103,6 +105,7 @@ private:
 
 }; // class Model
 
+} // namespace obj
 } // namespace scop
 
 #endif

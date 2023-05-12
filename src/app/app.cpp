@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/11 23:47:16 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/12 16:05:42 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -753,8 +753,8 @@ void	App::createRenderPass() {
 }
 
 void	App::createGraphicsPipeline() {
-	std::vector<char>	vert_shader_code = readFile(SCOP_VERTEX_SHADER_BINARY);
-	std::vector<char>	frag_shader_code = readFile(SCOP_FRAGMENT_SHADER_BINARY);
+	std::vector<char>	vert_shader_code = scop::utils::readFile(SCOP_VERTEX_SHADER_BINARY);
+	std::vector<char>	frag_shader_code = scop::utils::readFile(SCOP_FRAGMENT_SHADER_BINARY);
 
 	// Create shader modules to be used for shader stages
 	VkShaderModule		vert_shader_module = createShaderModule(vert_shader_code);
@@ -922,26 +922,6 @@ void	App::createGraphicsPipeline() {
 
 	vkDestroyShaderModule(logical_device, frag_shader_module, nullptr);
 	vkDestroyShaderModule(logical_device, vert_shader_module, nullptr);
-}
-
-/**
- * Read compiled file in binary mode and return in vector of char format.
- * Avoids problems with text files and end of line characters presence.
-*/
-std::vector<char>	App::readFile(const std::string& filename) {
-	// Read file as binary file, at the end of the file
-	std::ifstream	file(filename, std::ios::ate | std::ios::binary);
-
-	if (!file.is_open()) {
-		throw std::runtime_error("failed to open file: " + filename);
-	}
-
-	size_t				file_size = static_cast<size_t>(file.tellg());
-	std::vector<char>	buffer(file_size);
-	file.seekg(0);
-	file.read(buffer.data(), file_size);
-	file.close();
-	return buffer;
 }
 
 /**
@@ -2008,7 +1988,7 @@ bool	App::hasStencilCompotent(VkFormat format) const {
 
 void	App::loadModel(const std::string& path) {
 	scop::obj::Parser	parser;
-	scop::Model	model = parser.parseFile(path.c_str());
+	scop::obj::Model	model = parser.parseFile(path.c_str());
 	std::unordered_map<scop::Vertex, uint32_t>	unique_vertices{};
 
 	const auto&	model_vertices = model.getVertexCoords();

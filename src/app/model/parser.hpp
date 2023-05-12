@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:02:06 by etran             #+#    #+#             */
-/*   Updated: 2023/05/11 23:18:33 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/12 16:06:58 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,12 +100,14 @@ public:
 
 	Parser() = default;
 	~Parser() = default;
+
 	Parser(const Parser& x) = delete;
+	Parser(Parser&& x) = delete;
 	Parser&	operator=(const Parser& x) = delete;
 
 	/* ========================================================================= */
 
-	scop::Model			parseFile(const std::string& file_name);
+	Model			parseFile(const std::string& file_name);
 	
 private:
 	/* ========================================================================= */
@@ -129,7 +131,7 @@ private:
 	/*                               CLASS MEMBERS                              */
 	/* ======================================================================== */
 
-	scop::Model			model_output;
+	Model				model_output;
 	size_t				current_pos;
 	std::string			line;
 	std::string			token;

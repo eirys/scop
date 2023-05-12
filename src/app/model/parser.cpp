@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/11 23:43:20 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/12 16:07:06 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ namespace obj {
 /*                                   PUBLIC                                   */
 /* ========================================================================== */
 
-scop::Model	Parser::parseFile(const std::string& file_name) {
+Model	Parser::parseFile(const std::string& file_name) {
 	std::ifstream	file;
 
 	file.open(file_name);
@@ -349,7 +349,7 @@ void	Parser::fixMissingIndices() {
 // 	try {
 // 		typedef scop::obj::TokenType TokenType;
 
-// 		scop::Model model = parser.parseFile("/home/eli/random/42.obj");
+// 		scop::obj::Model model = parser.parseFile("/home/eli/random/42.obj");
 // 	} catch (const std::exception& e) {
 // 		std::cerr << e.what() <<__NL;
 // 	}

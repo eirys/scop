@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 14:23:35 by eli               #+#    #+#             */
-/*   Updated: 2023/05/11 14:14:46 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/12 15:39:11 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 // Std
 # include <cmath>
 # include <random>
+# include <fstream>
+# include <vector>
 
 # define __NL '\n'
 
@@ -28,10 +30,17 @@
 namespace scop {
 namespace utils {
 
+/**
+ * Converts degrees to radians.
+*/
 inline float	radians(float degrees) {
 	return degrees * M_PI / 180;
 }
 
+/**
+ * Generates a random float between 0.0f and 1.0f.
+ * Uses a Mersenne Twister pseudo-random generator.
+*/
 inline float	generateRandomFloat() {
 	static std::random_device rd;
 	static std::mt19937 gen(rd());
@@ -39,6 +48,9 @@ inline float	generateRandomFloat() {
 	return dis(gen);
 }
 
+/**
+ * Generates a random vibrant color.
+*/
 inline void	generateVibrantColor(float& red, float& green, float& blue) {
 	red = generateRandomFloat();
 	green = generateRandomFloat();
@@ -63,6 +75,25 @@ inline void	generateVibrantColor(float& red, float& green, float& blue) {
 			green = (green - minChannel) / delta;
 		}
 	}
+}
+
+/**
+ * Read binary file and return in vector of char format.
+*/
+inline std::vector<char>	readFile(const std::string& filename) {
+	// Read file as binary file, at the end of the file
+	std::ifstream	file(filename, std::ios::ate | std::ios::binary);
+
+	if (!file.is_open()) {
+		throw std::runtime_error("failed to open file: " + filename);
+	}
+
+	size_t				file_size = static_cast<size_t>(file.tellg());
+	std::vector<char>	buffer(file_size);
+	file.seekg(0);
+	file.read(buffer.data(), file_size);
+	file.close();
+	return buffer;
 }
 
 } // namespace utils

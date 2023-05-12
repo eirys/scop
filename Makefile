@@ -6,7 +6,7 @@
 #    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/05/11 22:44:53 by eli              ###   ########.fr        #
+#    Updated: 2023/05/12 16:09:49 by eli              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,13 +27,17 @@ LIB_DIR		:=	lib
 TOOLS_DIR	:=	tools
 APP_DIR		:=	app
 SUBMOD_DIR	:=	$(APP_DIR)/submodules
+MODEL_DIR	:=	$(APP_DIR)/models
 UTILS_DIR	:=	$(APP_DIR)/utils
+IMG_DIR		:=	$(UTILS_DIR)/img
 
 OBJ_SUBDIRS	:=	$(addprefix $(OBJ_DIR)/,\
 				$(APP_DIR) \
 				$(TOOLS_DIR) \
 				$(SUBMOD_DIR) \
-				$(UTILS_DIR))
+				$(MODEL_DIR) \
+				$(UTILS_DIR) \
+				$(IMG_DIR))
 
 # external libraries
 STB_PATH	:=	$(LIB_DIR)/stb
@@ -44,14 +48,18 @@ INC_FILES	:=	$(TOOLS_DIR)/utils.hpp \
 				$(TOOLS_DIR)/vector.hpp \
 				$(UTILS_DIR)/vertex.hpp \
 				$(UTILS_DIR)/uniform_buffer_object.hpp \
-				$(UTILS_DIR)/model.hpp \
-				$(UTILS_DIR)/parser.hpp \
+				$(MODEL_DIR)/model.hpp \
+				$(MODEL_DIR)/parser.hpp \
+				$(IMG_DIR)/image_loader.hpp \
+				$(IMG_DIR)/image_handler.hpp \
+				$(IMG_DIR)/ppm_loader.hpp \
 				$(SUBMOD_DIR)/window.hpp \
 				$(APP_DIR)/app.hpp
 
 SRC_FILES	:=	main.cpp \
-				$(UTILS_DIR)/model.cpp \
-				$(UTILS_DIR)/parser.cpp \
+				$(MODEL_DIR)/model.cpp \
+				$(MODEL_DIR)/parser.cpp \
+				$(IMG_DIR)/ppm_loader.cpp \
 				$(SUBMOD_DIR)/window.cpp \
 				$(APP_DIR)/app.cpp
 

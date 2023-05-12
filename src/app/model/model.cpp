@@ -6,13 +6,14 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 19:23:47 by eli               #+#    #+#             */
-/*   Updated: 2023/05/11 23:41:40 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/12 16:04:41 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "model.hpp"
 
 namespace scop {
+namespace obj {
 
 /* ========================================================================== */
 /*                                   PUBLIC                                   */
@@ -81,4 +82,5 @@ const std::vector<Model::Index>&	Model::getIndices() const noexcept {
 	return indices;
 }
 
+} // namespace obj
 } // namespace scop
