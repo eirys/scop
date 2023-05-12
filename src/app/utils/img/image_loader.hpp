@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 10:12:47 by eli               #+#    #+#             */
-/*   Updated: 2023/05/12 19:06:27 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/12 23:14:10 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,9 @@
 # include <string>
 # include <vector>
 
-# include "image_handler.hpp"
-
 namespace scop {
+
+class Image;
 
 enum ImageType {
 	PPM,
@@ -70,7 +70,7 @@ protected:
 	ImageLoader() = delete;
 	ImageLoader(const ImageLoader& x) = delete;
 	ImageLoader(ImageLoader&& x) = delete;
-	ImageLoader&	operator=(const ImageLoader& x) = delete;
+	ImageLoader& operator=(const ImageLoader& x) = delete;
 
 	/* ========================================================================= */
 	/*                                 EXCEPTIONS                                */

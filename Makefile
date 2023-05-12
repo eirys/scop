@@ -6,7 +6,7 @@
 #    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/05/12 20:51:26 by eli              ###   ########.fr        #
+#    Updated: 2023/05/12 22:17:23 by eli              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,13 +31,15 @@ MODEL_DIR	:=	$(APP_DIR)/model
 UTILS_DIR	:=	$(APP_DIR)/utils
 IMG_DIR		:=	$(UTILS_DIR)/img
 
-OBJ_SUBDIRS	:=	$(addprefix $(OBJ_DIR)/,\
-				$(APP_DIR) \
+SUBDIRS		:=	$(APP_DIR) \
 				$(TOOLS_DIR) \
 				$(SUBMOD_DIR) \
 				$(MODEL_DIR) \
 				$(UTILS_DIR) \
-				$(IMG_DIR))
+				$(IMG_DIR)
+
+OBJ_SUBDIRS	:=	$(addprefix $(OBJ_DIR)/,$(SUBDIRS))
+INC_SUBDIRS	:=	$(addprefix $(SRC_DIR)/,$(SUBDIRS))
 
 # external libraries
 STB_PATH	:=	$(LIB_DIR)/stb
@@ -76,15 +78,13 @@ SHD_BIN		:=	$(addsuffix .spv,$(SHD))
 # compiler
 CXX			:=	c++
 EXTRA		:=	-Wall -Werror -Wextra
+INCLUDES	:=	$(addprefix -I./,\
+				$(INC_SUBDIRS) \
+				$(STB_PATH))
+
 CFLAGS		:=	$(EXTRA) \
 				-std=c++17 \
-				-I./$(SRC_DIR)/$(APP_DIR) \
-				-I./$(SRC_DIR)/$(TOOLS_DIR) \
-				-I./$(SRC_DIR)/$(UTILS_DIR) \
-				-I./$(SRC_DIR)/$(SUBMOD_DIR) \
-				-I./$(SRC_DIR)/$(MODEL_DIR) \
-				-I./$(SRC_DIR)/$(IMG_DIR) \
-				-I./$(STB_PATH) \
+				$(INCLUDES) \
 				-O3 \
 				-g \
 				-DNDEBUG \
@@ -114,6 +114,9 @@ RM			:=	rm -rf
 
 .PHONY: all
 all: $(NAME)
+
+tmp:
+	$(CXX) $(CFLAGS) $(wildcard src/$(IMG_DIR)/*.cpp)
 
 $(NAME): $(SHD_BIN) $(OBJ)
 	$(CXX) $(CFLAGS) $(OBJ) -o $(NAME) $(LDFLAGS)

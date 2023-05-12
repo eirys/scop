@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 10:23:32 by eli               #+#    #+#             */
-/*   Updated: 2023/05/12 14:39:59 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/12 22:46:51 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,42 @@
 # include <string>
 # include <vector>
 
+# include "image_loader.hpp"
+
 namespace scop {
 class Image {
 public:
 	/* ========================================================================= */
+	/*                                  TYPEDEF                                  */
+	/* ========================================================================= */
+
+	typedef		enum ImageType	ImageType;
+
+	/* ========================================================================= */
 	/*                                  METHODS                                  */
 	/* ========================================================================= */
+
+	Image(
+		const std::string& path,
+		ImageType type,
+		std::vector<uint32_t>&& pixels,
+		size_t width,
+		size_t height
+	);
+
+	~Image() = default;
+
+	Image() = delete;
+	Image(const Image& x) = delete;
+	Image(Image&& x) = delete;
+	Image&	operator=(const Image& x) = delete;
+
+	/* ========================================================================= */
+
+	const std::string&			getPath() const noexcept;
+	const uint32_t*				getPixels() const noexcept;
+	size_t						getWidth() const noexcept;
+	size_t						getHeight() const noexcept;
 
 private:
 	/* ========================================================================= */
@@ -31,7 +61,8 @@ private:
 	/* ========================================================================= */
 
 	const std::string			path;
-	std::vector<uint32_t>		data;
+	ImageType					type;
+	const std::vector<uint32_t>	pixels;
 	size_t						width;
 	size_t						height;
 

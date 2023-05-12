@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 13:57:01 by eli               #+#    #+#             */
-/*   Updated: 2023/05/12 20:55:32 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/12 23:14:38 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <fstream>
 
 # include "image_loader.hpp"
+# include "image_handler.hpp"
 
 namespace scop {
 
@@ -53,32 +54,32 @@ private:
 	/*                                  TYPEDEFS                                 */
 	/* ========================================================================= */
 
-	typedef		ImageLoader		base;
-	typedef		enum FormatPPM	Format;
-	typedef		void (PpmLoader::*ParseBodyFn)();
+	typedef		ImageLoader				base;
+	typedef		std::vector<uint32_t>	Pixels;
+	typedef		enum FormatPPM			Format;
+	typedef		Pixels (PpmLoader::*ParseBodyFn)();
 
 	/* ========================================================================= */
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
 
-	Format				format;
-	uint8_t				max_color;
-	size_t				cursor = 0;	// Used to parse the file
-	size_t				line = 1;
+	Format		format;
+	uint8_t		max_color;
+	size_t		cursor = 0;	// Used to parse the file
+	size_t		line = 1;
 
 	/* ========================================================================= */
 
 	void		parseHeader();
-	void		parseBodyP3();
-	void		parseBodyP6();
+	Pixels		parseBodyP3();
+	Pixels		parseBodyP6();
 
 	Format		expectFormat();
 	uint32_t	expectNumber();
-	void		expectHex();
 
-	void		skipWhitespace();
-	void		skipNewline();
-	void		skipComment();
+	bool		skipWhitespace() noexcept;
+	bool		skipComment() noexcept;
+	void		ignoreChunk() noexcept;
 
 	/* ========================================================================= */
 	/*                                 EXCEPTION                                 */

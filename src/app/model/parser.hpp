@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:02:06 by etran             #+#    #+#             */
-/*   Updated: 2023/05/12 20:47:34 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/12 22:59:47 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,11 @@
 # include "model.hpp"
 # include "vertex.hpp"
 
-# define VERTEX			1 << 0 // 1
-# define TEXTURE		1 << 1 // 2
-# define NORMAL			1 << 2 // 4
+static constexpr const uint8_t	vertex_bit = 1 << 0;// 1
+static constexpr const uint8_t	texture_bit = 1 << 1; // 2
+static constexpr const uint8_t	normal_bit = 1 << 2; // 4
 
-# define NB_LINE_TYPES	10
+static constexpr const size_t	nb_line_types = 10;
 
 namespace scop {
 namespace obj {
@@ -96,7 +96,7 @@ private:
 	/**
 	 * List of possible line type in .obj file.
 	*/
-	const std::string	line_begin[NB_LINE_TYPES] = {
+	const std::string	line_begin[nb_line_types] = {
 		"v",
 		"vn",
 		"vt",
@@ -109,7 +109,7 @@ private:
 		"s"			// TODO
 	};
 
-	ParseFunction		parseLineFun[NB_LINE_TYPES] = {
+	ParseFunction		parseLineFun[nb_line_types] = {
 		&Parser::parseVertex,
 		&Parser::parseVertex,
 		&Parser::parseTexture,

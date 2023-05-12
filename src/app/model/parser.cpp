@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/12 21:16:16 by eli              ###   ########.fr       */
+/*   Updated: 2023/05/12 22:59:20 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void	Parser::processLine() {
 
 	// Check line type
 	getWord();
-	for (size_t i = 0; i < NB_LINE_TYPES; ++i) {
+	for (size_t i = 0; i < nb_line_types; ++i) {
 		if (token == line_begin[i]) {
 			skipWhitespace();
 			try {
@@ -287,13 +287,13 @@ uint8_t	Parser::getFormat() const noexcept {
 	size_t	last_slash = token.rfind(cs_slash);
 
 	if (first_slash == std::string::npos && last_slash == std::string::npos) {
-		return VERTEX;
+		return vertex_bit;
 	} else if (first_slash == last_slash) {
-		return VERTEX | TEXTURE;
+		return vertex_bit | texture_bit;
 	} else if (first_slash == last_slash - 1) {
-		return VERTEX | NORMAL;
+		return vertex_bit | normal_bit;
 	} else {
-		return VERTEX | TEXTURE | NORMAL;
+		return vertex_bit | texture_bit | normal_bit;
 	}
 }
 
