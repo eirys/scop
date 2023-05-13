@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 14:11:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/12 23:31:31 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 12:08:14 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@
 namespace scop {
 
 struct Mat4 {
-
 	/* ========================================================================= */
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
@@ -174,6 +173,11 @@ inline Mat4	lookAt(const Vect3& eye, const Vect3& center, const Vect3& up) {
 
 /**
  * @brief Produces orthographic projection matrix
+ * 
+ * @param fov			field of view in radians
+ * @param aspect_ratio	aspect ratio of the screen
+ * @param near			near clipping plane
+ * @param far			far clipping plane
 */
 inline Mat4	perspective(float fov, float aspect_ratio, float near, float far) {
 	float	tanHalfFov = std::tan(fov / 2);

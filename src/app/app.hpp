@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 02:40:37 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 14:50:59 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -352,15 +352,18 @@ private:
 	void							createColorResources();
 	void							updateVertexPart(
 		UniformBufferObject& ubo,
-		time_point current_time
+		time_point current_time,
+		uint32_t current_image
 	);
 	void							updateFragmentPart(
 		UniformBufferObject& ubo,
-		time_point current_time
+		time_point current_time,
+		uint32_t current_image
 	);
 	void							createTextureLoader(
 		const std::string& path
 	);
+	void							initUniformBuffer() noexcept;
 
 	static VKAPI_ATTR
 	VkBool32 VKAPI_CALL				debugCallback(

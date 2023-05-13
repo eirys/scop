@@ -6,7 +6,7 @@
 #    By: etran <etran@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/05/12 23:36:44 by etran            ###   ########.fr        #
+#    Updated: 2023/05/13 14:49:23 by etran            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -58,13 +58,13 @@ INC_FILES	:=	$(TOOLS_DIR)/utils.hpp \
 				$(SUBMOD_DIR)/window.hpp \
 				$(APP_DIR)/app.hpp
 
-SRC_FILES	:=	main.cpp \
-				$(MODEL_DIR)/model.cpp \
+SRC_FILES	:=	$(MODEL_DIR)/model.cpp \
 				$(MODEL_DIR)/parser.cpp \
 				$(IMG_DIR)/ppm_loader.cpp \
 				$(IMG_DIR)/image_handler.cpp \
 				$(SUBMOD_DIR)/window.cpp \
-				$(APP_DIR)/app.cpp
+				$(APP_DIR)/app.cpp \
+				main.cpp
 
 INC			:=	$(addprefix	$(SRC_DIR)/,$(INC_FILES))
 SRC			:=	$(addprefix $(SRC_DIR)/,$(SRC_FILES))

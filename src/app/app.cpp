@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 01:49:34 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 15:07:21 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,6 @@
 #include "matrix.hpp"
 #include "model.hpp"
 #include "parser.hpp"
-
-// #ifndef STB_IMAGE_IMPLEMENTATION
-// # define STB_IMAGE_IMPLEMENTATION
-// # include "stb_image.h"
-// #endif
 
 namespace scop {
 
@@ -121,6 +116,7 @@ App::~App() {
 /* ========================================================================== */
 
 void	App::run() {
+	initUniformBuffer();
 	while (window.alive()) {
 		// Poll events while not pressing x...
 		window.await();
@@ -1488,10 +1484,75 @@ void	App::updateUniformBuffer(uint32_t current_image) {
 	UniformBufferObject	ubo{};
 	time_point	current_time = std::chrono::high_resolution_clock::now();
 
-	updateVertexPart(ubo, current_time);
-	updateFragmentPart(ubo, current_time);
+	updateVertexPart(ubo, current_time, current_image);
+	updateFragmentPart(ubo, current_time, current_image);
+}
 
-	memcpy(uniform_buffers_mapped[current_image], &ubo, sizeof(ubo));
+void	App::updateVertexPart(
+	UniformBufferObject& ubo,
+	time_point current_time,
+	uint32_t current_image
+) {
+	static time_point	start_time = std::chrono::high_resolution_clock::now();
+	float	time = std::chrono::duration<float, std::chrono::seconds::period>(
+		current_time - start_time
+	).count();
+
+	// Define model: continuous rotation around z axis
+	ubo.model = scop::rotate(
+		time * scop::utils::radians(90.0f),	// rotation angle
+		scop::Vect3(0.0f, 0.0f, 1.0f)		// axis (z axis)
+	);
+	// Model: static
+	// ubo.model = scop::Mat4(1.0f);
+
+	// Define view transformation: above, 45deg angle
+	ubo.view = scop::lookAt(
+		scop::Vect3(1.6f, 5.0f, 2.0f),
+		scop::Vect3(0.0f, 0.0f, 0.0f),
+		scop::Vect3(0.0f, 0.0f, 1.0f)
+	);
+	// Define persp. projection (clip space?)
+	ubo.proj = scop::perspective(
+		scop::utils::radians(45.0f),
+		swap_chain_extent.width / static_cast<float>(swap_chain_extent.height),
+		0.1f,
+		10.0f
+	);
+	// Invert y axis (because y axis is inverted in Vulkan)
+	ubo.proj[5] *= -1;
+	memcpy(uniform_buffers_mapped[current_image], &ubo, UniformBufferObject::camera);
+}
+
+void	App::updateFragmentPart(
+	UniformBufferObject& ubo,
+	time_point current_time,
+	uint32_t current_image
+) {
+	ubo.texture_enabled = texture_enabled;
+
+	// Only udpate if it was recently toggled
+	if (texture_enabled_start.has_value()) {
+		// Transition from 0 to 1 in /*transition_duration*/ ms
+		float	time =
+			std::chrono::duration<float, std::chrono::milliseconds::period>(
+				current_time - texture_enabled_start.value()
+			).count() / transition_duration;
+		ubo.texture_mix = texture_enabled ? time : 1.0f - time;
+
+		// Reset texture_enabled_start if time is up
+		if (time >= 1.0f) {
+			texture_enabled_start.reset();
+		}
+	} else {
+		ubo.texture_mix = -1.0f;
+	}
+	memcpy(
+		(void*)(((char*)(void*)uniform_buffers_mapped[current_image]) + UniformBufferObject::camera),
+		&ubo.texture_enabled,
+		UniformBufferObject::texture
+	);
+
 }
 
 /**
@@ -1537,7 +1598,7 @@ void	App::createDescriptorSets() {
 		VkDescriptorBufferInfo	ubo_info_vertex{};
 		ubo_info_vertex.buffer = uniform_buffers[i];
 		ubo_info_vertex.offset = 0;
-		ubo_info_vertex.range = UniformBufferObject::vertex_shader_part;
+		ubo_info_vertex.range = UniformBufferObject::camera;
 
 		// Texture sampler
 		VkDescriptorImageInfo	image_info{};
@@ -1548,8 +1609,8 @@ void	App::createDescriptorSets() {
 		// Uniform buffer
 		VkDescriptorBufferInfo	ubo_info_fragment{};
 		ubo_info_fragment.buffer = uniform_buffers[i];
-		ubo_info_fragment.offset = UniformBufferObject::vertex_shader_part;
-		ubo_info_fragment.range = UniformBufferObject::fragment_shader_part;
+		ubo_info_fragment.offset = UniformBufferObject::camera;
+		ubo_info_fragment.range = UniformBufferObject::texture;
 
 		// Update buffer using descriptor write
 		std::array<VkWriteDescriptorSet, 3>	descriptor_writes{};
@@ -1597,22 +1658,7 @@ void	App::createDescriptorSets() {
  * Texture loader
 */
 void	App::createTextureImage() {
-	// int	tex_width, tex_height, tex_channels;
-
-	// Load image
-	// stbi_uc*	pixels = stbi_load(
-	// 	path,
-	// 	&tex_width,
-	// 	&tex_height,
-	// 	&tex_channels,
-	// 	STBI_rgb_alpha
-	// );
-
 	scop::Image	image = image_loader->load();
-
-	// if (!pixels) {
-		// throw std::runtime_error("failed to load texture image");
-	// }
 
 	mip_levels = 1 + static_cast<uint32_t>(
 		std::floor(std::log2(std::max(
@@ -1638,9 +1684,6 @@ void	App::createTextureImage() {
 	vkMapMemory(logical_device, staging_buffer_memory, 0, image_size, 0, &data);
 	memcpy(data, image.getPixels(), static_cast<size_t>(image_size));
 	vkUnmapMemory(logical_device, staging_buffer_memory);
-
-	// Free image loaded
-	// stbi_image_free(pixels);
 
 	// Create texture image to be filled
 	createImage(
@@ -2210,65 +2253,6 @@ void	App::createColorResources() {
 	);
 }
 
-void	App::updateVertexPart(
-	UniformBufferObject& ubo,
-	time_point current_time
-) {
-	static time_point	start_time = std::chrono::high_resolution_clock::now();
-	float	time = std::chrono::duration<float, std::chrono::seconds::period>(
-		current_time - start_time
-	).count();
-
-	// Define model: continuous rotation around z axis
-	ubo.model = scop::rotate(
-		time * scop::utils::radians(90.0f),	// rotation angle
-		scop::Vect3(0.0f, 0.0f, 1.0f)		// axis (z axis)
-	);
-	// Model: static
-	// ubo.model = scop::Mat4(1.0f);
-
-	// Define view transformation: above, 45deg angle
-	ubo.view = scop::lookAt(
-		scop::Vect3(1.6f, 5.0f, 2.0f),		// eye position
-		scop::Vect3(0.0f, 0.0f, 0.0f),		// center position
-		scop::Vect3(0.0f, 0.0f, 1.0f)		// up axis (z axis)
-	);
-	// Define persp. projection (clip space?)
-	ubo.proj = scop::perspective(
-		scop::utils::radians(45.0f),		// FOV angle
-		swap_chain_extent.width				// aspect ratio
-		/ static_cast<float>(swap_chain_extent.height),
-		0.1f,								// near view plane
-		10.0f								// far view plane
-	);
-	// Invert y axis (because y axis is inverted in Vulkan)
-	ubo.proj[5] *= -1;
-}
-
-void	App::updateFragmentPart(
-	UniformBufferObject& ubo,
-	time_point current_time
-) {
-	ubo.texture_enabled = texture_enabled;
-
-	// Only udpate if it was recently toggled
-	if (texture_enabled_start.has_value()) {
-		// Transition from 0 to 1 in 0.3 second
-		float	time =
-			std::chrono::duration<float, std::chrono::milliseconds::period>(
-				current_time - texture_enabled_start.value()
-			).count() / transition_duration;
-		ubo.texture_mix = texture_enabled ? time : 1.0f - time;
-
-		// Reset texture_enabled_start if time is up
-		if (time >= 1.0f) {
-			texture_enabled_start.reset();
-		}
-	} else {
-		ubo.texture_mix = -1.0f;
-	}
-}
-
 void	App::createTextureLoader(const std::string& path) {
 	std::string	file;
 	if (path.empty()) {
@@ -2288,6 +2272,23 @@ void	App::createTextureLoader(const std::string& path) {
 		file = path;
 	}
 	image_loader = std::make_unique<scop::PpmLoader>(file);
+}
+
+void	App::initUniformBuffer() noexcept {
+	UniformBufferObject	ubo = {};
+
+	// Camera not needed, will be set in updateUniformBuffer
+	// Texture needs to be set
+	ubo.texture_enabled = true;
+	ubo.texture_mix = -1.0f;
+
+	LOG((void*)(((char*)(void*)uniform_buffers_mapped[current_frame]) + UniformBufferObject::camera));
+
+	memcpy(
+		(void*)(((char*)(void*)uniform_buffers_mapped[current_frame]) + UniformBufferObject::camera),
+		&ubo.texture_enabled,
+		UniformBufferObject::texture
+	);
 }
 
 /* ========================================================================== */
