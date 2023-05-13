@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 13:57:01 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 02:30:34 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 09:59:38 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 // Std
 # include <string>
 # include <fstream>
+# include <functional>
 
 # include "image_loader.hpp"
 # include "image_handler.hpp"
@@ -54,10 +55,10 @@ private:
 	/*                                  TYPEDEFS                                 */
 	/* ========================================================================= */
 
-	typedef		ImageLoader				base;
-	typedef		std::vector<uint32_t>	Pixels;
-	typedef		enum FormatPPM			Format;
-	typedef		Pixels (PpmLoader::*ParseBodyFn)();
+	typedef		ImageLoader					base;
+	typedef		std::vector<uint32_t>		Pixels;
+	typedef		enum FormatPPM				Format;
+	typedef		std::function<uint8_t()>	ParseNumberFn;
 
 	/* ========================================================================= */
 	/*                               CLASS MEMBERS                               */
@@ -71,8 +72,9 @@ private:
 	/* ========================================================================= */
 
 	void		parseHeader();
-	Pixels		parseBodyP3();
-	Pixels		parseBodyP6();
+	// Pixels		parseBodyP3();
+	// Pixels		parseBodyP6();
+	Pixels		parseBody();
 
 	Format		expectFormat();
 	uint32_t	expectNumber();
@@ -80,6 +82,8 @@ private:
 	bool		skipWhitespace() noexcept;
 	bool		skipComment() noexcept;
 	void		ignoreChunk() noexcept;
+
+	uint32_t	createPixel(uint8_t r, uint8_t g, uint8_t b) const noexcept;
 
 	/* ========================================================================= */
 	/*                                 EXCEPTION                                 */

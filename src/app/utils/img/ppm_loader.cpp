@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 15:00:15 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 02:38:03 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 10:14:50 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,13 +29,8 @@ PpmLoader::PpmLoader(const std::string& _path):
 Image	PpmLoader::load() {
 	try {
 		parseHeader();
+		Pixels	pixels = parseBody();
 
-		ParseBodyFn	parseBodyFn[2] = {
-			&PpmLoader::parseBodyP3,
-			&PpmLoader::parseBodyP6
-		};
-
-		Pixels	pixels = (this->*parseBodyFn[static_cast<int>(format)])();
 		return Image(
 			base::path,
 			base::type,
@@ -46,7 +41,7 @@ Image	PpmLoader::load() {
 	} catch (const PpmParseError& e) {
 		throw base::FailedToLoadImage(
 			base::path,
-			std::string(e.what()) + "(line " + std::to_string(line) + ")"
+			std::string(e.what()) + " (line " + std::to_string(line) + ")"
 		);
 	} catch (const std::exception& e) {
 		throw std::runtime_error(
@@ -86,36 +81,54 @@ void	PpmLoader::parseHeader() {
 	}
 }
 
-PpmLoader::Pixels	PpmLoader::parseBodyP3() {
-	// TODO
-	return PpmLoader::Pixels();
-}
-
 /**
- * Parses the image body of a P6 file.
+ * Parses the image body.
 */
-PpmLoader::Pixels	PpmLoader::parseBodyP6() {
-	auto	readExcept = [this]() -> uint8_t {
+PpmLoader::Pixels	PpmLoader::parseBody() {
+	// Reads a character.
+	ParseNumberFn	readExcept = [this]() -> uint8_t {
 		if (cursor >= base::data.size()) {
 			throw PpmParseError("unexpected end of file");
 		}
 		return static_cast<uint8_t>(base::data[cursor++]);
 	};
 
+	// Reads a number.
+	ParseNumberFn	readNb = [this]() -> uint32_t {
+		while (skipWhitespace()) {
+			;
+		}
+		uint32_t	nb = 0;
+		uint8_t		c;
+
+		while (cursor < base::data.size()) {
+			c = static_cast<uint8_t>(base::data[cursor++]);
+			if (c >= '0' && c <= '9') {
+				nb = nb * 10 + (c - '0');
+			} else if (std::isspace(c)) {
+				return nb;
+			} else {
+				throw PpmParseError("expecting number");
+			}
+		}
+		throw PpmParseError("unexpected end of file");
+	};
+
+	ParseNumberFn	parseChannelFn(format == Format::P6 ? readExcept : readNb);
 	PpmLoader::Pixels	pixels(base::width * base::height * sizeof(uint32_t));
 	size_t	row = 0;
 
-	while (cursor < base::data.size()) {
+	while (row < base::height) {
 		uint8_t	r, g, b;
 
 		for (size_t i = 0; i < base::width; ++i) {
 			// Read 3 bytes (RGB)
-			r = readExcept();
-			g = readExcept();
-			b = readExcept();
+			r = parseChannelFn();
+			g = parseChannelFn();
+			b = parseChannelFn();
 
 			// Create pixel (ARGB)
-			pixels[row * base::width + i] = 0xff000000 | (b << 16) | (g << 8) | r;
+			pixels[row * base::width + i] = createPixel(r, g, b);
 		}
 		++row;
 	}
@@ -230,13 +243,17 @@ void	PpmLoader::ignoreChunk() noexcept {
 	while (skipComment() || skipWhitespace()) { ; }
 }
 
+uint32_t	PpmLoader::createPixel(uint8_t r, uint8_t g, uint8_t b) const noexcept {
+	return 0xff000000 | (b << 16) | (g << 8) | r;
+}
+
 } // namespace scop
 
 //TODO remove
 // int main() {
 // 	try {
 
-// 	scop::PpmLoader	loader("textures/hammy.ppm");
+// 	scop::PpmLoader	loader("/home/eli/random/tmp.ppm");
 // 	loader.load();
 // 	} catch (const std::exception& e) {
 // 		std::cerr << e.what() << std::endl;
