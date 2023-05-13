@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 21:24:10 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 22:29:19 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,11 +129,21 @@ void	App::run() {
 
 /* ========================================================================== */
 
-void	App::toggleTexture() {
+/**
+ * On toggle, changes the texture of the model.
+*/
+void	App::toggleTexture() noexcept {
 	texture_enabled = !texture_enabled;
 	texture_enabled_start.emplace(
 		std::chrono::high_resolution_clock::now()
 	);
+}
+
+/**
+ * On toggle, changes the rotation of the model.
+*/
+void	App::toggleRotation(RotationAxis axis) noexcept {
+	(void)axis;
 }
 
 /* ========================================================================== */

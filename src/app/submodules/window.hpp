@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:36 by eli               #+#    #+#             */
-/*   Updated: 2023/05/12 23:31:31 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 22:17:25 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,33 +22,25 @@
 
 namespace scop {
 
-void	framebufferResizeCallback(
-	GLFWwindow* window,
-	int width,
-	int height
-);
-
-void	keyCallback(
-	GLFWwindow* window,
-	int key,
-	int scancode,
-	int action,
-	int mods
-);
-
 /**
  * Window handler
 */
 class Window {
 public:
 	/* ========================================================================= */
+	/*                                  TYPEDEF                                  */
+	/* ========================================================================= */
+	
+	typedef std::chrono::milliseconds		milliseconds;
+
+	/* ========================================================================= */
 	/*                               CONST MEMBERS                               */
 	/* ========================================================================= */
 
-	static constexpr uint32_t		width = 800;
-	static constexpr uint32_t		height = 600;
-	static constexpr char			title[] = "Etran's Scop: ";
-	static constexpr std::chrono::milliseconds	spam_delay = std::chrono::milliseconds(500);
+	static constexpr const uint32_t		width = 800;
+	static constexpr const uint32_t		height = 600;
+	static constexpr const char			title[] = "Etran's Scop: ";
+	static constexpr const milliseconds	spam_delay = std::chrono::milliseconds(500);
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
@@ -67,12 +59,12 @@ public:
 	void							pause() const;
 	void							await() const;
 	bool							alive() const;
-	bool							resized() const;
+	bool							resized() const noexcept;
 
-	GLFWwindow*						getWindow();
-	GLFWwindow const*				getWindow() const;
+	GLFWwindow*						getWindow() noexcept;
+	GLFWwindow const*				getWindow() const noexcept;
 	
-	void							toggleFrameBufferResized(bool resized);
+	void							toggleFrameBufferResized(bool resized) noexcept;
 
 private:
 	/* ========================================================================= */
@@ -83,6 +75,20 @@ private:
 	bool							frame_buffer_resized = false;
 
 }; // class Window
+
+void	framebufferResizeCallback(
+	GLFWwindow* window,
+	int width,
+	int height
+);
+
+void	keyCallback(
+	GLFWwindow* window,
+	int key,
+	int scancode,
+	int action,
+	int mods
+);
 
 } // namespace scop
 

@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:42 by eli               #+#    #+#             */
-/*   Updated: 2023/05/12 23:31:31 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 22:28:49 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,26 @@
 #include "app.hpp"
 
 namespace scop {
+
+/* ========================================================================== */
+/*                              STATIC FUNCTIONS                              */
+/* ========================================================================== */
+
+void	framebufferResizeCallback(
+	GLFWwindow* window,
+	int width,
+	int height
+);
+
+void	keyCallback(
+	GLFWwindow* window,
+	int key,
+	int scancode,
+	int action,
+	int mods
+);
+
+void	toggleTextureCallback() noexcept;
 
 /* ========================================================================== */
 /*                                   PUBLIC                                   */
@@ -37,6 +57,7 @@ Window::Window(const std::string& model_name) {
 
 	// handle resizing
 	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+	glfwSetKeyCallback(window, keyCallback);
 	glfwSetKeyCallback(window, keyCallback);
 }
 
@@ -74,21 +95,21 @@ bool	Window::alive() const {
 	return !glfwWindowShouldClose(window);
 }
 
-bool	Window::resized() const {
+bool	Window::resized() const noexcept {
 	return frame_buffer_resized;
 }
 
-GLFWwindow*	Window::getWindow() {
+GLFWwindow*	Window::getWindow() noexcept {
 	return window;
 }
 
-GLFWwindow const*	Window::getWindow() const {
+GLFWwindow const*	Window::getWindow() const noexcept {
 	return window;
 }
 
 /* ========================================================================== */
 
-void	Window::toggleFrameBufferResized(bool is_resized) {
+void	Window::toggleFrameBufferResized(bool is_resized) noexcept {
 	frame_buffer_resized = is_resized;
 }
 
@@ -120,35 +141,47 @@ void	keyCallback(
 	int action,
 	int mods
 ) {
-	using std::chrono::steady_clock;
-
 	(void)window;
 	(void)scancode;
 	(void)mods;
 
-	// Ignore everything but space
-	if (key != GLFW_KEY_SPACE) {
+	if (action != GLFW_PRESS) {
 		return;
 	}
-
-	// On key press
-	if (action == GLFW_PRESS) {
-		static steady_clock::time_point	key_pressed;
-
-		steady_clock::time_point	now = steady_clock::now();
-		steady_clock::duration	duration =
-			std::chrono::duration_cast<std::chrono::milliseconds>(
-				now - key_pressed
-			);
-		// Avoid key spamming
-		if (duration < Window::spam_delay) {
-			return;
-		}
-		scop::App::toggleTexture();
-
-		// Update last key press
-		key_pressed = now;
+	// Ignore everything but space
+	switch (key) {
+		case GLFW_KEY_1:
+			return App::toggleRotation(RotationAxis::ROTATION_X);
+		case GLFW_KEY_2:
+			return App::toggleRotation(RotationAxis::ROTATION_Y);
+		case GLFW_KEY_3:
+			return App::toggleRotation(RotationAxis::ROTATION_Z);
+		case GLFW_KEY_SPACE:
+			return toggleTextureCallback();
+		default:
+			break;
 	}
+}
+
+void toggleTextureCallback() noexcept {
+	using std::chrono::steady_clock;
+
+	static steady_clock::time_point	key_pressed{};
+
+	steady_clock::time_point	now = steady_clock::now();
+	steady_clock::duration	duration =
+		std::chrono::duration_cast<Window::milliseconds>(
+			now - key_pressed
+		);
+
+	// Avoid key spamming
+	if (duration < Window::spam_delay) {
+		return;
+	}
+	scop::App::toggleTexture();
+
+	// Update last key press
+	key_pressed = now;
 }
 
 } // namespace scop

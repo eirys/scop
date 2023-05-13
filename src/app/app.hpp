@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 14:50:59 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 22:27:44 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,27 +50,17 @@
 
 namespace scop {
 
-/* ========================================================================== */
-/*                                    UTILS                                   */
-/* ========================================================================== */
+enum RotationAxis {
+	ROTATION_X,
+	ROTATION_Y,
+	ROTATION_Z
+};
 
-VkResult	CreateDebugUtilsMessengerEXT(
-	VkInstance instance,
-	const VkDebugUtilsMessengerCreateInfoEXT* p_create_info,
-	const VkAllocationCallbacks* p_allocator,
-	VkDebugUtilsMessengerEXT* p_debug_messenger
-);
-
-void	DestroyDebugUtilsMessengerEXT(
-	VkInstance instance,
-	VkDebugUtilsMessengerEXT debug_messenger,
-	const VkAllocationCallbacks* p_allocator
-);
-
-/* ========================================================================== */
-
+/**
+ * Core engine.
+*/
 class App {
-public:
+private:
 	/* ========================================================================= */
 	/*                                  TYPEDEF                                  */
 	/* ========================================================================= */
@@ -101,6 +91,7 @@ public:
 		scop::Vect3		color;
 	};
 
+public:
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
 	/* ========================================================================= */
@@ -116,7 +107,8 @@ public:
 	/* ========================================================================= */
 
 	void			run();
-	static void		toggleTexture();
+	static void		toggleTexture() noexcept;
+	static void		toggleRotation(RotationAxis axis) noexcept;
 
 private:
 	/* ========================================================================= */
@@ -374,6 +366,25 @@ private:
 	);
 
 }; // class App
+
+/* ========================================================================== */
+/*                                    UTILS                                   */
+/* ========================================================================== */
+
+VkResult	CreateDebugUtilsMessengerEXT(
+	VkInstance instance,
+	const VkDebugUtilsMessengerCreateInfoEXT* p_create_info,
+	const VkAllocationCallbacks* p_allocator,
+	VkDebugUtilsMessengerEXT* p_debug_messenger
+);
+
+void	DestroyDebugUtilsMessengerEXT(
+	VkInstance instance,
+	VkDebugUtilsMessengerEXT debug_messenger,
+	const VkAllocationCallbacks* p_allocator
+);
+
+/* ========================================================================== */
 
 } // namespace scop
 
