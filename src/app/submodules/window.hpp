@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:36 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 22:17:25 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 22:30:45 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,20 +75,6 @@ private:
 	bool							frame_buffer_resized = false;
 
 }; // class Window
-
-void	framebufferResizeCallback(
-	GLFWwindow* window,
-	int width,
-	int height
-);
-
-void	keyCallback(
-	GLFWwindow* window,
-	int key,
-	int scancode,
-	int action,
-	int mods
-);
 
 } // namespace scop
 

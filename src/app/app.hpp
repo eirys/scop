@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 22:27:44 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 22:59:29 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,7 @@ private:
 	const std::vector<const char*>	device_extensions = {
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
-	static constexpr size_t			max_frames_in_flight = 2;
+	static constexpr size_t			max_frames_in_flight = 1;
 	static constexpr float			transition_duration = 300.0f;	// ms
 
 	#ifndef NDEBUG
@@ -159,11 +159,11 @@ private:
 	VkPipeline						graphics_pipeline;
 
 	VkCommandPool					command_pool;
-	std::vector<VkCommandBuffer>	command_buffers;
+	VkCommandBuffer					command_buffers;
 
-	std::vector<VkSemaphore>		image_available_semaphores;
-	std::vector<VkSemaphore>		render_finished_semaphores;
-	std::vector<VkFence>			in_flight_fences;
+	VkSemaphore						image_available_semaphores;
+	VkSemaphore						render_finished_semaphores;
+	VkFence							in_flight_fences;
 
 	std::vector<scop::Vertex>		vertices;
 	std::vector<uint32_t>			indices;
@@ -175,11 +175,11 @@ private:
 
 	VkDescriptorSetLayout			descriptor_set_layout;
 	VkDescriptorPool				descriptor_pool;
-	std::vector<VkDescriptorSet>	descriptor_sets;
+	VkDescriptorSet					descriptor_sets;
 
-	std::vector<VkBuffer>			uniform_buffers;
-	std::vector<VkDeviceMemory>		uniform_buffers_memory;
-	std::vector<void*>				uniform_buffers_mapped;
+	VkBuffer						uniform_buffers;
+	VkDeviceMemory					uniform_buffers_memory;
+	void*							uniform_buffers_mapped;
 
 	uint32_t						mip_levels;
 	VkImage							texture_image;
@@ -200,8 +200,6 @@ private:
 	bool							texture_enabled;
 	static
 	std::optional<time_point>		texture_enabled_start;
-
-	uint32_t						current_frame = 0;
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
@@ -283,9 +281,7 @@ private:
 	) const;
 	void							createDescriptorSetLayout();
 	void							createUniformBuffers();
-	void							updateUniformBuffer(
-		uint32_t current_image
-	);
+	void							updateUniformBuffer();
 	void							createDescriptorPool();
 	void							createDescriptorSets();
 	void							createTextureImage();
@@ -344,13 +340,11 @@ private:
 	void							createColorResources();
 	void							updateVertexPart(
 		UniformBufferObject& ubo,
-		time_point current_time,
-		uint32_t current_image
+		time_point current_time
 	);
 	void							updateFragmentPart(
 		UniformBufferObject& ubo,
-		time_point current_time,
-		uint32_t current_image
+		time_point current_time
 	);
 	void							createTextureLoader(
 		const std::string& path

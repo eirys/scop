@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 22:29:19 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 23:07:55 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,11 +72,9 @@ App::~App() {
 	// Remove render pass
 	vkDestroyRenderPass(logical_device, render_pass, nullptr);
 
-	// Remove uniform buffers
-	for (size_t i = 0; i < max_frames_in_flight; ++i) {
-		vkDestroyBuffer(logical_device, uniform_buffers[i], nullptr);
-		vkFreeMemory(logical_device, uniform_buffers_memory[i], nullptr);
-	}
+	// Remove uniform buffer
+	vkDestroyBuffer(logical_device, uniform_buffers, nullptr);
+	vkFreeMemory(logical_device, uniform_buffers_memory, nullptr);
 
 	// Remove descriptor pool
 	vkDestroyDescriptorPool(logical_device, descriptor_pool, nullptr);
@@ -91,11 +89,9 @@ App::~App() {
 	vkFreeMemory(logical_device, vertex_buffer_memory, nullptr);
 
 	// Remove sync objects
-	for (size_t i = 0; i < max_frames_in_flight; ++i) {
-		vkDestroySemaphore(logical_device, image_available_semaphores[i], nullptr);
-		vkDestroySemaphore(logical_device, render_finished_semaphores[i], nullptr);
-		vkDestroyFence(logical_device, in_flight_fences[i], nullptr);
-	}
+	vkDestroySemaphore(logical_device, image_available_semaphores, nullptr);
+	vkDestroySemaphore(logical_device, render_finished_semaphores, nullptr);
+	vkDestroyFence(logical_device, in_flight_fences, nullptr);
 
 	// Remove command pool (and command buffers)
 	vkDestroyCommandPool(logical_device, command_pool, nullptr);
@@ -996,16 +992,14 @@ void	App::createCommandPool() {
 }
 
 void	App::createCommandBuffers() {
-	command_buffers.resize(max_frames_in_flight);
-
 	// Command buffers
 	VkCommandBufferAllocateInfo	alloc_info{};
 	alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	alloc_info.commandPool = command_pool;
 	alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	alloc_info.commandBufferCount = static_cast<uint32_t>(command_buffers.size());
+	alloc_info.commandBufferCount = static_cast<uint32_t>(max_frames_in_flight);
 
-	if (vkAllocateCommandBuffers(logical_device, &alloc_info, command_buffers.data()) != VK_SUCCESS) {
+	if (vkAllocateCommandBuffers(logical_device, &alloc_info, &command_buffers) != VK_SUCCESS) {
 		throw std::runtime_error("failed to allocate command buffers");
 	}
 }
@@ -1071,7 +1065,7 @@ void	App::recordCommandBuffer(VkCommandBuffer command_buffer, uint32_t image_ind
 		pipeline_layout,
 		0,
 		1,
-		&descriptor_sets[current_frame],
+		&descriptor_sets,
 		0,
 		nullptr
 	);
@@ -1096,15 +1090,15 @@ void	App::recordCommandBuffer(VkCommandBuffer command_buffer, uint32_t image_ind
 */
 void	App::drawFrame() {
 	// Wait fence available, lock it
-	vkWaitForFences(logical_device, 1, &in_flight_fences[current_frame], VK_TRUE, UINT64_MAX);
+	vkWaitForFences(logical_device, 1, &in_flight_fences, VK_TRUE, UINT64_MAX);
 
-	// Retrieve available image from swap chain
+	// Next available image from swap chain
 	uint32_t	image_index;
 	VkResult	result = vkAcquireNextImageKHR(
 		logical_device,
 		swap_chain,
 		UINT64_MAX,
-		image_available_semaphores[current_frame],
+		image_available_semaphores,
 		VK_NULL_HANDLE,
 		&image_index
 	);
@@ -1117,20 +1111,20 @@ void	App::drawFrame() {
 	}
 
 	// Work is done, unlock fence
-	vkResetFences(logical_device, 1, &in_flight_fences[current_frame]);
+	vkResetFences(logical_device, 1, &in_flight_fences);
 
 	// Record buffer
-	vkResetCommandBuffer(command_buffers[current_frame], 0);
-	recordCommandBuffer(command_buffers[current_frame], image_index);
+	vkResetCommandBuffer(command_buffers, 0);
+	recordCommandBuffer(command_buffers, image_index);
 
-	updateUniformBuffer(current_frame);
+	updateUniformBuffer();
 
 	// Set synchronization objects
 	VkSemaphore				wait_semaphore[] = {
-		image_available_semaphores[current_frame]
+		image_available_semaphores
 	};
 	VkSemaphore				signal_semaphores[] = {
-		render_finished_semaphores[current_frame]
+		render_finished_semaphores
 	};
 	VkPipelineStageFlags	wait_stages[] = {
 		VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT
@@ -1141,22 +1135,21 @@ void	App::drawFrame() {
 	submit_info.pWaitSemaphores = wait_semaphore;
 	submit_info.pWaitDstStageMask = wait_stages;
 	submit_info.commandBufferCount = 1;
-	submit_info.pCommandBuffers = &command_buffers[current_frame];
+	submit_info.pCommandBuffers = &command_buffers;
 	submit_info.signalSemaphoreCount = 1;
 	submit_info.pSignalSemaphores = signal_semaphores;
 
-	// Submit command buffer
-	if (vkQueueSubmit(graphics_queue, 1, &submit_info, in_flight_fences[current_frame]) != VK_SUCCESS) {
+	// Submit command buffer to be processed by graphics queue
+	if (vkQueueSubmit(graphics_queue, 1, &submit_info, in_flight_fences) != VK_SUCCESS) {
 		throw std::runtime_error("failed to submit draw command buffer");
 	}
 
-	// Set presentation (swap chain)
+	// Set presentation for next swap chain image
+	VkSwapchainKHR	swap_chains[] = { swap_chain };
 	VkPresentInfoKHR	present_info{};
 	present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 	present_info.waitSemaphoreCount = 1;
 	present_info.pWaitSemaphores = signal_semaphores;
-
-	VkSwapchainKHR	swap_chains[] = { swap_chain };
 	present_info.swapchainCount = 1;
 	present_info.pSwapchains = swap_chains;
 	present_info.pImageIndices = &image_index;
@@ -1175,19 +1168,12 @@ void	App::drawFrame() {
 	} else if (result != VK_SUCCESS) {
 		throw std::runtime_error("failed to present swapchain image");
 	}
-
-	// Update current frame
-	current_frame = (current_frame + 1) % max_frames_in_flight;
 }
 
 /**
  * Create semaphores and fences
 */
 void	App::createSyncObjects() {
-	image_available_semaphores.resize(max_frames_in_flight);
-	render_finished_semaphores.resize(max_frames_in_flight);
-	in_flight_fences.resize(max_frames_in_flight);
-
 	VkSemaphoreCreateInfo	semaphore_info{};
 	semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
@@ -1195,12 +1181,10 @@ void	App::createSyncObjects() {
 	fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 	fence_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-	for (size_t i = 0; i < max_frames_in_flight; ++i) {
-		if (vkCreateSemaphore(logical_device, &semaphore_info, nullptr, &image_available_semaphores[i]) != VK_SUCCESS ||
-			vkCreateSemaphore(logical_device, &semaphore_info, nullptr, &render_finished_semaphores[i]) != VK_SUCCESS ||
-			vkCreateFence(logical_device, &fence_info, nullptr, &in_flight_fences[i]) != VK_SUCCESS) {
-			throw std::runtime_error("failed to create semaphore");
-		}
+	if (vkCreateSemaphore(logical_device, &semaphore_info, nullptr, &image_available_semaphores) != VK_SUCCESS ||
+		vkCreateSemaphore(logical_device, &semaphore_info, nullptr, &render_finished_semaphores) != VK_SUCCESS ||
+		vkCreateFence(logical_device, &fence_info, nullptr, &in_flight_fences) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create semaphore");
 	}
 }
 
@@ -1256,7 +1240,7 @@ void	App::recreateSwapChain() {
  * Create the vertex buffer that'll be used to store the vertices of the triangle.
 */
 void	App::createVertexBuffer() {
-	VkDeviceSize	buffer_size = sizeof(vertices[0]) * vertices.size();
+	VkDeviceSize	buffer_size = sizeof(Vertex) * vertices.size();
 
 	// Create staging buffer to upload cpu memory to
 	VkBuffer		staging_buffer;
@@ -1462,46 +1446,39 @@ void	App::createDescriptorSetLayout() {
 void	App::createUniformBuffers() {
 	VkDeviceSize	buffer_size = sizeof(UniformBufferObject);
 
-	uniform_buffers.resize(max_frames_in_flight);
-	uniform_buffers_memory.resize(max_frames_in_flight);
-	uniform_buffers_mapped.resize(max_frames_in_flight);
-
-	for (size_t i = 0; i < max_frames_in_flight; ++i) {
-		createBuffer(
-			buffer_size,
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			uniform_buffers[i],
-			uniform_buffers_memory[i]
-		);
-		vkMapMemory(
-			logical_device,
-			uniform_buffers_memory[i],
-			0,
-			buffer_size,
-			0,
-			&uniform_buffers_mapped[i]
-		);
-	}
+	createBuffer(
+		buffer_size,
+		VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+		uniform_buffers,
+		uniform_buffers_memory
+	);
+	vkMapMemory(
+		logical_device,
+		uniform_buffers_memory,
+		0,
+		buffer_size,
+		0,
+		&uniform_buffers_mapped
+	);
 }
 
 /**
  * Update transformation of vertices
 */
-void	App::updateUniformBuffer(uint32_t current_image) {
+void	App::updateUniformBuffer() {
 	// Ensure 90deg rotation/sec
 
 	UniformBufferObject	ubo{};
 	time_point	current_time = std::chrono::high_resolution_clock::now();
 
-	updateVertexPart(ubo, current_time, current_image);
-	updateFragmentPart(ubo, current_time, current_image);
+	updateVertexPart(ubo, current_time);
+	updateFragmentPart(ubo, current_time);
 }
 
 void	App::updateVertexPart(
 	UniformBufferObject& ubo,
-	time_point current_time,
-	uint32_t current_image
+	time_point current_time
 ) {
 	static time_point	start_time = std::chrono::high_resolution_clock::now();
 	float	time = std::chrono::duration<float, std::chrono::seconds::period>(
@@ -1531,40 +1508,41 @@ void	App::updateVertexPart(
 	);
 	// Invert y axis (because y axis is inverted in Vulkan)
 	ubo.proj[5] *= -1;
-	memcpy(uniform_buffers_mapped[current_image], &ubo, UniformBufferObject::camera_size);
+	memcpy(uniform_buffers_mapped, &ubo, UniformBufferObject::camera_size);
 }
 
 void	App::updateFragmentPart(
 	UniformBufferObject& ubo,
-	time_point current_time,
-	uint32_t current_image
+	time_point current_time
 ) {
 	// Only udpate if it was recently toggled
-	if (texture_enabled_start.has_value()) {
-		// Transition from 0 to 1 in /*transition_duration*/ ms
-		ubo.texture_enabled = texture_enabled;
-		float	time =
-			std::chrono::duration<float, std::chrono::milliseconds::period>(
-				current_time - texture_enabled_start.value()
-			).count() / transition_duration;
-		ubo.texture_mix = texture_enabled ? time : 1.0f - time;
+	if (!texture_enabled_start.has_value()) {
+		return;
+	}
 
-		memcpy(
-			reinterpret_cast<void*>(
-				reinterpret_cast<uintptr_t>(uniform_buffers_mapped[current_image]) +
-				UniformBufferObject::camera_size
-			),
-			reinterpret_cast<void*>(
-				reinterpret_cast<uintptr_t>(&ubo) +
-				UniformBufferObject::camera_size
-			),
-			UniformBufferObject::texture_size
-		);
+	// Transition from 0 to 1 in /*transition_duration*/ ms
+	ubo.texture_enabled = texture_enabled;
+	float	time =
+		std::chrono::duration<float, std::chrono::milliseconds::period>(
+			current_time - texture_enabled_start.value()
+		).count() / transition_duration;
+	ubo.texture_mix = texture_enabled ? time : 1.0f - time;
 
-		// Reset texture_enabled_start if time is up
-		if (time >= 1.0f) {
-			texture_enabled_start.reset();
-		}
+	memcpy(
+		reinterpret_cast<void*>(
+			reinterpret_cast<uintptr_t>(uniform_buffers_mapped) +
+			UniformBufferObject::camera_size
+		),
+		reinterpret_cast<void*>(
+			reinterpret_cast<uintptr_t>(&ubo) +
+			UniformBufferObject::camera_size
+		),
+		UniformBufferObject::texture_size
+	);
+
+	// Reset texture_enabled_start if time is up
+	if (time >= 1.0f) {
+		texture_enabled_start.reset();
 	}
 }
 
@@ -1592,79 +1570,73 @@ void	App::createDescriptorPool() {
 }
 
 void	App::createDescriptorSets() {
-	std::vector<VkDescriptorSetLayout>	layouts(max_frames_in_flight, descriptor_set_layout);
 	VkDescriptorSetAllocateInfo			alloc_info{};
 	alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 	alloc_info.descriptorPool = descriptor_pool;
 	alloc_info.descriptorSetCount = static_cast<uint32_t>(max_frames_in_flight);
-	alloc_info.pSetLayouts = layouts.data();
+	alloc_info.pSetLayouts = &descriptor_set_layout;
 
-	descriptor_sets.resize(max_frames_in_flight);
-
-	if (vkAllocateDescriptorSets(logical_device, &alloc_info, descriptor_sets.data()) != VK_SUCCESS) {
+	if (vkAllocateDescriptorSets(logical_device, &alloc_info, &descriptor_sets) != VK_SUCCESS) {
 		throw std::runtime_error("failed to allocate descriptor sets");
 	}
 
-	// Populate descriptors
-	for (size_t i = 0; i < max_frames_in_flight; ++i) {
-		// Uniform buffer
-		VkDescriptorBufferInfo	ubo_info_vertex{};
-		ubo_info_vertex.buffer = uniform_buffers[i];
-		ubo_info_vertex.offset = 0;
-		ubo_info_vertex.range = UniformBufferObject::camera_size;
+	// Uniform buffer
+	VkDescriptorBufferInfo	ubo_info_vertex{};
+	ubo_info_vertex.buffer = uniform_buffers;
+	ubo_info_vertex.offset = 0;
+	ubo_info_vertex.range = UniformBufferObject::camera_size;
 
-		// Texture sampler
-		VkDescriptorImageInfo	image_info{};
-		image_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		image_info.imageView = texture_image_view;
-		image_info.sampler = texture_sampler;
+	// Texture sampler
+	VkDescriptorImageInfo	image_info{};
+	image_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	image_info.imageView = texture_image_view;
+	image_info.sampler = texture_sampler;
 
-		// Uniform buffer
-		VkDescriptorBufferInfo	ubo_info_fragment{};
-		ubo_info_fragment.buffer = uniform_buffers[i];
-		ubo_info_fragment.offset = UniformBufferObject::camera_size;
-		ubo_info_fragment.range = UniformBufferObject::texture_size;
+	// Uniform buffer
+	VkDescriptorBufferInfo	ubo_info_fragment{};
+	ubo_info_fragment.buffer = uniform_buffers;
+	ubo_info_fragment.offset = UniformBufferObject::camera_size;
+	ubo_info_fragment.range = UniformBufferObject::texture_size;
 
-		// Update buffer using descriptor write
-		std::array<VkWriteDescriptorSet, 3>	descriptor_writes{};
-		descriptor_writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		descriptor_writes[0].dstSet = descriptor_sets[i];
-		descriptor_writes[0].dstBinding = 0;
-		descriptor_writes[0].dstArrayElement = 0;
-		descriptor_writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		descriptor_writes[0].descriptorCount = 1;
-		descriptor_writes[0].pBufferInfo = &ubo_info_vertex;
-		descriptor_writes[0].pImageInfo = nullptr;
-		descriptor_writes[0].pTexelBufferView = nullptr;
+	// Allow buffer udpate using descriptor write
+	std::array<VkWriteDescriptorSet, 3>	descriptor_writes{};
+	descriptor_writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	descriptor_writes[0].dstSet = descriptor_sets;
+	descriptor_writes[0].dstBinding = 0;
+	descriptor_writes[0].dstArrayElement = 0;
+	descriptor_writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	descriptor_writes[0].descriptorCount = 1;
+	descriptor_writes[0].pBufferInfo = &ubo_info_vertex;
+	descriptor_writes[0].pImageInfo = nullptr;
+	descriptor_writes[0].pTexelBufferView = nullptr;
 
-		descriptor_writes[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		descriptor_writes[1].dstSet = descriptor_sets[i];
-		descriptor_writes[1].dstBinding = 1;
-		descriptor_writes[1].dstArrayElement = 0;
-		descriptor_writes[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		descriptor_writes[1].descriptorCount = 1;
-		descriptor_writes[1].pBufferInfo = nullptr;
-		descriptor_writes[1].pImageInfo = &image_info;
-		descriptor_writes[1].pTexelBufferView = nullptr;
+	descriptor_writes[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	descriptor_writes[1].dstSet = descriptor_sets;
+	descriptor_writes[1].dstBinding = 1;
+	descriptor_writes[1].dstArrayElement = 0;
+	descriptor_writes[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	descriptor_writes[1].descriptorCount = 1;
+	descriptor_writes[1].pBufferInfo = nullptr;
+	descriptor_writes[1].pImageInfo = &image_info;
+	descriptor_writes[1].pTexelBufferView = nullptr;
 
-		descriptor_writes[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		descriptor_writes[2].dstSet = descriptor_sets[i];
-		descriptor_writes[2].dstBinding = 2;
-		descriptor_writes[2].dstArrayElement = 0;
-		descriptor_writes[2].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		descriptor_writes[2].descriptorCount = 1;
-		descriptor_writes[2].pBufferInfo = &ubo_info_fragment;
-		descriptor_writes[2].pImageInfo = nullptr;
-		descriptor_writes[2].pTexelBufferView = nullptr;
+	descriptor_writes[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	descriptor_writes[2].dstSet = descriptor_sets;
+	descriptor_writes[2].dstBinding = 2;
+	descriptor_writes[2].dstArrayElement = 0;
+	descriptor_writes[2].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	descriptor_writes[2].descriptorCount = 1;
+	descriptor_writes[2].pBufferInfo = &ubo_info_fragment;
+	descriptor_writes[2].pImageInfo = nullptr;
+	descriptor_writes[2].pTexelBufferView = nullptr;
 
-		vkUpdateDescriptorSets(
-			logical_device,
-			static_cast<uint32_t>(descriptor_writes.size()),
-			descriptor_writes.data(),
-			0,
-			nullptr
-		);
-	}
+	vkUpdateDescriptorSets(
+		logical_device,
+		static_cast<uint32_t>(descriptor_writes.size()),
+		descriptor_writes.data(),
+		0,
+		nullptr
+	);
 }
 
 /**
@@ -2300,18 +2272,7 @@ void	App::initUniformBuffer() noexcept {
 
 	memcpy(
 		reinterpret_cast<void*>(
-			reinterpret_cast<uintptr_t>(uniform_buffers_mapped[current_frame]) +
-			UniformBufferObject::camera_size
-		),
-		reinterpret_cast<void*>(
-			reinterpret_cast<uintptr_t>(&ubo) +
-			UniformBufferObject::camera_size
-		),
-		UniformBufferObject::texture_size
-	);
-	memcpy(
-		reinterpret_cast<void*>(
-			reinterpret_cast<uintptr_t>(uniform_buffers_mapped[current_frame + 1]) +
+			reinterpret_cast<uintptr_t>(uniform_buffers_mapped) +
 			UniformBufferObject::camera_size
 		),
 		reinterpret_cast<void*>(
