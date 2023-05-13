@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 10:12:47 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 00:16:06 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 10:22:58 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,9 @@ namespace scop {
 
 class Image;
 
+/**
+ * Image extension.
+*/
 enum ImageType {
 	PPM,
 	// PNG,		TODO

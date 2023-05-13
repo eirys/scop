@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 15:00:15 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 10:14:50 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 10:20:50 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,6 @@ PpmLoader::Pixels	PpmLoader::parseBody() {
 			g = parseChannelFn();
 			b = parseChannelFn();
 
-			// Create pixel (ARGB)
 			pixels[row * base::width + i] = createPixel(r, g, b);
 		}
 		++row;
@@ -243,19 +242,14 @@ void	PpmLoader::ignoreChunk() noexcept {
 	while (skipComment() || skipWhitespace()) { ; }
 }
 
+/**
+ * Builds a pixel from RGB values.
+ * 
+ * @note	- Alpha is set to 255.
+ * @note	- RGB values are reversed (ABGR).
+*/
 uint32_t	PpmLoader::createPixel(uint8_t r, uint8_t g, uint8_t b) const noexcept {
 	return 0xff000000 | (b << 16) | (g << 8) | r;
 }
 
 } // namespace scop
-
-//TODO remove
-// int main() {
-// 	try {
-
-// 	scop::PpmLoader	loader("/home/eli/random/tmp.ppm");
-// 	loader.load();
-// 	} catch (const std::exception& e) {
-// 		std::cerr << e.what() << std::endl;
-// 	}
-// }

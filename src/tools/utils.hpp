@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 14:23:35 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 00:53:46 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 10:31:08 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,7 @@ namespace scop {
 namespace utils {
 
 /**
- * Determine endianness of the system.
- * 
- * If true, the system is big endian.
+ * @brief If true, the system is big endian.
 */
 const bool	big_endian = []() -> bool {
 	const int	value = 0x01;
@@ -51,8 +49,8 @@ inline float	radians(float degrees) noexcept {
 }
 
 /**
- * Generates a random float between 0.0f and 1.0f.
- * Uses a Mersenne Twister pseudo-random generator.
+ * @brief Generates a random float between 0.0f and 1.0f.
+ * @note Uses a Mersenne Twister pseudo-random generator.
 */
 inline float	generateRandomFloat() {
 	static std::random_device rd;

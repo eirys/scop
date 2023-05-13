@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 13:57:01 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 09:59:38 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 10:22:36 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,8 @@
 namespace scop {
 
 enum FormatPPM {
-	P3 = 0,		// ASCII
-	P6 = 1		// BINARY
+	P3,		// ASCII
+	P6		// BINARY
 };
 
 /**
@@ -72,8 +72,6 @@ private:
 	/* ========================================================================= */
 
 	void		parseHeader();
-	// Pixels		parseBodyP3();
-	// Pixels		parseBodyP6();
 	Pixels		parseBody();
 
 	Format		expectFormat();
