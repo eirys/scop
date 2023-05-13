@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 22:59:29 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 23:09:28 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -377,8 +377,6 @@ void	DestroyDebugUtilsMessengerEXT(
 	VkDebugUtilsMessengerEXT debug_messenger,
 	const VkAllocationCallbacks* p_allocator
 );
-
-/* ========================================================================== */
 
 } // namespace scop
 

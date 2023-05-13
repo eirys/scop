@@ -6,7 +6,7 @@
 #    By: etran <etran@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/05/13 14:49:23 by etran            ###   ########.fr        #
+#    Updated: 2023/05/13 23:16:22 by etran            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -40,9 +40,6 @@ SUBDIRS		:=	$(APP_DIR) \
 
 OBJ_SUBDIRS	:=	$(addprefix $(OBJ_DIR)/,$(SUBDIRS))
 INC_SUBDIRS	:=	$(addprefix $(SRC_DIR)/,$(SUBDIRS))
-
-# external libraries
-STB_PATH	:=	$(LIB_DIR)/stb
 
 # cpp files
 INC_FILES	:=	$(TOOLS_DIR)/utils.hpp \
@@ -116,13 +113,9 @@ RM			:=	rm -rf
 .PHONY: all
 all: $(NAME)
 
-tmp:
-	$(CXX) $(CFLAGS) $(wildcard src/$(IMG_DIR)/*.cpp)
-
 $(NAME): $(SHD_BIN) $(OBJ)
-	@echo "Creating $(NAME)..."
 	@$(CXX) $(CFLAGS) $(OBJ) -o $(NAME) $(LDFLAGS)
-	@echo "Done"
+	@echo "\`$(NAME)\` was successfully created."
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(INC)
 	@mkdir -p $(OBJ_DIR) $(OBJ_SUBDIRS)
@@ -133,18 +126,17 @@ $(SHD_DIR)/%.spv: $(SHD_DIR)/shader.%
 	@echo "Compiling shader $<..."
 	@$(GLSLC) $< -o $@
 
-.PHONY: test
-test: all
-	./$(NAME)
-
 .PHONY: clean
 clean:
-	${RM} $(OBJ_DIR)
+	@${RM} $(OBJ_DIR)
+	@echo "Cleaning object files."
 
 .PHONY: fclean
 fclean: clean
-	${RM} $(SHD_BIN)
-	${RM} $(NAME)
+	@${RM} $(SHD_BIN)
+	@echo "Removed shader binaries."
+	@${RM} $(NAME)
+	@echo "Removed $(NAME)."
 
 .PHONY: re
 re: fclean all

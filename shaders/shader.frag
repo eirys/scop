@@ -16,7 +16,7 @@ void main() {
 	vec4	tex_color = texture(tex_sampler, frag_tex_coord);
 	vec4	input_color = vec4(frag_color, 1.0);
 
-	if (ubo.texture_mix != -1.0 || ubo.texture_mix > 1.0) {
+	if (ubo.texture_mix != -1.0 && ubo.texture_mix <= 1.0) {
 		out_color = mix(input_color, tex_color, ubo.texture_mix);
 	} else if (ubo.texture_enabled) {
 		out_color = tex_color;
