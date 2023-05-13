@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 15:07:21 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 20:58:47 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -1529,30 +1529,33 @@ void	App::updateFragmentPart(
 	time_point current_time,
 	uint32_t current_image
 ) {
-	ubo.texture_enabled = texture_enabled;
-
 	// Only udpate if it was recently toggled
 	if (texture_enabled_start.has_value()) {
 		// Transition from 0 to 1 in /*transition_duration*/ ms
+		ubo.texture_enabled = texture_enabled;
 		float	time =
 			std::chrono::duration<float, std::chrono::milliseconds::period>(
 				current_time - texture_enabled_start.value()
 			).count() / transition_duration;
 		ubo.texture_mix = texture_enabled ? time : 1.0f - time;
 
+		memcpy(
+			reinterpret_cast<void*>(
+				reinterpret_cast<uintptr_t>(uniform_buffers_mapped[current_image]) +
+				UniformBufferObject::camera
+			),
+			reinterpret_cast<void*>(
+				reinterpret_cast<uintptr_t>(&ubo) +
+				UniformBufferObject::camera
+			),
+			UniformBufferObject::texture
+		);
+
 		// Reset texture_enabled_start if time is up
 		if (time >= 1.0f) {
 			texture_enabled_start.reset();
 		}
-	} else {
-		ubo.texture_mix = -1.0f;
 	}
-	memcpy(
-		(void*)(((char*)(void*)uniform_buffers_mapped[current_image]) + UniformBufferObject::camera),
-		&ubo.texture_enabled,
-		UniformBufferObject::texture
-	);
-
 }
 
 /**
@@ -2275,18 +2278,31 @@ void	App::createTextureLoader(const std::string& path) {
 }
 
 void	App::initUniformBuffer() noexcept {
-	UniformBufferObject	ubo = {};
+	UniformBufferObject	ubo{};
 
-	// Camera not needed, will be set in updateUniformBuffer
-	// Texture needs to be set
-	ubo.texture_enabled = true;
+	ubo.texture_enabled = texture_enabled;
 	ubo.texture_mix = -1.0f;
 
-	LOG((void*)(((char*)(void*)uniform_buffers_mapped[current_frame]) + UniformBufferObject::camera));
-
 	memcpy(
-		(void*)(((char*)(void*)uniform_buffers_mapped[current_frame]) + UniformBufferObject::camera),
-		&ubo.texture_enabled,
+		reinterpret_cast<void*>(
+			reinterpret_cast<uintptr_t>(uniform_buffers_mapped[current_frame]) +
+			UniformBufferObject::camera
+		),
+		reinterpret_cast<void*>(
+			reinterpret_cast<uintptr_t>(&ubo) +
+			UniformBufferObject::camera
+		),
+		UniformBufferObject::texture
+	);
+		memcpy(
+		reinterpret_cast<void*>(
+			reinterpret_cast<uintptr_t>(uniform_buffers_mapped[current_frame + 1]) +
+			UniformBufferObject::camera
+		),
+		reinterpret_cast<void*>(
+			reinterpret_cast<uintptr_t>(&ubo) +
+			UniformBufferObject::camera
+		),
 		UniformBufferObject::texture
 	);
 }

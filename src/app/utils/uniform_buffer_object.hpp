@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 20:12:41 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 13:00:22 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 20:53:24 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,16 +16,16 @@
 # include "matrix.hpp"
 
 namespace scop {
-struct UniformBufferObject {
+struct alignas(16) UniformBufferObject {
 	/* ========================================================================= */
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
 
 	/* VERTEX SHADER =========================================================== */
 
-	alignas(16) scop::Mat4	model;
-	alignas(16) scop::Mat4	view;
-	alignas(16) scop::Mat4	proj;
+	scop::Mat4	model;
+	scop::Mat4	view;
+	scop::Mat4	proj;
 
 	/* FRAGMENT SHADER ========================================================= */
 
@@ -36,8 +36,8 @@ struct UniformBufferObject {
 	/*                               STATIC MEMBERS                              */
 	/* ========================================================================= */
 
-	static constexpr const size_t	camera = 3 * sizeof(scop::Mat4);
-	static constexpr const size_t	texture = sizeof(bool) + sizeof(float);
+	static constexpr size_t	camera = 3 * sizeof(scop::Mat4);
+	static constexpr size_t	texture = 16; // due to alignas(16) in struct
 };
 } // namespace scop
 
