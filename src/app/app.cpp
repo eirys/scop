@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 20:58:47 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 21:24:10 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -1521,7 +1521,7 @@ void	App::updateVertexPart(
 	);
 	// Invert y axis (because y axis is inverted in Vulkan)
 	ubo.proj[5] *= -1;
-	memcpy(uniform_buffers_mapped[current_image], &ubo, UniformBufferObject::camera);
+	memcpy(uniform_buffers_mapped[current_image], &ubo, UniformBufferObject::camera_size);
 }
 
 void	App::updateFragmentPart(
@@ -1542,13 +1542,13 @@ void	App::updateFragmentPart(
 		memcpy(
 			reinterpret_cast<void*>(
 				reinterpret_cast<uintptr_t>(uniform_buffers_mapped[current_image]) +
-				UniformBufferObject::camera
+				UniformBufferObject::camera_size
 			),
 			reinterpret_cast<void*>(
 				reinterpret_cast<uintptr_t>(&ubo) +
-				UniformBufferObject::camera
+				UniformBufferObject::camera_size
 			),
-			UniformBufferObject::texture
+			UniformBufferObject::texture_size
 		);
 
 		// Reset texture_enabled_start if time is up
@@ -1601,7 +1601,7 @@ void	App::createDescriptorSets() {
 		VkDescriptorBufferInfo	ubo_info_vertex{};
 		ubo_info_vertex.buffer = uniform_buffers[i];
 		ubo_info_vertex.offset = 0;
-		ubo_info_vertex.range = UniformBufferObject::camera;
+		ubo_info_vertex.range = UniformBufferObject::camera_size;
 
 		// Texture sampler
 		VkDescriptorImageInfo	image_info{};
@@ -1612,8 +1612,8 @@ void	App::createDescriptorSets() {
 		// Uniform buffer
 		VkDescriptorBufferInfo	ubo_info_fragment{};
 		ubo_info_fragment.buffer = uniform_buffers[i];
-		ubo_info_fragment.offset = UniformBufferObject::camera;
-		ubo_info_fragment.range = UniformBufferObject::texture;
+		ubo_info_fragment.offset = UniformBufferObject::camera_size;
+		ubo_info_fragment.range = UniformBufferObject::texture_size;
 
 		// Update buffer using descriptor write
 		std::array<VkWriteDescriptorSet, 3>	descriptor_writes{};
@@ -2277,6 +2277,11 @@ void	App::createTextureLoader(const std::string& path) {
 	image_loader = std::make_unique<scop::PpmLoader>(file);
 }
 
+/**
+ * @brief	Initiate uniform buffer (texture part).
+ * 
+ * @note	Since they won't be permanently updated, they need initiation.
+*/
 void	App::initUniformBuffer() noexcept {
 	UniformBufferObject	ubo{};
 
@@ -2286,24 +2291,24 @@ void	App::initUniformBuffer() noexcept {
 	memcpy(
 		reinterpret_cast<void*>(
 			reinterpret_cast<uintptr_t>(uniform_buffers_mapped[current_frame]) +
-			UniformBufferObject::camera
+			UniformBufferObject::camera_size
 		),
 		reinterpret_cast<void*>(
 			reinterpret_cast<uintptr_t>(&ubo) +
-			UniformBufferObject::camera
+			UniformBufferObject::camera_size
 		),
-		UniformBufferObject::texture
+		UniformBufferObject::texture_size
 	);
-		memcpy(
+	memcpy(
 		reinterpret_cast<void*>(
 			reinterpret_cast<uintptr_t>(uniform_buffers_mapped[current_frame + 1]) +
-			UniformBufferObject::camera
+			UniformBufferObject::camera_size
 		),
 		reinterpret_cast<void*>(
 			reinterpret_cast<uintptr_t>(&ubo) +
-			UniformBufferObject::camera
+			UniformBufferObject::camera_size
 		),
-		UniformBufferObject::texture
+		UniformBufferObject::texture_size
 	);
 }
 

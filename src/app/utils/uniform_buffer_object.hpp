@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 20:12:41 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 20:53:24 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 21:03:23 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,8 @@ struct alignas(16) UniformBufferObject {
 	/*                               STATIC MEMBERS                              */
 	/* ========================================================================= */
 
-	static constexpr size_t	camera = 3 * sizeof(scop::Mat4);
-	static constexpr size_t	texture = 16; // due to alignas(16) in struct
+	static constexpr const size_t	camera_size = 3 * sizeof(scop::Mat4);
+	static constexpr const size_t	texture_size = 16; // due to alignas(16) in struct
 };
 } // namespace scop
 
