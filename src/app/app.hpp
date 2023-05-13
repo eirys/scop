@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/12 23:51:33 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 02:40:37 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,11 +45,8 @@
 
 # define SCOP_VERTEX_SHADER_BINARY		"shaders/vert.spv"
 # define SCOP_FRAGMENT_SHADER_BINARY	"shaders/frag.spv"
-# define SCOP_TEXTURE_FILE_HAMSTER_JPG	"textures/hammy.jpg"
-# define SCOP_TEXTURE_FILE_HAMSTER_PPM	"textures/hammy.ppm"
 
-# define SCOP_MODEL_FILE_VIKING_OBJ		"models/viking_room.obj"
-# define SCOP_TEXTURE_FILE_VIKING_PNG	"textures/viking_room.png"
+# define SCOP_TEXTURE_FILE_HAMSTER_PPM	"textures/hammy.ppm"
 
 namespace scop {
 

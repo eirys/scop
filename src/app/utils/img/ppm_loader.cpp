@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 15:00:15 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 02:33:07 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 02:38:03 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,10 +109,12 @@ PpmLoader::Pixels	PpmLoader::parseBodyP6() {
 		uint8_t	r, g, b;
 
 		for (size_t i = 0; i < base::width; ++i) {
+			// Read 3 bytes (RGB)
 			r = readExcept();
 			g = readExcept();
 			b = readExcept();
-			// pixels.emplace_back(0xff000000 | (r << 16) | (g << 8) | b);
+
+			// Create pixel (ARGB)
 			pixels[row * base::width + i] = 0xff000000 | (b << 16) | (g << 8) | r;
 		}
 		++row;
@@ -120,16 +122,6 @@ PpmLoader::Pixels	PpmLoader::parseBodyP6() {
 	if (row != base::height) {
 		throw PpmParseError("invalid number of rows");
 	}
-	LOG("Finished parsing body");
-
-	// Create file to check if its ok
-	// std::ofstream	file("test.ppm");
-	// for (size_t i = 0; i < pixels.size(); ++i) {
-	// 	// Deconstruct pixel to get rgb values
-	// 	file << ((pixels[i] >> 16) & 0xff) << ((pixels[i] >> 8) & 0xff) << (pixels[i] & 0xff);
-	// }
-	// file.close();
-
 	return pixels;
 }
 
