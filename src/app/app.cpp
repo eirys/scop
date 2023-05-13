@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 00:15:03 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 01:49:34 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -1621,7 +1621,7 @@ void	App::createTextureImage() {
 		)))
 	);
 
-	VkDeviceSize	image_size = image.getWidth() * image.getHeight() * 4;
+	VkDeviceSize	image_size = image.getWidth() * image.getHeight() * sizeof(uint32_t);
 	VkBuffer		staging_buffer;
 	VkDeviceMemory	staging_buffer_memory;
 

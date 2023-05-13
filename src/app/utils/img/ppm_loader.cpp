@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 15:00:15 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 01:32:19 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 02:33:07 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,9 +84,6 @@ void	PpmLoader::parseHeader() {
 	if (max_color > std::numeric_limits<uint8_t>::max()) {
 		throw PpmParseError("max color value is too high, expecting 8 bits (255)");
 	}
-
-	LOG("Width: " << base::width << __NL <<
-	"Height: " << base::height);
 }
 
 PpmLoader::Pixels	PpmLoader::parseBodyP3() {
@@ -99,7 +96,7 @@ PpmLoader::Pixels	PpmLoader::parseBodyP3() {
 */
 PpmLoader::Pixels	PpmLoader::parseBodyP6() {
 	auto	readExcept = [this]() -> uint8_t {
-		if (cursor > base::data.size()) {
+		if (cursor >= base::data.size()) {
 			throw PpmParseError("unexpected end of file");
 		}
 		return static_cast<uint8_t>(base::data[cursor++]);
@@ -108,7 +105,6 @@ PpmLoader::Pixels	PpmLoader::parseBodyP6() {
 	PpmLoader::Pixels	pixels(base::width * base::height * sizeof(uint32_t));
 	size_t	row = 0;
 
-	// For each line, read 3 * width bytes
 	while (cursor < base::data.size()) {
 		uint8_t	r, g, b;
 
@@ -116,8 +112,8 @@ PpmLoader::Pixels	PpmLoader::parseBodyP6() {
 			r = readExcept();
 			g = readExcept();
 			b = readExcept();
-			uint32_t	pixel = createPixel(r, g, b, 255);
-			pixels.emplace_back(pixel);
+			// pixels.emplace_back(0xff000000 | (r << 16) | (g << 8) | b);
+			pixels[row * base::width + i] = 0xff000000 | (b << 16) | (g << 8) | r;
 		}
 		++row;
 	}
@@ -125,6 +121,15 @@ PpmLoader::Pixels	PpmLoader::parseBodyP6() {
 		throw PpmParseError("invalid number of rows");
 	}
 	LOG("Finished parsing body");
+
+	// Create file to check if its ok
+	// std::ofstream	file("test.ppm");
+	// for (size_t i = 0; i < pixels.size(); ++i) {
+	// 	// Deconstruct pixel to get rgb values
+	// 	file << ((pixels[i] >> 16) & 0xff) << ((pixels[i] >> 8) & 0xff) << (pixels[i] & 0xff);
+	// }
+	// file.close();
+
 	return pixels;
 }
 
@@ -233,30 +238,9 @@ void	PpmLoader::ignoreChunk() noexcept {
 	while (skipComment() || skipWhitespace()) { ; }
 }
 
-/**
- * Creates a pixel from the given values, depending on the endianness.
-*/
-constexpr uint32_t	PpmLoader::createPixel(
-	uint8_t red,
-	uint8_t green,
-	uint8_t blue,
-	uint8_t alpha
-) const noexcept {
-	// if (utils::big_endian) {
-		// return (alpha << 24) | (red << 16) | (green << 8) | blue;
-	// } else {
-		// return red << 24 | green << 16 | blue << 8 | alpha;
-	// }
-		// return red << 24 | green << 16 | blue << 8 | alpha;
-		// return (alpha << 24) | (red << 16) | (green << 8) | blue;
-		// return blue << 24 | green << 16 | red << 8 | alpha;
-		// return alpha << 24 | blue << 16 | green << 8 | red;
-}
-
 } // namespace scop
 
 //TODO remove
-// #include <iostream>
 // int main() {
 // 	try {
 
