@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 13:54:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/14 10:38:31 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/14 18:30:34 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,17 +70,59 @@ struct Vect3 {
 
 	/* OPERATORS =============================================================== */
 
+	Vect3	operator-() const noexcept {
+		return Vect3(-x, -y, -z);
+	}
+
+	Vect3&	operator+=(const Vect3& rhs) noexcept {
+		x += rhs.x;
+		y += rhs.y;
+		z += rhs.z;
+		return *this;
+	}
+
 	Vect3	operator+(const Vect3& rhs) const noexcept {
-		return Vect3{ x + rhs.x, y + rhs.y, z + rhs.z };
+		Vect3	res(*this);
+		return res.operator+=(rhs);
+	}
+
+	Vect3&	operator-=(const Vect3& rhs) noexcept {
+		x -= rhs.x;
+		y -= rhs.y;
+		z -= rhs.z;
+		return *this;
 	}
 
 	Vect3	operator-(const Vect3& rhs) const noexcept {
-		return Vect3{ x - rhs.x, y - rhs.y, z - rhs.z };
+		Vect3	res(*this);
+		return res.operator-=(rhs);
+	}
+
+	Vect3&	operator*=(float rhs) noexcept {
+		x *= rhs;
+		y *= rhs;
+		z *= rhs;
+		return *this;
 	}
 
 	Vect3	operator*(float rhs) const noexcept {
-		return Vect3{ x * rhs, y * rhs, z * rhs };
+		Vect3	res(*this);
+		return res.operator*=(rhs);
 	}
+
+	Vect3&	operator/=(float rhs) noexcept {
+		x /= rhs;
+		y /= rhs;
+		z /= rhs;
+		return *this;
+	}
+
+	Vect3	operator/(float rhs) const noexcept {
+		Vect3	res(*this);
+		return res.operator/=(rhs);
+	}
+
+	/* ========================================================================= */
 
 	/**
 	 * @brief Returns the dot product of the vector with another vector
@@ -157,16 +199,52 @@ struct Vect2 {
 
 	/* OPERATORS =============================================================== */
 
+	Vect2	operator-() const noexcept {
+		return Vect2{ -x, -y };
+	}
+
+	Vect2&	operator+=(const Vect2& rhs) noexcept {
+		x += rhs.x;
+		y += rhs.y;
+		return *this;
+	}
+
 	Vect2	operator+(const Vect2& rhs) const noexcept {
-		return Vect2{x + rhs.x, y + rhs.y};
+		Vect2	res(*this);
+		return res.operator+=(rhs);
+	}
+
+	Vect2&	operator-=(const Vect2& rhs) noexcept {
+		x -= rhs.x;
+		y -= rhs.y;
+		return *this;
 	}
 
 	Vect2	operator-(const Vect2& rhs) const noexcept {
-		return Vect2{x - rhs.x, y - rhs.y};
+		Vect2	res(*this);
+		return res.operator-=(rhs);
+	}
+
+	Vect2&	operator*=(float rhs) noexcept {
+		x *= rhs;
+		y *= rhs;
+		return *this;
 	}
 
 	Vect2	operator*(float rhs) const noexcept {
-		return Vect2{x * rhs, y * rhs};
+		Vect2	res(*this);
+		return res.operator*=(rhs);
+	}
+
+	Vect2&	operator/=(float rhs) noexcept {
+		x /= rhs;
+		y /= rhs;
+		return *this;
+	}
+
+	Vect2	operator/(float rhs) const noexcept {
+		Vect2	res(*this);
+		return res.operator/=(rhs);
 	}
 
 	/* BOOLEAN COMPARISON ====================================================== */

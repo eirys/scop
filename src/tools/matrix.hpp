@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 14:11:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/14 11:08:16 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/14 19:30:15 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,25 +86,33 @@ struct Mat4 {
 	}
 
 	/* OPERATORS =============================================================== */
+	
+	Mat4&	operator+=(const Mat4& rhs) noexcept {
+		for (size_t i = 0; i < 16; i++) {
+			mat[i] += rhs.mat[i];
+		}
+		return *this;
+	}
 
 	Mat4	operator+(const Mat4& rhs) const noexcept {
-		Mat4 result;
+		Mat4	result(*this);
+		return result.operator+=(rhs);
+	}
+
+	Mat4&	operator-=(const Mat4& rhs) noexcept {
 		for (size_t i = 0; i < 16; i++) {
-			result[i] = mat[i] + rhs.mat[i];
+			mat[i] -= rhs.mat[i];
 		}
-		return result;
+		return *this;
 	}
 
 	Mat4	operator-(const Mat4& rhs) const noexcept {
-		Mat4 result;
-		for (size_t i = 0; i < 16; i++) {
-			result[i] = mat[i] - rhs.mat[i];
-		}
-		return result;
+		Mat4	result(*this);
+		return result.operator-=(rhs);
 	}
 
-	Mat4	operator*(const Mat4& rhs) const noexcept {
-		Mat4 result;
+	Mat4&	operator*=(const Mat4& rhs) noexcept {
+		Mat4	result;
 		for (size_t i = 0; i < 4; i++) {
 			for (size_t j = 0; j < 4; j++) {
 				for (size_t k = 0; k < 4; k++) {
@@ -112,7 +120,27 @@ struct Mat4 {
 				}
 			}
 		}
-		return result;
+		*this = result;
+		return *this;
+	}
+
+	Mat4	operator*(const Mat4& rhs) const noexcept {
+		Mat4 result(*this);
+		return result.operator*=(rhs);
+	}
+
+	/* ========================================================================= */
+
+	Mat4&	operator*=(float rhs) noexcept {
+		for (size_t i = 0; i < 16; i++) {
+			mat[i] *= rhs;
+		}
+		return *this;
+	}
+
+	Mat4	operator*(float rhs) const noexcept {
+		Mat4 result(*this);
+		return result.operator*=(rhs);
 	}
 
 	Vect3	operator*(const Vect3& rhs) const noexcept {

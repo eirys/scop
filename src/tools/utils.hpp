@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 14:23:35 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 10:31:08 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/14 21:09:39 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <fstream>
 # include <vector>
 # include <iostream>
+# include <cstring>
 
 # define __NL '\n'
 
@@ -27,6 +28,9 @@
 # else
 #  define LOG(X)
 # endif
+
+# include "vector.hpp"
+# include "vertex.hpp"
 
 namespace scop {
 namespace utils {
@@ -37,7 +41,8 @@ namespace utils {
 const bool	big_endian = []() -> bool {
 	const int	value = 0x01;
 	const void*	address = static_cast<const void *>(&value);
-	const unsigned char*	least_significant_address = static_cast<const unsigned char*>(address);
+	const unsigned char*	least_significant_address =
+		static_cast<const unsigned char*>(address);
 	return *least_significant_address != 0x01;
 }();
 
@@ -105,6 +110,23 @@ inline std::vector<char>	readFile(const std::string& filename) {
 	file.read(buffer.data(), file_size);
 	file.close();
 	return buffer;
+}
+
+/**
+ * @brief Computes the barycenter of a list of vertices.
+ * 
+ * @param vertices The list of vertices.
+*/
+inline Vect3	computeBarycenter(const std::vector<Vertex>& vertices) noexcept {
+	Vect3	barycenter{};
+
+	for (const Vertex& vertex : vertices) {
+		barycenter += vertex.pos;
+	}
+	if (vertices.size() > 0) {
+		barycenter /= static_cast<float>(vertices.size());
+	}
+	return barycenter;
 }
 
 } // namespace utils

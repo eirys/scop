@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 19:23:53 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 23:21:03 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/14 18:09:27 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,10 @@ public:
 		std::array<Index, 3>		indices;
 	};
 
+	/* ========================================================================= */
+	/*                               CONST MEMBERS                               */
+	/* ========================================================================= */
+
 	const std::vector<Vect2>		default_texture_coords = {
 		{ 0.0f, 0.0f },
 		{ 1.0f, 0.0f },
@@ -98,11 +102,11 @@ private:
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
 
-	std::vector<Vect3>					vertex_coords;
-	std::vector<Vect2>					texture_coords;
-	std::vector<Vect3>					normal_coords;
-	std::vector<Index>					indices;
-	std::vector<Triangle>				triangles;
+	std::vector<Vect3>		vertex_coords;
+	std::vector<Vect2>		texture_coords;
+	std::vector<Vect3>		normal_coords;
+	std::vector<Index>		indices;
+	std::vector<Triangle>	triangles;
 
 }; // class Model
 

@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:42 by eli               #+#    #+#             */
-/*   Updated: 2023/05/14 11:10:57 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/14 21:11:37 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,7 +141,6 @@ void	keyCallback(
 	int action,
 	int mods
 ) {
-	(void)window;
 	(void)scancode;
 	(void)mods;
 
@@ -160,6 +159,8 @@ void	keyCallback(
 			return App::toggleRotation(RotationAxis::ROTATION_NONE);
 		case GLFW_KEY_SPACE:
 			return toggleTextureCallback();
+		case GLFW_KEY_ESCAPE:
+			glfwSetWindowShouldClose(window, GLFW_TRUE);
 		default:
 			break;
 	}
