@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/14 10:58:55 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/14 11:48:46 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ namespace obj {
 /* ========================================================================== */
 
 Model	Parser::parseFile(const std::string& file_name) {
+	checkFile(file_name);
 	std::ifstream	file;
 
 	file.open(file_name);
@@ -46,7 +47,9 @@ Model	Parser::parseFile(const std::string& file_name) {
 			);
 		}
 	}
-
+	if (file.bad()) {
+		throw std::invalid_argument("Error while reading file " + file_name);
+	}
 	// Fix empty indices in face
 	fixMissingIndices();
 
@@ -56,6 +59,19 @@ Model	Parser::parseFile(const std::string& file_name) {
 /* ========================================================================== */
 /*                                   PRIVATE                                  */
 /* ========================================================================== */
+
+void	Parser::checkFile(const std::string& file) const {
+	if (file.empty()) {
+		throw std::invalid_argument("Empty file name");
+	}
+	size_t	extension_pos = file.rfind('.' == std::string::npos);
+	
+	if (extension_pos == std::string::npos) {
+		throw std::invalid_argument("File '" + file + "' has no extension");
+	} else if (file.substr(extension_pos) != ".obj") {
+		throw std::invalid_argument("File '" + file + "' is not a .obj file");
+	}
+}
 
 void	Parser::processLine() {
 	if (line.empty()) {
@@ -338,17 +354,3 @@ void	Parser::fixMissingIndices() {
 
 } // namespace obj
 } // namespace scop
-
-// TODO remove
-// #include <iostream>		// cerr
-// int main() {
-// 	scop::obj::Parser	parser;
-
-// 	try {
-// 		typedef scop::obj::TokenType TokenType;
-
-// 		scop::obj::Model model = parser.parseFile("/home/eli/random/42.obj");
-// 	} catch (const std::exception& e) {
-// 		std::cerr << e.what() <<__NL;
-// 	}
-// }

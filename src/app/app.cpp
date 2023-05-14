@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/14 11:13:45 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/14 11:23:41 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ App::App(
 	const std::string& texture_file
 ): window(model_file) {
 	createTextureLoader(texture_file);
+	loadModel(model_file);
 	createInstance();
 	setupDebugMessenger();
 	createSurface();
@@ -47,7 +48,6 @@ App::App(
 	createTextureImage();
 	createTextureImageView();
 	createTextureSampler();
-	loadModel(model_file);
 	createVertexBuffer();
 	createIndexBuffer();
 	createUniformBuffers();

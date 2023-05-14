@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:02:06 by etran             #+#    #+#             */
-/*   Updated: 2023/05/12 23:31:31 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/14 11:33:07 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,6 +141,7 @@ private:
 
 	/* ======================================================================== */
 
+	void				checkFile(const std::string& file) const;
 	void				processLine();
 
 	void				parseVertex();
@@ -170,6 +171,8 @@ namespace mtl {
 
 /**
  * Parser for .mtl files.
+ * 
+ * TODO
 */
 class Parser {
 }; // class Parser
