@@ -3,8 +3,8 @@ A simple graphics `.obj` renderer, made with Vulkan.
 
 ## Usage
 `./scop filepath {texturepath}`
-You can toggle some features by pressing keys.
 
+### Features
 **Texture enabling**:
 - `Space`	toggles/untoggles texture
 
