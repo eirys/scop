@@ -5,13 +5,14 @@ A simple graphics `.obj` renderer, made with Vulkan.
 `./scop filepath {texturepath}`
 You can toggle some features by pressing keys.
 
-**Texture enabling**
-`Space`	toggles/untoggles texture
-**Rotation keys**
-`1`	axis X
-`2`	axis Y
-`3`	axis Z
-`4`	disable rotation
+**Texture enabling**:
+- `Space`	toggles/untoggles texture
+
+**Rotation keys**:
+- `1`	axis X
+- `2`	axis Y
+- `3`	axis Z
+- `4`	disable rotation
 
 ## Examples
 
