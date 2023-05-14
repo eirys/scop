@@ -4,7 +4,6 @@ A simple graphics `.obj` renderer, made with Vulkan.
 ## Usage
 `./scop filepath {texturepath}`
 
-### Features
 **Texture enabling**:
 - `Space`	toggles/untoggles texture
 
