@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 10:23:32 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 00:09:24 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/15 00:59:42 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,11 +47,11 @@ public:
 		size_t height
 	);
 
+	Image(Image&& x) = default;
 	~Image() = default;
 
 	Image() = delete;
 	Image(const Image& x) = delete;
-	Image(Image&& x) = delete;
 	Image&	operator=(const Image& x) = delete;
 
 	/* ========================================================================= */

@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 13:57:01 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 10:22:36 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/15 01:04:35 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,12 +38,12 @@ public:
 	/* ========================================================================= */
 
 	PpmLoader(const std::string& path);
+	PpmLoader(PpmLoader&& x) = default;
 
 	~PpmLoader() = default;
 
 	PpmLoader() = delete;
 	PpmLoader(const PpmLoader& x) = delete;
-	PpmLoader(PpmLoader&& x) = delete;
 	PpmLoader&	operator=(const PpmLoader& x) = delete;
 
 	/* ========================================================================= */

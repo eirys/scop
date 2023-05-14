@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/14 22:44:19 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/15 01:09:50 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ namespace scop {
 bool							App::texture_enabled = true;
 std::optional<App::time_point>	App::texture_enabled_start;
 std::optional<Vect3>			App::rotation_axis;
+float							App::zoom_input = 1.0f;
 
 /* ========================================================================== */
 /*                                   PUBLIC                                   */
@@ -148,6 +149,19 @@ void	App::toggleRotation(RotationAxis axis) noexcept {
 		rotation_axis = Vect3(0.0f, 0.0f, 1.0f);
 	} else {
 		rotation_axis.reset();
+	}
+}
+
+void	App::toggleZoom(ZoomInput zoom) noexcept {
+	if (zoom == ZoomInput::ZOOM_NONE) {
+		zoom_input = 1.0f;
+		return;
+	} else if (zoom == ZoomInput::ZOOM_IN && zoom_input < 1.5f) {
+		zoom_input += 0.1f;
+	} else if (zoom == ZoomInput::ZOOM_OUT && zoom_input > 0.5f) {
+		zoom_input -= 0.1f;
+	} else {
+		LOG("Zoom limit reached. Reset with scroll press.");
 	}
 }
 
@@ -1496,7 +1510,7 @@ void	App::updateVertexPart(
 
 	UniformBufferObject::Camera	camera{};
 
-	// Define rotation
+	// Define object transformation model
 	if (rotation_axis.has_value()) {
 		camera.model = scop::rotate(
 			time * scop::utils::radians(90.0f),
@@ -1505,14 +1519,19 @@ void	App::updateVertexPart(
 	} else {
 		camera.model = scop::Mat4(1.0f);
 	}
-	// Define view transformation: above, 45deg angle
-	camera.view = scop::lookAt(
+
+	// Define camera transformation view
+	scop::Mat4	zoom = scop::scale(
+		scop::Mat4(1.0f),
+		scop::Vect3(zoom_input, zoom_input, zoom_input)
+	);
+	camera.view = zoom * scop::lookAt(
 		scop::Vect3(2.0f, 2.0f, 2.0f),
 		scop::Vect3(0.0f, 0.0f, 0.0f),
-		scop::Vect3(0.0f, 0.0f, 1.0f)
+		scop::Vect3(0.0f, 1.0f, 0.0f)
 	);
 
-	// Define persp. projection (clip space?)
+	// Define persp. projection transformation
 	camera.proj = scop::perspective(
 		scop::utils::radians(45.0f),
 		swap_chain_extent.width / static_cast<float>(swap_chain_extent.height),
@@ -1521,6 +1540,7 @@ void	App::updateVertexPart(
 	);
 	// Invert y axis (because y axis is inverted in Vulkan)
 	camera.proj[5] *= -1;
+
 	memcpy(
 		uniform_buffers_mapped,
 		&camera,
@@ -1654,16 +1674,15 @@ void	App::createDescriptorSets() {
  * Texture loader
 */
 void	App::createTextureImage() {
-	scop::Image	image = image_loader->load();
-
+	// scop::Image	image = image_loader->load();
 	mip_levels = 1 + static_cast<uint32_t>(
 		std::floor(std::log2(std::max(
-			image.getWidth(),
-			image.getHeight()
+			image->getWidth(),
+			image->getHeight()
 		)))
 	);
 
-	VkDeviceSize	image_size = image.getWidth() * image.getHeight() * sizeof(uint32_t);
+	VkDeviceSize	image_size = image->getWidth() * image->getHeight() * sizeof(uint32_t);
 	VkBuffer		staging_buffer;
 	VkDeviceMemory	staging_buffer_memory;
 
@@ -1678,13 +1697,13 @@ void	App::createTextureImage() {
 	// Map buffer, copy image load into buffer
 	void*	data;
 	vkMapMemory(logical_device, staging_buffer_memory, 0, image_size, 0, &data);
-	memcpy(data, image.getPixels(), static_cast<size_t>(image_size));
+	memcpy(data, image->getPixels(), static_cast<size_t>(image_size));
 	vkUnmapMemory(logical_device, staging_buffer_memory);
 
 	// Create texture image to be filled
 	createImage(
-		image.getWidth(),
-		image.getHeight(),
+		image->getWidth(),
+		image->getHeight(),
 		mip_levels,
 		VK_SAMPLE_COUNT_1_BIT,
 		VK_FORMAT_R8G8B8A8_SRGB,
@@ -1708,16 +1727,16 @@ void	App::createTextureImage() {
 	copyBufferToImage(
 		staging_buffer,
 		texture_image,
-		static_cast<uint32_t>(image.getWidth()),
-		static_cast<uint32_t>(image.getHeight())
+		static_cast<uint32_t>(image->getWidth()),
+		static_cast<uint32_t>(image->getHeight())
 	);
 
 	// Fill mipmaps images (directly handled by gpu)
 	generateMipmaps(
 		texture_image,
 		VK_FORMAT_R8G8B8A8_SRGB,
-		image.getWidth(),
-		image.getHeight(),
+		image->getWidth(),
+		image->getHeight(),
 		mip_levels
 	);
 
@@ -2272,14 +2291,15 @@ void	App::createTextureLoader(const std::string& path) {
 			throw std::invalid_argument(
 				"No extention found for texture file (must be .ppm)"
 			);
-		} else if (path.find(".ppm") == std::string::npos) {
+		} else if (path.find("ppm", extension_pos) == std::string::npos) {
 			throw std::invalid_argument(
 				"Texture file must be a ppm file (.ppm)"
 			);
 		}
 		file = path;
 	}
-	image_loader = std::make_unique<scop::PpmLoader>(file);
+	std::unique_ptr<scop::ImageLoader>	image_loader(new PpmLoader(file));
+	image = std::make_unique<scop::Image>(image_loader->load());
 }
 
 /**

@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:42 by eli               #+#    #+#             */
-/*   Updated: 2023/05/14 22:09:48 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/15 00:29:05 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,19 @@ void	keyCallback(
 	int scancode,
 	int action,
 	int mods
+);
+
+void	mouseButtonCallback(
+	GLFWwindow* window,
+	int button,
+	int action,
+	int mods
+);
+
+void	scrollCallback(
+	GLFWwindow* window,
+	double xoffset,
+	double yoffset
 );
 
 void	toggleTextureCallback() noexcept;
@@ -58,7 +71,8 @@ Window::Window(const std::string& model_name) {
 	// handle resizing
 	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 	glfwSetKeyCallback(window, keyCallback);
-	glfwSetKeyCallback(window, keyCallback);
+	glfwSetMouseButtonCallback(window, mouseButtonCallback);
+	glfwSetScrollCallback(window, scrollCallback);
 }
 
 Window::~Window() {
@@ -172,6 +186,8 @@ void	keyCallback(
 void	toggleTextureCallback() noexcept {
 	using std::chrono::steady_clock;
 
+	// TODO: try disabling delay
+
 	static steady_clock::time_point	key_pressed{};
 
 	steady_clock::time_point	now = steady_clock::now();
@@ -188,6 +204,45 @@ void	toggleTextureCallback() noexcept {
 
 	// Update last key press
 	key_pressed = now;
+}
+
+/**
+ * Function callback for mouse button press (unused)
+*/
+void	mouseButtonCallback(
+	GLFWwindow* window,
+	int button,
+	int action,
+	int mods
+) {
+	(void)window;
+	(void)button;
+	(void)action;
+	(void)mods;
+
+	if (action != GLFW_PRESS) {
+		return;
+	}
+
+	// Reset zoom on scroll click
+	if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
+		App::toggleZoom(ZoomInput::ZOOM_NONE);
+	}
+}
+
+void	scrollCallback(
+	GLFWwindow* window,
+	double xoffset,
+	double yoffset
+) {
+	(void)window;
+	(void)xoffset;
+
+	if (yoffset > 0) {
+		App::toggleZoom(ZoomInput::ZOOM_IN);
+	} else {
+		App::toggleZoom(ZoomInput::ZOOM_OUT);
+	}
 }
 
 } // namespace scop

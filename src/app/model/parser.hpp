@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:02:06 by etran             #+#    #+#             */
-/*   Updated: 2023/05/14 11:33:07 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/15 01:03:54 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,10 +50,10 @@ public:
 	/* ========================================================================= */
 
 	Parser() = default;
+	Parser(Parser&& x) = default;
 	~Parser() = default;
 
 	Parser(const Parser& x) = delete;
-	Parser(Parser&& x) = delete;
 	Parser&	operator=(const Parser& x) = delete;
 
 	/* ========================================================================= */

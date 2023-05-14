@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 14:11:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/14 19:30:15 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/15 00:25:33 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,9 +189,11 @@ inline Mat4	rotate(float angle, const Vect3& axis) noexcept {
 /**
  * @brief Produces lookAt matrix
  * 
- * @param eye:		position of the camera (eye)
+ * @param eye:		position of the camera
  * @param center:	position of the object to look at
- * @param up:		up vector, usually (0, 0, 1)
+ * @param up:		up vector, usually (0, 0, 1). Used to determine
+ * 					orientation of the camera. Should not be parallel
+ * 					to the vector from eye to center.
 */
 inline Mat4	lookAt(const Vect3& eye, const Vect3& center, const Vect3& up) noexcept {
 	Vect3	f = (center - eye).normalize();
@@ -232,6 +234,25 @@ inline Mat4	perspective(float fov, float aspect_ratio, float near, float far) no
 		// Row 4
 		0, 0, -2 * far * near / range, 0
 	};
+}
+
+/**
+ * @brief Scales the matrix by the given vector
+ * 
+ * @param mat:		matrix to scale
+ * @param scale:	vector to scale by
+ * 
+ * @note			only scales the first 3 rows of the matrix
+*/
+inline Mat4	scale(const Mat4& mat, const Vect3& scale) noexcept {
+	Mat4	result(mat);
+
+	for (size_t j = 0; j < 3; ++j) {
+		for (size_t i = 0; i < 3; ++i) {
+			result[j * 4 + i] *= scale[j];
+		}
+	}
+	return result;
 }
 
 }; // namespace scop

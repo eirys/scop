@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/14 23:07:06 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/15 01:01:01 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,12 @@ enum RotationAxis {
 	ROTATION_Y,
 	ROTATION_Z,
 	ROTATION_NONE
+};
+
+enum ZoomInput {
+	ZOOM_IN,
+	ZOOM_OUT,
+	ZOOM_NONE
 };
 
 /**
@@ -110,6 +116,7 @@ public:
 	void			run();
 	static void		toggleTexture() noexcept;
 	static void		toggleRotation(RotationAxis axis) noexcept;
+	static void		toggleZoom(ZoomInput input) noexcept;
 
 private:
 	/* ========================================================================= */
@@ -135,7 +142,7 @@ private:
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
 
-	std::unique_ptr<scop::ImageLoader>	image_loader;
+	std::unique_ptr<scop::Image>			image;
 
 	scop::Window					window;
 	VkInstance						vk_instance;
@@ -207,6 +214,8 @@ private:
 	std::optional<time_point>		texture_enabled_start;
 	static
 	std::optional<Vect3>			rotation_axis;
+	static
+	float							zoom_input;
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
