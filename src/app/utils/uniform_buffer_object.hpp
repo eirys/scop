@@ -6,14 +6,14 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 20:12:41 by eli               #+#    #+#             */
-/*   Updated: 2023/05/14 22:08:04 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/14 22:27:25 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef UNIFORM_BUFFER_OBJECT_HPP
 # define UNIFORM_BUFFER_OBJECT_HPP
 
-# define __ALIGNMENT 64
+# define __ALIGNMENT 16
 
 # include "matrix.hpp"
 
@@ -25,13 +25,13 @@ public:
 	/*                               HELPER OBJECTS                              */
 	/* ========================================================================= */
 
-	class Camera {
+	struct Camera {
 		scop::Mat4	model;
 		scop::Mat4	view;
 		scop::Mat4	proj;
 	};
 
-	class Texture {
+	struct Texture {
 		bool	enabled;
 		float	mix;
 	};
@@ -59,15 +59,11 @@ public:
 
 	/* VERTEX SHADER =========================================================== */
 
-	scop::Mat4	rotation;
-	scop::Mat4	view;
-	scop::Mat4	proj;
-	scop::Vect3	translation;	// TODO: remove
+	alignas(__ALIGNMENT) Camera		camera; // 3 * 64 = 192 bytes
 
 	/* FRAGMENT SHADER ========================================================= */
 
-	alignas(__ALIGNMENT) bool	texture_enabled;
-	float	texture_mix;
+	alignas(__ALIGNMENT) Texture	texture; // 1 * 64 = 64 bytes
 
 };
 

@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/14 11:10:51 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/14 23:07:06 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -346,11 +346,9 @@ private:
 	VkSampleCountFlagBits			getMaxUsableSampleCount() const;
 	void							createColorResources();
 	void							updateVertexPart(
-		UniformBufferObject& ubo,
 		time_point current_time
 	);
 	void							updateFragmentPart(
-		UniformBufferObject& ubo,
 		time_point current_time
 	);
 	void							createTextureLoader(

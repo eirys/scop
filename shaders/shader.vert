@@ -7,20 +7,18 @@ layout(location = 2) in vec2 in_tex_coord;
 layout(location = 0) out vec3 frag_color;
 layout(location = 1) out vec2 frag_tex_coord;
 
-layout(binding = 0) uniform UniformBufferObject {
-	mat4 rotation;
+layout(binding = 0) uniform Camera {
+	mat4 model;
 	mat4 view;
 	mat4 proj;
-	vec3 translation;
-} ubo;
+} camera_ubo;
 
 void	main() {
 	gl_Position =
-				(ubo.proj
-				* ubo.view
-				* ubo.rotation
-				* vec4(in_position, 1.0))
-				+ vec4(ubo.translation, 0.0);
+				(camera_ubo.proj
+				* camera_ubo.view
+				* camera_ubo.model
+				* vec4(in_position, 1.0));
 	frag_color = in_color;
 	frag_tex_coord = in_tex_coord;
 }

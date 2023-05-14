@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/14 22:08:22 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/14 22:44:19 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -892,12 +892,13 @@ void	App::createGraphicsPipeline() {
 	dynamic_state.dynamicStateCount = static_cast<uint32_t>(dynamic_states.size());
 	dynamic_state.pDynamicStates = dynamic_states.data();
 
-	// Pipeline layout setups
 	// Push constants setup
 	// VkPushConstantRange	push_constant_range{};
 	// push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 	// push_constant_range.offset = 0;
 	// push_constant_range.size = sizeof(PushConstantData);
+
+	// Pipeline layout setups
 
 	VkPipelineLayoutCreateInfo	pipeline_layout_info{};
 	pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -1455,6 +1456,7 @@ void	App::createDescriptorSetLayout() {
 void	App::createUniformBuffers() {
 	VkDeviceSize	buffer_size = sizeof(UniformBufferObject);
 
+	// Create the buffer and allocate memory
 	createBuffer(
 		buffer_size,
 		VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
@@ -1462,6 +1464,8 @@ void	App::createUniformBuffers() {
 		uniform_buffers,
 		uniform_buffers_memory
 	);
+
+	// Map it to allow CPU to write on it
 	vkMapMemory(
 		logical_device,
 		uniform_buffers_memory,
@@ -1476,15 +1480,13 @@ void	App::createUniformBuffers() {
  * Update transformation of vertices
 */
 void	App::updateUniformBuffer() {
-	UniformBufferObject	ubo{};
 	time_point	current_time = std::chrono::high_resolution_clock::now();
 
-	updateVertexPart(ubo, current_time);
-	updateFragmentPart(ubo, current_time);
+	updateVertexPart(current_time);
+	updateFragmentPart(current_time);
 }
 
 void	App::updateVertexPart(
-	UniformBufferObject& ubo,
 	time_point current_time
 ) {
 	static time_point	start_time = std::chrono::high_resolution_clock::now();
@@ -1492,40 +1494,41 @@ void	App::updateVertexPart(
 		current_time - start_time
 	).count();
 
+	UniformBufferObject::Camera	camera{};
+
 	// Define rotation
 	if (rotation_axis.has_value()) {
-		ubo.rotation = scop::rotate(
+		camera.model = scop::rotate(
 			time * scop::utils::radians(90.0f),
 			rotation_axis.value()
 		);
 	} else {
-		ubo.rotation = scop::Mat4(1.0f);
+		camera.model = scop::Mat4(1.0f);
 	}
 	// Define view transformation: above, 45deg angle
-	ubo.view = scop::lookAt(
+	camera.view = scop::lookAt(
 		scop::Vect3(2.0f, 2.0f, 2.0f),
 		scop::Vect3(0.0f, 0.0f, 0.0f),
 		scop::Vect3(0.0f, 0.0f, 1.0f)
 	);
 
 	// Define persp. projection (clip space?)
-	ubo.proj = scop::perspective(
+	camera.proj = scop::perspective(
 		scop::utils::radians(45.0f),
 		swap_chain_extent.width / static_cast<float>(swap_chain_extent.height),
 		0.1f,
 		10.0f
 	);
 	// Invert y axis (because y axis is inverted in Vulkan)
-	ubo.proj[5] *= -1;
+	camera.proj[5] *= -1;
 	memcpy(
 		uniform_buffers_mapped,
-		&ubo,
-		offsetof(UniformBufferObject, translation)
+		&camera,
+		offsetof(UniformBufferObject, texture)
 	);
 }
 
 void	App::updateFragmentPart(
-	UniformBufferObject& ubo,
 	time_point current_time
 ) {
 	// Only udpate if it was recently toggled
@@ -1533,17 +1536,19 @@ void	App::updateFragmentPart(
 		return;
 	}
 
+	UniformBufferObject::Texture	texture;
+
 	// Transition from 0 to 1 in /*transition_duration*/ ms	float
 	float	time = std::chrono::duration<float, std::chrono::milliseconds::period>(
 		current_time - texture_enabled_start.value()
 	).count() / transition_duration;
 
-	ubo.texture_enabled = texture_enabled;
-	ubo.texture_mix = texture_enabled ? time : 1.0f - time;
+	texture.enabled = texture_enabled;
+	texture.mix = texture_enabled ? time : 1.0f - time;
 	memcpy(
-		(char*)uniform_buffers_mapped + offsetof(UniformBufferObject, texture_enabled),
-		&ubo.texture_enabled,
-		sizeof(ubo) - offsetof(UniformBufferObject, texture_enabled)
+		(char*)uniform_buffers_mapped + offsetof(UniformBufferObject, texture),
+		&texture,
+		sizeof(texture)
 	);
 
 	// Reset texture_enabled_start if time is up
@@ -1586,11 +1591,11 @@ void	App::createDescriptorSets() {
 		throw std::runtime_error("failed to allocate descriptor sets");
 	}
 
-	// Uniform buffer
+	// Ubo Camera
 	VkDescriptorBufferInfo	ubo_info_vertex{};
 	ubo_info_vertex.buffer = uniform_buffers;
 	ubo_info_vertex.offset = 0;
-	ubo_info_vertex.range = offsetof(UniformBufferObject, texture_enabled);
+	ubo_info_vertex.range = offsetof(UniformBufferObject, texture);
 
 	// Texture sampler
 	VkDescriptorImageInfo	image_info{};
@@ -1598,11 +1603,11 @@ void	App::createDescriptorSets() {
 	image_info.imageView = texture_image_view;
 	image_info.sampler = texture_sampler;
 
-	// Uniform buffer
+	// Ubo Texture
 	VkDescriptorBufferInfo	ubo_info_fragment{};
 	ubo_info_fragment.buffer = uniform_buffers;
-	ubo_info_fragment.offset = offsetof(UniformBufferObject, texture_enabled);
-	ubo_info_fragment.range = sizeof(UniformBufferObject) - offsetof(UniformBufferObject, texture_enabled);
+	ubo_info_fragment.offset = offsetof(UniformBufferObject, texture);
+	ubo_info_fragment.range = sizeof(UniformBufferObject) - offsetof(UniformBufferObject, texture);
 
 	// Allow buffer udpate using descriptor write
 	std::array<VkWriteDescriptorSet, 3>	descriptor_writes{};
@@ -2253,7 +2258,7 @@ void	App::createColorResources() {
 /**
  * @brief	Creates texture loader object. If no path is provided, default
  * 			texture is loaded.
- * 
+ *
  * @todo	Handle other image formats
 */
 void	App::createTextureLoader(const std::string& path) {
@@ -2283,9 +2288,8 @@ void	App::createTextureLoader(const std::string& path) {
 void	App::initUniformBuffer() noexcept {
 	UniformBufferObject	ubo{};
 
-	ubo.texture_enabled = texture_enabled;
-	ubo.texture_mix = -1.0f;
-	ubo.translation = Vect3(0.0f, 0.0f, 0.0f);
+	ubo.texture.enabled = texture_enabled;
+	ubo.texture.mix = -1.0f;
 
 	memcpy(uniform_buffers_mapped, &ubo, sizeof(ubo));
 }
