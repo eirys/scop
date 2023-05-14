@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:42 by eli               #+#    #+#             */
-/*   Updated: 2023/05/14 21:11:37 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/14 22:09:48 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,7 +147,7 @@ void	keyCallback(
 	if (action != GLFW_PRESS) {
 		return;
 	}
-	// Ignore everything but space
+	// Ignore everything but those keys
 	switch (key) {
 		case GLFW_KEY_1:
 			return App::toggleRotation(RotationAxis::ROTATION_X);
@@ -166,7 +166,10 @@ void	keyCallback(
 	}
 }
 
-void toggleTextureCallback() noexcept {
+/**
+ * Toggles texture on/off
+*/
+void	toggleTextureCallback() noexcept {
 	using std::chrono::steady_clock;
 
 	static steady_clock::time_point	key_pressed{};

@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 20:12:41 by eli               #+#    #+#             */
-/*   Updated: 2023/05/14 20:44:11 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/14 22:08:04 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,28 @@ namespace scop {
 class UniformBufferObject {
 public:
 	/* ========================================================================= */
+	/*                               HELPER OBJECTS                              */
+	/* ========================================================================= */
+
+	class Camera {
+		scop::Mat4	model;
+		scop::Mat4	view;
+		scop::Mat4	proj;
+	};
+
+	class Texture {
+		bool	enabled;
+		float	mix;
+	};
+
+	/* ========================================================================= */
 	/*                                  METHODS                                  */
 	/* ========================================================================= */
 
 	UniformBufferObject() = default;
-	UniformBufferObject& operator=(const UniformBufferObject& other) = default;
-	UniformBufferObject(UniformBufferObject&& other) = default;
 	UniformBufferObject(const UniformBufferObject& other) = default;
+	UniformBufferObject(UniformBufferObject&& other) = default;
+	UniformBufferObject& operator=(const UniformBufferObject& other) = default;
 	~UniformBufferObject() = default;
 
 	/* ========================================================================= */
@@ -36,7 +51,6 @@ public:
 	// TODO
 	// void	updateCamera(/* options */);
 	// void	updateTexture();
-
 
 // private:
 	/* ========================================================================= */
@@ -48,7 +62,7 @@ public:
 	scop::Mat4	rotation;
 	scop::Mat4	view;
 	scop::Mat4	proj;
-	scop::Vect3	translation;
+	scop::Vect3	translation;	// TODO: remove
 
 	/* FRAGMENT SHADER ========================================================= */
 
