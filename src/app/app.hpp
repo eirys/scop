@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 23:09:28 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/14 11:10:51 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,8 @@ namespace scop {
 enum RotationAxis {
 	ROTATION_X,
 	ROTATION_Y,
-	ROTATION_Z
+	ROTATION_Z,
+	ROTATION_NONE
 };
 
 /**
@@ -196,10 +197,16 @@ private:
 	VkDeviceMemory					color_image_memory;
 	VkImageView						color_image_view;
 
+	/* ========================================================================= */
+	/*                               STATIC MEMBERS                              */
+	/* ========================================================================= */
+
 	static
 	bool							texture_enabled;
 	static
 	std::optional<time_point>		texture_enabled_start;
+	static
+	std::optional<Vect3>			rotation_axis;
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */

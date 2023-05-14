@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:42 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 22:28:49 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/14 11:10:57 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,6 +156,8 @@ void	keyCallback(
 			return App::toggleRotation(RotationAxis::ROTATION_Y);
 		case GLFW_KEY_3:
 			return App::toggleRotation(RotationAxis::ROTATION_Z);
+		case GLFW_KEY_4:
+			return App::toggleRotation(RotationAxis::ROTATION_NONE);
 		case GLFW_KEY_SPACE:
 			return toggleTextureCallback();
 		default:

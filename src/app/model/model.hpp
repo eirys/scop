@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 19:23:53 by eli               #+#    #+#             */
-/*   Updated: 2023/05/12 23:31:31 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/13 23:21:03 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,10 +70,11 @@ public:
 	/* ========================================================================= */
 
 	Model() = default;
-	~Model() = default;
 	Model(const Model& x) = default;
 	Model(Model&& x) = default;
-	Model&	operator=(const Model& x) = default;
+	~Model() = default;
+
+	Model&	operator=(const Model& x) = delete;
 
 	/* ========================================================================= */
 

@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 23:07:55 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/14 11:13:45 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ namespace scop {
 
 bool							App::texture_enabled = true;
 std::optional<App::time_point>	App::texture_enabled_start;
+std::optional<Vect3>			App::rotation_axis;
 
 /* ========================================================================== */
 /*                                   PUBLIC                                   */
@@ -139,7 +140,15 @@ void	App::toggleTexture() noexcept {
  * On toggle, changes the rotation of the model.
 */
 void	App::toggleRotation(RotationAxis axis) noexcept {
-	(void)axis;
+	if (axis == RotationAxis::ROTATION_X) {
+		rotation_axis = Vect3(1.0f, 0.0f, 0.0f);
+	} else if (axis == RotationAxis::ROTATION_Y) {
+		rotation_axis = Vect3(0.0f, 1.0f, 0.0f);
+	} else if (axis == RotationAxis::ROTATION_Z) {
+		rotation_axis = Vect3(0.0f, 0.0f, 1.0f);
+	} else {
+		rotation_axis.reset();
+	}
 }
 
 /* ========================================================================== */
@@ -1485,14 +1494,15 @@ void	App::updateVertexPart(
 		current_time - start_time
 	).count();
 
-	// Define model: continuous rotation around z axis
-	ubo.model = scop::rotate(
-		time * scop::utils::radians(90.0f),	// rotation angle
-		scop::Vect3(0.0f, 0.0f, 1.0f)		// axis (z axis)
-	);
-	// Model: static
-	// ubo.model = scop::Mat4(1.0f);
-
+	// Define model of transformation: rotation
+	if (rotation_axis.has_value()) {
+		ubo.model = scop::rotate(
+			time * scop::utils::radians(90.0f),
+			rotation_axis.value()
+		);
+	} else {
+		ubo.model = scop::Mat4(1.0f);
+	}
 	// Define view transformation: above, 45deg angle
 	ubo.view = scop::lookAt(
 		scop::Vect3(1.6f, 5.0f, 2.0f),
@@ -2238,6 +2248,12 @@ void	App::createColorResources() {
 	);
 }
 
+/**
+ * @brief	Creates texture loader object. If no path is provided, default
+ * 			texture is loaded.
+ * 
+ * @todo	Handle other image formats
+*/
 void	App::createTextureLoader(const std::string& path) {
 	std::string	file;
 	if (path.empty()) {

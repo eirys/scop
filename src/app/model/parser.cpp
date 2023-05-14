@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/12 23:31:31 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/14 10:58:55 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -267,10 +267,10 @@ Parser::TokenType	Parser::checkNumberType(const std::string& word) const {
 	size_t	dot_pos = word.find(cs_dot, pos_checked);
 	if (dot_pos == std::string::npos) {
 		checkJunkAfterNumber(word, pos_checked);
-		return TOKEN_INT;
+		return TokenType::TOKEN_INT;
 	}
 	checkJunkAfterNumber(word, dot_pos + 1);
-	return TOKEN_FLOAT;
+	return TokenType::TOKEN_FLOAT;
 }
 
 /**

@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 13:54:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/12 23:31:31 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/14 10:38:31 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,22 +70,22 @@ struct Vect3 {
 
 	/* OPERATORS =============================================================== */
 
-	Vect3	operator+(const Vect3& rhs) const {
+	Vect3	operator+(const Vect3& rhs) const noexcept {
 		return Vect3{ x + rhs.x, y + rhs.y, z + rhs.z };
 	}
 
-	Vect3	operator-(const Vect3& rhs) const {
+	Vect3	operator-(const Vect3& rhs) const noexcept {
 		return Vect3{ x - rhs.x, y - rhs.y, z - rhs.z };
 	}
 
-	Vect3	operator*(float rhs) const {
+	Vect3	operator*(float rhs) const noexcept {
 		return Vect3{ x * rhs, y * rhs, z * rhs };
 	}
 
 	/**
 	 * @brief Returns the dot product of the vector with another vector
 	 */
-	float	dot(const Vect3& rhs) const {
+	float	dot(const Vect3& rhs) const noexcept {
 		return x * rhs.x + y * rhs.y + z * rhs.z;
 	}
 
@@ -107,7 +107,7 @@ struct Vect3 {
 	/**
 	 * @brief Returns the cross product of the vector with another vector
 	*/
-	Vect3	cross(const Vect3& rhs) const {
+	Vect3	cross(const Vect3& rhs) const noexcept {
 		return Vect3{
 			y * rhs.z - z * rhs.y,
 			z * rhs.x - x * rhs.z,
@@ -117,7 +117,7 @@ struct Vect3 {
 
 	/* BOOLEAN COMPARISON ====================================================== */
 
-	bool	operator==(const Vect3& rhs) const {
+	bool	operator==(const Vect3& rhs) const noexcept {
 		return x == rhs.x && y == rhs.y && z == rhs.z;
 	}
 
@@ -157,21 +157,21 @@ struct Vect2 {
 
 	/* OPERATORS =============================================================== */
 
-	Vect2	operator+(const Vect2& rhs) const {
+	Vect2	operator+(const Vect2& rhs) const noexcept {
 		return Vect2{x + rhs.x, y + rhs.y};
 	}
 
-	Vect2	operator-(const Vect2& rhs) const {
+	Vect2	operator-(const Vect2& rhs) const noexcept {
 		return Vect2{x - rhs.x, y - rhs.y};
 	}
 
-	Vect2	operator*(float rhs) const {
+	Vect2	operator*(float rhs) const noexcept {
 		return Vect2{x * rhs, y * rhs};
 	}
 
 	/* BOOLEAN COMPARISON ====================================================== */
 
-	bool	operator==(const Vect2& rhs) const {
+	bool	operator==(const Vect2& rhs) const noexcept {
 		return x == rhs.x && y == rhs.y;
 	}
 

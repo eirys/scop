@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 14:11:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 12:08:14 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/14 11:08:16 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ struct Mat4 {
 	/* ========================================================================= */
 
 	Mat4() {
-		bzero(mat, 16 * sizeof(float));
+		memset(mat, 0.0f, 16 * sizeof(float));
 	}
 
 	Mat4(const Mat4& other) {
@@ -60,12 +60,14 @@ struct Mat4 {
 		}
 	}
 
-	Mat4&	operator=(const Mat4& rhs) {
+	Mat4&	operator=(const Mat4& rhs) noexcept {
 		for (size_t i = 0; i < 16; ++i) {
 			mat[i] = rhs.mat[i];
 		}
 		return *this;
 	}
+
+	~Mat4() = default;
 
 	/* ACCESSORS =============================================================== */
 
@@ -85,7 +87,7 @@ struct Mat4 {
 
 	/* OPERATORS =============================================================== */
 
-	Mat4	operator+(const Mat4& rhs) const {
+	Mat4	operator+(const Mat4& rhs) const noexcept {
 		Mat4 result;
 		for (size_t i = 0; i < 16; i++) {
 			result[i] = mat[i] + rhs.mat[i];
@@ -93,7 +95,7 @@ struct Mat4 {
 		return result;
 	}
 
-	Mat4	operator-(const Mat4& rhs) const {
+	Mat4	operator-(const Mat4& rhs) const noexcept {
 		Mat4 result;
 		for (size_t i = 0; i < 16; i++) {
 			result[i] = mat[i] - rhs.mat[i];
@@ -101,7 +103,7 @@ struct Mat4 {
 		return result;
 	}
 
-	Mat4	operator*(const Mat4& rhs) const {
+	Mat4	operator*(const Mat4& rhs) const noexcept {
 		Mat4 result;
 		for (size_t i = 0; i < 4; i++) {
 			for (size_t j = 0; j < 4; j++) {
@@ -113,6 +115,15 @@ struct Mat4 {
 		return result;
 	}
 
+	Vect3	operator*(const Vect3& rhs) const noexcept {
+		Vect3 result;
+		result.x = mat[0] * rhs.x + mat[1] * rhs.y + mat[2] * rhs.z + mat[3];
+		result.y = mat[4] * rhs.x + mat[5] * rhs.y + mat[6] * rhs.z + mat[7];
+		result.z = mat[8] * rhs.x + mat[9] * rhs.y + mat[10] * rhs.z + mat[11];
+		// w component of Vect4 ignored (assumed to be 1)
+		return result;
+	}
+
 }; // struct Mat4
 
 /**
@@ -121,7 +132,7 @@ struct Mat4 {
  * @param angle:	angle in radians
  * @param axis:		axis of rotation
 */
-inline Mat4	rotate(float angle, const Vect3& axis) {
+inline Mat4	rotate(float angle, const Vect3& axis) noexcept {
 	float	c = std::cos(angle);
 	float	s = std::sin(angle);
 	Vect3	u = axis.normalize();
@@ -154,7 +165,7 @@ inline Mat4	rotate(float angle, const Vect3& axis) {
  * @param center:	position of the object to look at
  * @param up:		up vector, usually (0, 0, 1)
 */
-inline Mat4	lookAt(const Vect3& eye, const Vect3& center, const Vect3& up) {
+inline Mat4	lookAt(const Vect3& eye, const Vect3& center, const Vect3& up) noexcept {
 	Vect3	f = (center - eye).normalize();
 	Vect3	s = f.cross(up).normalize();
 	Vect3	u = s.cross(f);
@@ -179,7 +190,7 @@ inline Mat4	lookAt(const Vect3& eye, const Vect3& center, const Vect3& up) {
  * @param near			near clipping plane
  * @param far			far clipping plane
 */
-inline Mat4	perspective(float fov, float aspect_ratio, float near, float far) {
+inline Mat4	perspective(float fov, float aspect_ratio, float near, float far) noexcept {
 	float	tanHalfFov = std::tan(fov / 2);
 	float	range = far - near;
 
