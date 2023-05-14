@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/14 11:48:46 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/14 13:49:27 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ void	Parser::checkFile(const std::string& file) const {
 	if (file.empty()) {
 		throw std::invalid_argument("Empty file name");
 	}
-	size_t	extension_pos = file.rfind('.' == std::string::npos);
+	size_t	extension_pos = file.rfind('.');
 	
 	if (extension_pos == std::string::npos) {
 		throw std::invalid_argument("File '" + file + "' has no extension");
@@ -215,15 +215,6 @@ void	Parser::parseFace() {
 		skipWhitespace();
 	}
 
-	// TODO: Replace occurence of -1 by last element of corresponding list
-	// for (auto& index : indices) {
-	// 	for (size_t i = 0; i < 3; ++i) {
-	// 		if (index[i] == -1) {
-	// 			index[i] = indices.back()[i];
-	// 		}
-	// 	}
-	// }
-
 	if (indices.size() < 3) {
 		throw Parser::parse_error("expecting at least 3 vertices");
 	}
@@ -316,24 +307,41 @@ uint8_t	Parser::getFormat() const noexcept {
 void	Parser::storeTriangles(
 	const std::vector<Model::Index>& indices
 ) {
+	size_t	attr_sizes[3] = {
+		model_output.getVertexCoords().size(),
+		model_output.getTextureCoords().size(),
+		model_output.getNormalCoords().size()
+	};
 	size_t	nb_triangles = indices.size() - 2;
-	for (size_t i = 0; i < nb_triangles; ++i) {
-		Model::Triangle	triangle{};
 
+	for (size_t i = 0; i < nb_triangles; ++i) {
+
+		// Replace occurence of -1 by last element of corresponding list
+		auto	selectIndex =
+			[indices, attr_sizes](size_t pos, size_t attr) -> int {
+				if (indices[pos][attr] < 0) {
+					return attr_sizes[attr] - 1;
+				} else {
+					return indices[pos][attr] - 1;
+				}
+			};
+
+		Model::Triangle	triangle{};
+		
 		triangle.indices[0] = {
-			.vertex = indices[0].vertex - 1,
-			.texture = indices[0].texture - 1,
-			.normal = indices[0].normal - 1
+			.vertex = selectIndex(0, 0),
+			.texture = selectIndex(0, 1),
+			.normal = selectIndex(0, 2)
 		};
 		triangle.indices[1] = {
-			.vertex = indices[i + 1].vertex - 1,
-			.texture = indices[i + 1].texture - 1,
-			.normal = indices[i + 1].normal - 1
+			.vertex = selectIndex(i + 1, 0),
+			.texture = selectIndex(i + 1, 1),
+			.normal = selectIndex(i + 1, 2)
 		};
 		triangle.indices[2] = {
-			.vertex = indices[i + 2].vertex - 1,
-			.texture = indices[i + 2].texture - 1,
-			.normal = indices[i + 2].normal - 1
+			.vertex = selectIndex(i + 2, 0),
+			.texture = selectIndex(i + 2, 1),
+			.normal = selectIndex(i + 2, 2)
 		};
 		model_output.addTriangle(triangle);
 	}
@@ -341,7 +349,7 @@ void	Parser::storeTriangles(
 
 /**
  * Check if there are missing indices,
- * and add dummies.
+ * and add default ones.
 */
 void	Parser::fixMissingIndices() {
 	if (model_output.getTextureCoords().empty()) {
