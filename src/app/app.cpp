@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/15 10:54:03 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/15 11:35:45 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ bool							App::texture_enabled = true;
 std::optional<App::time_point>	App::texture_enabled_start;
 std::optional<Vect3>			App::rotation_axis;
 float							App::zoom_input = 1.0f;
+Vect3							App::up_axis = Vect3(0.0f, 1.0f, 0.0f);
 
 /* ========================================================================== */
 /*                                   PUBLIC                                   */
@@ -30,7 +31,7 @@ App::App(
 	const std::string& model_file,
 	const std::string& texture_file
 ): window(model_file) {
-	createTextureLoader(texture_file);
+	loadTexture(texture_file);
 	loadModel(model_file);
 	createInstance();
 	setupDebugMessenger();
@@ -160,6 +161,16 @@ void	App::toggleZoom(ZoomInput zoom) noexcept {
 		zoom_input += 0.1f;
 	} else if (zoom == ZoomInput::ZOOM_OUT && zoom_input > 0.2f) {
 		zoom_input -= 0.1f;
+	}
+}
+
+void	App::changeUpAxis(UpAxis axis) noexcept {
+	if (axis == UpAxis::UP_X) {
+		up_axis = Vect3(1.0f, 0.0f, 0.0f);
+	} else if (axis == UpAxis::UP_Y) {
+		up_axis = Vect3(0.0f, 1.0f, 0.0f);
+	} else if (axis == UpAxis::UP_Z) {
+		up_axis = Vect3(0.0f, 0.0f, 1.0f);
 	}
 }
 
@@ -1526,7 +1537,7 @@ void	App::updateVertexPart(
 	camera.view = zoom * scop::lookAt(
 		scop::Vect3(2.0f, 2.0f, 2.0f),
 		scop::Vect3(0.0f, 0.0f, 0.0f),
-		scop::Vect3(0.0f, 1.0f, 0.0f)
+		up_axis
 	);
 
 	// Define persp. projection transformation
@@ -2278,12 +2289,14 @@ void	App::createColorResources() {
  *
  * @todo	Handle other image formats
 */
-void	App::createTextureLoader(const std::string& path) {
+void	App::loadTexture(const std::string& path) {
+	std::unique_ptr<scop::ImageLoader>	image_loader;
 	std::string	file;
+
+	// Only handle ppm files for now
 	if (path.empty()) {
 		file = SCOP_TEXTURE_FILE_HAMSTER_PPM;
 	} else {
-		// Only handle ppm files for now
 		size_t	extension_pos = path.rfind('.');
 		if (extension_pos == std::string::npos) {
 			throw std::invalid_argument(
@@ -2296,7 +2309,7 @@ void	App::createTextureLoader(const std::string& path) {
 		}
 		file = path;
 	}
-	std::unique_ptr<scop::ImageLoader>	image_loader(new PpmLoader(file));
+	image_loader.reset(new PpmLoader(file));
 	image = std::make_unique<scop::Image>(image_loader->load());
 }
 

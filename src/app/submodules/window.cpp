@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:42 by eli               #+#    #+#             */
-/*   Updated: 2023/05/15 10:54:39 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/15 11:11:41 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,7 +174,13 @@ void	keyCallback(
 		case GLFW_KEY_SPACE:
 			return toggleTextureCallback();
 		case GLFW_KEY_ESCAPE:
-			glfwSetWindowShouldClose(window, GLFW_TRUE);
+			return glfwSetWindowShouldClose(window, GLFW_TRUE);
+		case GLFW_KEY_Q:
+			return App::changeUpAxis(UpAxis::UP_X);
+		case GLFW_KEY_W:
+			return App::changeUpAxis(UpAxis::UP_Y);
+		case GLFW_KEY_E:
+			return App::changeUpAxis(UpAxis::UP_Z);
 		default:
 			break;
 	}

@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/15 10:45:29 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/15 11:26:10 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,12 @@ enum ZoomInput {
 	ZOOM_NONE
 };
 
+enum UpAxis {
+	UP_X,
+	UP_Y,
+	UP_Z
+};
+
 /**
  * Core engine.
 */
@@ -117,6 +123,7 @@ public:
 	static void		toggleTexture() noexcept;
 	static void		toggleRotation(RotationAxis axis) noexcept;
 	static void		toggleZoom(ZoomInput input) noexcept;
+	static void		changeUpAxis(UpAxis axis) noexcept;
 
 private:
 	/* ========================================================================= */
@@ -212,6 +219,7 @@ private:
 	static std::optional<time_point>	texture_enabled_start;
 	static std::optional<Vect3>			rotation_axis;
 	static float						zoom_input;
+	static Vect3						up_axis;
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
@@ -356,7 +364,7 @@ private:
 	void							updateFragmentPart(
 		time_point current_time
 	);
-	void							createTextureLoader(
+	void							loadTexture(
 		const std::string& path
 	);
 	void							initUniformBuffer() noexcept;
