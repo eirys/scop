@@ -13,6 +13,10 @@ A simple graphics `.obj` renderer, made with Vulkan.
 - `3`	axis Z
 - `4`	disable rotation
 
+**Zoom**
+- `scroll up/down`	zoom in/out
+- `scroll press`	reset zoom
+
 ## Examples
 
 **Basic cube**

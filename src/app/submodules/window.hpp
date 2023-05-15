@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:36 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 22:30:45 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/15 10:54:22 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ public:
 	/* ========================================================================= */
 	/*                                  TYPEDEF                                  */
 	/* ========================================================================= */
-	
+
 	typedef std::chrono::milliseconds		milliseconds;
 
 	/* ========================================================================= */
@@ -54,16 +54,15 @@ public:
 	Window(Window&& x) = delete;
 	Window& operator=(const Window& rhs) = delete;
 
-	void							retrieveSize(int& width, int& height) const;
-	
 	void							pause() const;
 	void							await() const;
 	bool							alive() const;
 	bool							resized() const noexcept;
 
+	void							retrieveSize(int& width, int& height) const;
 	GLFWwindow*						getWindow() noexcept;
 	GLFWwindow const*				getWindow() const noexcept;
-	
+
 	void							toggleFrameBufferResized(bool resized) noexcept;
 
 private:
@@ -71,7 +70,7 @@ private:
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
 
-	GLFWwindow*						window;
+	GLFWwindow*						window = nullptr;
 	bool							frame_buffer_resized = false;
 
 }; // class Window

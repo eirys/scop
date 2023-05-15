@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/15 01:01:01 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/15 10:45:29 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,14 +208,10 @@ private:
 	/*                               STATIC MEMBERS                              */
 	/* ========================================================================= */
 
-	static
-	bool							texture_enabled;
-	static
-	std::optional<time_point>		texture_enabled_start;
-	static
-	std::optional<Vect3>			rotation_axis;
-	static
-	float							zoom_input;
+	static bool							texture_enabled;
+	static std::optional<time_point>	texture_enabled_start;
+	static std::optional<Vect3>			rotation_axis;
+	static float						zoom_input;
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */

@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/15 01:09:50 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/15 10:54:03 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,12 +156,10 @@ void	App::toggleZoom(ZoomInput zoom) noexcept {
 	if (zoom == ZoomInput::ZOOM_NONE) {
 		zoom_input = 1.0f;
 		return;
-	} else if (zoom == ZoomInput::ZOOM_IN && zoom_input < 1.5f) {
+	} else if (zoom == ZoomInput::ZOOM_IN && zoom_input < 2.0f) {
 		zoom_input += 0.1f;
-	} else if (zoom == ZoomInput::ZOOM_OUT && zoom_input > 0.5f) {
+	} else if (zoom == ZoomInput::ZOOM_OUT && zoom_input > 0.2f) {
 		zoom_input -= 0.1f;
-	} else {
-		LOG("Zoom limit reached. Reset with scroll press.");
 	}
 }
 
@@ -2080,7 +2078,7 @@ void	App::loadModel(const std::string& path) {
 	}
 
 	// Center model
-	Vect3	barycenter = utils::computeBarycenter(vertices);
+	scop::Vect3	barycenter = utils::computeBarycenter(vertices);
 	for (auto& vertex: vertices) {
 		vertex.pos -= barycenter;
 	}

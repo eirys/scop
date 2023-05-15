@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:42 by eli               #+#    #+#             */
-/*   Updated: 2023/05/15 00:29:05 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/15 10:54:39 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,6 @@ void	toggleTextureCallback() noexcept;
 /* ========================================================================== */
 
 Window::Window(const std::string& model_name) {
-	const std::string	window_title = title + model_name;
-	
 	// initialize glfw
 	glfwInit();
 
@@ -62,13 +60,15 @@ Window::Window(const std::string& model_name) {
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
 	// create a window pointer
+	const std::string	window_title = title + model_name;
+
 	window = glfwCreateWindow(width, height, window_title.c_str(), nullptr, nullptr);
 
 	// set pointer to window to `this` instance pointer
 	// so we can access it from the callback functions
 	glfwSetWindowUserPointer(window, this);
 
-	// handle resizing
+	// Setup event callbacks
 	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 	glfwSetKeyCallback(window, keyCallback);
 	glfwSetMouseButtonCallback(window, mouseButtonCallback);
@@ -76,8 +76,10 @@ Window::Window(const std::string& model_name) {
 }
 
 Window::~Window() {
-	// Remove window instance
-	glfwDestroyWindow(window);
+	if (window != nullptr) {
+		// Remove window instance
+		glfwDestroyWindow(window);
+	}
 
 	// Remove glfw instance
 	glfwTerminate();
@@ -88,8 +90,6 @@ Window::~Window() {
 void	Window::retrieveSize(int& width, int& height) const {
 	glfwGetFramebufferSize(window, &width, &height);
 }
-
-/* ========================================================================== */
 
 void	Window::pause() const {
 	int	current_width, current_height;
