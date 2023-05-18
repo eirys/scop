@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/18 15:39:18 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/18 16:41:17 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@
 # include "graphics_pipeline.hpp"
 
 # define SCOP_TEXTURE_FILE_HAMSTER_PPM	"textures/hammy.ppm"
+# define SCOP_MOVE_SPEED				0.005f
 
 namespace scop {
 
@@ -52,6 +53,16 @@ enum ZoomInput {
 	ZOOM_IN,
 	ZOOM_OUT,
 	ZOOM_NONE
+};
+
+enum ObjectDirection {
+	MOVE_FORWARD,
+	MOVE_BACKWARD,
+	MOVE_LEFT,
+	MOVE_RIGHT,
+	MOVE_UP,
+	MOVE_DOWN,
+	MOVE_NONE
 };
 
 /**
@@ -95,6 +106,12 @@ public:
 		RotationAxis axis, 
 		RotationInput value
 	) noexcept;
+	static void							toggleMove(
+		ObjectDirection direction
+	) noexcept;
+	static void							untoggleMove(
+		ObjectDirection direction
+	) noexcept;
 	static void							toggleZoom(ZoomInput input) noexcept;
 	static void							changeUpAxis() noexcept;
 
@@ -118,9 +135,9 @@ private:
 	static std::optional<time_point>	texture_enabled_start;
 	static std::array<scop::Mat4, 3>	rotation_matrices;
 	static std::array<float, 3>			rotation_angles;
+	static scop::Vect3					movement;
 	static float						zoom_input;
 	static size_t						selected_up_axis;
-	static scop::Vect3					translation;
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
@@ -129,7 +146,6 @@ private:
 	void								drawFrame();
 	void								loadModel(const std::string& path);
 	void								loadTexture(const std::string& path);
-	void								updateRotation(size_t i);
 
 }; // class App
 

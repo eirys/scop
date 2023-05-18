@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 14:11:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/17 17:58:44 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/18 17:01:48 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -274,7 +274,7 @@ inline Mat4	perspective(float fov, float aspect_ratio, float near, float far) no
  * @param mat:		matrix to scale
  * @param scale:	vector to scale by
  *
- * @note			only scales the first 3 rows of the matrix
+ * @note Only scales the first 3 rows of the matrix
 */
 inline Mat4	scale(const Mat4& mat, const Vect3& scale) noexcept {
 	Mat4	result(mat);
@@ -284,6 +284,20 @@ inline Mat4	scale(const Mat4& mat, const Vect3& scale) noexcept {
 			result[j * 4 + i] *= scale[j];
 		}
 	}
+	return result;
+}
+
+/**
+ * @brief Produces a translation matrix from the given vector
+ * 
+ * @param dir:		vector to translate by
+*/
+inline Mat4	translate(const Mat4& mat, const Vect3& dir) noexcept {
+	Mat4	result(mat);
+
+	result[3] = dir.x;
+	result[7] = dir.y;
+	result[11] = dir.z;
 	return result;
 }
 

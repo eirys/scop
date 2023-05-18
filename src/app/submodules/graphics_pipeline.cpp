@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 16:34:03 by etran             #+#    #+#             */
-/*   Updated: 2023/05/17 01:55:09 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/18 15:55:38 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ void	GraphicsPipeline::idle() {
 }
 
 void	GraphicsPipeline::render(
-scop::Window& window,
+	scop::Window& window,
 	size_t indices_size
 ) {
 	// Wait fence available, lock it

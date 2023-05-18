@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:42 by eli               #+#    #+#             */
-/*   Updated: 2023/05/18 15:30:53 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/18 16:21:38 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,40 +166,78 @@ void	keyCallback(
 ) {
 	(void)scancode;
 
-	RotationInput	rotation_input = (
-		mods & GLFW_MOD_CONTROL ?
-			RotationInput::ROTATION_INPUT_SUB :
-			RotationInput::ROTATION_INPUT_ADD
-	);
-
 	if (action == GLFW_PRESS) {
 		switch (key) {
-			case GLFW_KEY_SPACE:
-				return toggleTextureCallback();
 			case GLFW_KEY_ESCAPE:
 				return glfwSetWindowShouldClose(window, GLFW_TRUE);
+
+			// Texture toggle
+			case GLFW_KEY_T:
+				return toggleTextureCallback();
+
+			// Camera orientation
 			case GLFW_KEY_TAB:
 				return App::changeUpAxis();
+
+			// Rotation
 			case GLFW_KEY_1:
 				return App::updateRotation(
 					RotationAxis::ROTATION_AXIS_X,
-					rotation_input
+					mods & GLFW_MOD_SHIFT ?
+						RotationInput::ROTATION_INPUT_SUB :
+						RotationInput::ROTATION_INPUT_ADD
 				);
 			case GLFW_KEY_2:
 				return App::updateRotation(
 					RotationAxis::ROTATION_AXIS_Y,
-					rotation_input
+					mods & GLFW_MOD_SHIFT ?
+						RotationInput::ROTATION_INPUT_SUB :
+						RotationInput::ROTATION_INPUT_ADD
 				);
 			case GLFW_KEY_3:
 				return App::updateRotation(
 					RotationAxis::ROTATION_AXIS_Z,
-					rotation_input
+					mods & GLFW_MOD_SHIFT ?
+						RotationInput::ROTATION_INPUT_SUB :
+						RotationInput::ROTATION_INPUT_ADD
 				);
 			case GLFW_KEY_4:
 				return App::updateRotation(
 					RotationAxis::ROTATION_NONE,
 					RotationInput::ROTATION_INPUT_NONE
 				);
+
+			// Translation
+			case GLFW_KEY_W:
+				return App::toggleMove(ObjectDirection::MOVE_FORWARD);
+			case GLFW_KEY_S:
+				return App::toggleMove(ObjectDirection::MOVE_BACKWARD);
+			case GLFW_KEY_A:
+				return App::toggleMove(ObjectDirection::MOVE_LEFT);
+			case GLFW_KEY_D:
+				return App::toggleMove(ObjectDirection::MOVE_RIGHT);
+			case GLFW_KEY_SPACE:
+				return App::toggleMove(ObjectDirection::MOVE_UP);
+			case GLFW_KEY_LEFT_CONTROL:
+				return App::toggleMove(ObjectDirection::MOVE_DOWN);
+
+			default:
+				break;
+		}
+	} else if (action == GLFW_RELEASE) {
+		switch (key) {
+			case GLFW_KEY_W:
+				return App::untoggleMove(ObjectDirection::MOVE_FORWARD);
+			case GLFW_KEY_S:
+				return App::untoggleMove(ObjectDirection::MOVE_BACKWARD);
+			case GLFW_KEY_A:
+				return App::untoggleMove(ObjectDirection::MOVE_LEFT);
+			case GLFW_KEY_D:
+				return App::untoggleMove(ObjectDirection::MOVE_RIGHT);
+			case GLFW_KEY_SPACE:
+				return App::untoggleMove(ObjectDirection::MOVE_UP);
+			case GLFW_KEY_LEFT_CONTROL:
+				return App::untoggleMove(ObjectDirection::MOVE_DOWN);
 			default:
 				break;
 		}

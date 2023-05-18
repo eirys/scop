@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/18 15:41:51 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/18 16:43:53 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,11 @@ std::array<scop::Mat4, 3>		App::rotation_matrices = {
 	scop::Mat4(1.0f),
 	scop::Mat4(1.0f)
 };
+scop::Vect3						App::movement = scop::Vect3(0.0f, 0.0f, 0.0f);
 
 float							App::zoom_input = 1.0f;
 
 size_t							App::selected_up_axis = 1;
-
-scop::Vect3						App::translation = scop::Vect3(0.0f, 0.0f, 0.0f);
 
 /* ========================================================================== */
 /*                                   PUBLIC                                   */
@@ -107,6 +106,56 @@ void	App::updateRotation(RotationAxis dir, RotationInput value) noexcept {
 	}
 }
 
+void	App::toggleMove(ObjectDirection dir) noexcept {
+	switch (dir) {
+		case ObjectDirection::MOVE_FORWARD:
+			if (movement.z == 0.0f)
+				movement.z = -SCOP_MOVE_SPEED;
+			break;
+		case ObjectDirection::MOVE_BACKWARD:
+			if (movement.z == 0.0f)
+				movement.z = SCOP_MOVE_SPEED;
+			break;
+		case ObjectDirection::MOVE_RIGHT:
+			if (movement.x == 0.0f)
+				movement.x = SCOP_MOVE_SPEED;
+			break;
+		case ObjectDirection::MOVE_LEFT:
+			if (movement.x == 0.0f)
+				movement.x = -SCOP_MOVE_SPEED;
+			break;
+		case ObjectDirection::MOVE_UP:
+			if (movement.y == 0.0f)
+				movement.y = SCOP_MOVE_SPEED;
+			break;
+		case ObjectDirection::MOVE_DOWN:
+			if (movement.y == 0.0f)
+				movement.y = -SCOP_MOVE_SPEED;
+			break;
+		default:
+			return;
+	}
+}
+
+void	App::untoggleMove(ObjectDirection dir) noexcept {
+	if (
+		dir == ObjectDirection::MOVE_FORWARD ||
+		dir == ObjectDirection::MOVE_BACKWARD
+	) {
+		movement.z = 0.0f;
+	} else if (
+		dir == ObjectDirection::MOVE_RIGHT ||
+		dir == ObjectDirection::MOVE_LEFT
+	) {
+		movement.x = 0.0f;
+	} else if (
+		dir == ObjectDirection::MOVE_UP ||
+		dir == ObjectDirection::MOVE_DOWN
+	) {
+		movement.y = 0.0f;
+	}
+}
+
 void	App::toggleZoom(ZoomInput zoom) noexcept {
 	if (zoom == ZoomInput::ZOOM_NONE) {
 		zoom_input = 1.0f;
@@ -150,7 +199,11 @@ void	App::loadModel(const std::string& path) {
 				model_textures[index.texture].x,
 				1.0f - model_textures[index.texture].y
 			};
-			math::generateVibrantColor(vertex.color.x, vertex.color.y, vertex.color.z);
+			math::generateVibrantColor(
+				vertex.color.x,
+				vertex.color.y,
+				vertex.color.z
+			);
 			// vertex.normal = model_normals[index.normal_index];
 
 			if (unique_vertices.count(vertex) == 0) {

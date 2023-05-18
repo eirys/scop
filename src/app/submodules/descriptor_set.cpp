@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:56:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/18 15:40:35 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/18 17:03:33 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -255,14 +255,19 @@ void	DescriptorSet::updateVertexPart(
 ) {
 	UniformBufferObject::Camera	camera{};
 
-	static const std::array<Vect3, 3>	up_axis = {
-		Vect3(1.0f, 0.0f, 0.0f),
-		Vect3(0.0f, 1.0f, 0.0f),
-		Vect3(0.0f, 0.0f, 1.0f)
+	static scop::Vect3	translation = Vect3{ 0.0f, 0.0f, 0.0f };
+	static const std::array<scop::Vect3, 3>	up_axis = {
+		scop::Vect3(1.0f, 0.0f, 0.0f),
+		scop::Vect3(0.0f, 1.0f, 0.0f),
+		scop::Vect3(0.0f, 0.0f, 1.0f)
 	};
 
+	// Add translation (object movement)
+	translation += App::movement;
+	camera.translation = translation;
+
 	// Define object transformation model
-	camera.rotation = (
+	camera.model = (
 		App::rotation_matrices[0] *
 		App::rotation_matrices[1] *
 		App::rotation_matrices[2]
@@ -270,7 +275,7 @@ void	DescriptorSet::updateVertexPart(
 
 	// Define camera transformation view
 	camera.view = scop::lookAt(
-		scop::Vect3(5.0f, 1.0f, 5.0f),
+		scop::Vect3(1.0f, 1.0f, 2.0f),
 		scop::Vect3(0.0f, 0.0f, 0.0f),
 		up_axis[App::selected_up_axis]
 	);
@@ -280,7 +285,7 @@ void	DescriptorSet::updateVertexPart(
 		scop::math::radians(45.0f),
 		extent.width / static_cast<float>(extent.height),
 		0.1f,
-		10.0f
+		15.0f
 	);
 	// Invert y axis (because y axis is inverted in Vulkan)
 	camera.proj[5] *= -1;
@@ -294,8 +299,6 @@ void	DescriptorSet::updateVertexPart(
 			scop::App::zoom_input
 		)
 	);
-
-	camera.translation = App::translation;
 
 	memcpy(
 		uniform_buffers_mapped,
