@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 20:12:41 by eli               #+#    #+#             */
-/*   Updated: 2023/05/14 22:27:25 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/17 17:13:34 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,23 +47,16 @@ public:
 	~UniformBufferObject() = default;
 
 	/* ========================================================================= */
-
-	// TODO
-	// void	updateCamera(/* options */);
-	// void	updateTexture();
-
-// private:
-	/* ========================================================================= */
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
 
 	/* VERTEX SHADER =========================================================== */
 
-	alignas(__ALIGNMENT) Camera		camera; // 3 * 64 = 192 bytes
+	alignas(__ALIGNMENT) Camera		camera;
 
 	/* FRAGMENT SHADER ========================================================= */
 
-	alignas(__ALIGNMENT) Texture	texture; // 1 * 64 = 64 bytes
+	alignas(__ALIGNMENT) Texture	texture;
 
 };
 

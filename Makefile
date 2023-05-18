@@ -6,13 +6,15 @@
 #    By: etran <etran@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/05/18 13:56:12 by etran            ###   ########.fr        #
+#    Updated: 2023/05/18 14:21:26 by etran            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 # ============================================================================ #
 #                                    TARGETS                                   #
 # ============================================================================ #
+
+school		:= $(shell env | grep 42paris | wc -l)
 
 # final binary
 NAME		:=	scop
@@ -27,9 +29,9 @@ LIB_DIR		:=	lib
 TOOLS_DIR	:=	tools
 APP_DIR		:=	app
 SUBMOD_DIR	:=	$(APP_DIR)/submodules
-MODEL_DIR	:=	$(APP_DIR)/model
 UTILS_DIR	:=	$(APP_DIR)/utils
 IMG_DIR		:=	$(UTILS_DIR)/img
+MODEL_DIR	:=	$(UTILS_DIR)/model
 
 SUBDIRS		:=	$(APP_DIR) \
 				$(TOOLS_DIR) \
@@ -43,6 +45,7 @@ INC_SUBDIRS	:=	$(addprefix $(SRC_DIR)/,$(SUBDIRS))
 
 # cpp files
 INC_FILES	:=	$(TOOLS_DIR)/utils.hpp \
+				$(TOOLS_DIR)/math.hpp \
 				$(TOOLS_DIR)/matrix.hpp \
 				$(TOOLS_DIR)/vector.hpp \
 				$(UTILS_DIR)/vertex.hpp \
@@ -53,6 +56,15 @@ INC_FILES	:=	$(TOOLS_DIR)/utils.hpp \
 				$(IMG_DIR)/image_handler.hpp \
 				$(IMG_DIR)/ppm_loader.hpp \
 				$(SUBMOD_DIR)/window.hpp \
+				$(SUBMOD_DIR)/debug_module.hpp \
+				$(SUBMOD_DIR)/device.hpp \
+				$(SUBMOD_DIR)/render_target.hpp \
+				$(SUBMOD_DIR)/render_target_resources.hpp \
+				$(SUBMOD_DIR)/descriptor_set.hpp \
+				$(SUBMOD_DIR)/command_buffer.hpp \
+				$(SUBMOD_DIR)/texture_sampler.hpp \
+				$(SUBMOD_DIR)/vertex_input.hpp \
+				$(SUBMOD_DIR)/graphics_pipeline.hpp \
 				$(APP_DIR)/app.hpp
 
 SRC_FILES	:=	$(MODEL_DIR)/model.cpp \
@@ -60,6 +72,15 @@ SRC_FILES	:=	$(MODEL_DIR)/model.cpp \
 				$(IMG_DIR)/ppm_loader.cpp \
 				$(IMG_DIR)/image_handler.cpp \
 				$(SUBMOD_DIR)/window.cpp \
+				$(SUBMOD_DIR)/debug_module.cpp \
+				$(SUBMOD_DIR)/device.cpp \
+				$(SUBMOD_DIR)/render_target.cpp \
+				$(SUBMOD_DIR)/render_target_resources.cpp \
+				$(SUBMOD_DIR)/descriptor_set.cpp \
+				$(SUBMOD_DIR)/command_buffer.cpp \
+				$(SUBMOD_DIR)/texture_sampler.cpp \
+				$(SUBMOD_DIR)/vertex_input.cpp \
+				$(SUBMOD_DIR)/graphics_pipeline.cpp \
 				$(APP_DIR)/app.cpp \
 				main.cpp
 
@@ -75,21 +96,20 @@ SHD_BIN		:=	$(addsuffix .spv,$(SHD))
 
 # compiler
 CXX			:=	c++
+EXTRA		:=	-Wall -Werror -Wextra
 INCLUDES	:=	$(addprefix -I./,\
 				$(INC_SUBDIRS) \
 				$(STB_PATH))
-EXTRA		:=	-Wall -Werror -Wextra
 
 ifdef school
 	EXTRA	+=	-Wno-unused-private-field
 endif
 
-CFLAGS		:=	$(EXTRA) \
+CFLAGS		:=	$(EXTRA)\
 				-std=c++17 \
 				$(INCLUDES) \
-				-O3 \
-				-g \
 				-DNDEBUG \
+				-O3 \
 				-D__DEBUG
 
 LDFLAGS		:=	-lglfw \

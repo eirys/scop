@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 13:54:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/14 18:30:34 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/17 17:56:42 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,9 @@ struct Vect3 {
 	 * @brief Returns the dot product of the vector with another vector
 	 */
 	float	dot(const Vect3& rhs) const noexcept {
-		return x * rhs.x + y * rhs.y + z * rhs.z;
+		return static_cast<float>(
+			std::fma(x, rhs.x, std::fma(y, rhs.y, std::fma(z, rhs.z, 0)))
+		);
 	}
 
 	/**
@@ -151,9 +153,9 @@ struct Vect3 {
 	*/
 	Vect3	cross(const Vect3& rhs) const noexcept {
 		return Vect3{
-			y * rhs.z - z * rhs.y,
-			z * rhs.x - x * rhs.z,
-			x * rhs.y - y * rhs.x
+			static_cast<float>(std::fma(y, rhs.z, std::fma(-z, rhs.y, 0))),
+			static_cast<float>(std::fma(z, rhs.x, std::fma(-x, rhs.z, 0))),
+			static_cast<float>(std::fma(x, rhs.y, std::fma(-y, rhs.x, 0)))
 		};
 	}
 

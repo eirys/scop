@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 14:11:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/15 00:25:33 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/17 17:58:44 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ struct Mat4 {
 	}
 
 	/* OPERATORS =============================================================== */
-	
+
 	Mat4&	operator+=(const Mat4& rhs) noexcept {
 		for (size_t i = 0; i < 16; i++) {
 			mat[i] += rhs.mat[i];
@@ -116,7 +116,9 @@ struct Mat4 {
 		for (size_t i = 0; i < 4; i++) {
 			for (size_t j = 0; j < 4; j++) {
 				for (size_t k = 0; k < 4; k++) {
-					result[i * 4 + j] += mat[i * 4 + k] * rhs.mat[k * 4 + j];
+					result[i * 4 + j] = static_cast<float>(
+						std::fma(mat[i * 4 + k], rhs.mat[k * 4 + j], result[i * 4 + j])
+					);
 				}
 			}
 		}
@@ -145,10 +147,31 @@ struct Mat4 {
 
 	Vect3	operator*(const Vect3& rhs) const noexcept {
 		Vect3 result;
-		result.x = mat[0] * rhs.x + mat[1] * rhs.y + mat[2] * rhs.z + mat[3];
-		result.y = mat[4] * rhs.x + mat[5] * rhs.y + mat[6] * rhs.z + mat[7];
-		result.z = mat[8] * rhs.x + mat[9] * rhs.y + mat[10] * rhs.z + mat[11];
+		// result.x = mat[0] * rhs.x + mat[1] * rhs.y + mat[2] * rhs.z + mat[3];
+		// result.y = mat[4] * rhs.x + mat[5] * rhs.y + mat[6] * rhs.z + mat[7];
+		// result.z = mat[8] * rhs.x + mat[9] * rhs.y + mat[10] * rhs.z + mat[11];
 		// w component of Vect4 ignored (assumed to be 1)
+		result.x = static_cast<float>(
+			std::fma(
+				mat[0],
+				rhs.x,
+				std::fma(mat[1], rhs.y, std::fma(mat[2], rhs.z, mat[3]))
+			)
+		);
+		result.y = static_cast<float>(
+			std::fma(
+				mat[4],
+				rhs.x,
+				std::fma(mat[5], rhs.y, std::fma(mat[6], rhs.z, mat[7]))
+			)
+		);
+		result.z = static_cast<float>(
+			std::fma(
+				mat[8],
+				rhs.x,
+				std::fma(mat[9], rhs.y, std::fma(mat[10], rhs.z, mat[11]))
+			)
+		);
 		return result;
 	}
 
@@ -167,19 +190,28 @@ inline Mat4	rotate(float angle, const Vect3& axis) noexcept {
 
 	return Mat4{
 		// Row 1
-		u.x * u.x * (1 - c) + c,
-		u.x * u.y * (1 - c) - u.z * s,
-		u.x * u.z * (1 - c) + u.y * s,
+		// u.x * u.x * (1 - c) + c,
+		static_cast<float>(std::fma(u.x, std::fma(u.x, 1 - c, 0), c)),
+		// u.x * u.y * (1 - c) - u.z * s,
+		static_cast<float>(std::fma(u.x, std::fma(u.y, 1 - c, 0), std::fma(-u.z, s, 0))),
+		// u.x * u.z * (1 - c) + u.y * s,
+		static_cast<float>(std::fma(u.x, std::fma(u.z, 1 - c, 0), std::fma(u.y, s, 0))),
 		0,
 		// Row 2
-		u.y * u.x * (1 - c) + u.z * s,
-		u.y * u.y * (1 - c) + c,
-		u.y * u.z * (1 - c) - u.x * s,
+		// u.y * u.x * (1 - c) + u.z * s,
+		static_cast<float>(std::fma(u.y, std::fma(u.x, 1 - c, 0), std::fma(u.z, s, 0))),
+		// u.y * u.y * (1 - c) + c,
+		static_cast<float>(std::fma(u.y, std::fma(u.y, 1 - c, 0), c)),
+		// u.y * u.z * (1 - c) - u.x * s,
+		static_cast<float>(std::fma(u.y, std::fma(u.z, 1 - c, 0), std::fma(-u.x, s, 0))),
 		0,
 		// Row 3
-		u.z * u.x * (1 - c) - u.y * s,
-		u.z * u.y * (1 - c) + u.x * s,
-		u.z * u.z * (1 - c) + c,
+		// u.z * u.x * (1 - c) - u.y * s,
+		static_cast<float>(std::fma(u.z, std::fma(u.x, 1 - c, 0), std::fma(-u.y, s, 0))),
+		// u.z * u.y * (1 - c) + u.x * s,
+		static_cast<float>(std::fma(u.z, std::fma(u.y, 1 - c, 0), std::fma(u.x, s, 0))),
+		// u.z * u.z * (1 - c) + c,
+		static_cast<float>(std::fma(u.z, std::fma(u.z, 1 - c, 0), c)),
 		0,
 		// Row 4
 		0, 0, 0, 1
@@ -188,7 +220,7 @@ inline Mat4	rotate(float angle, const Vect3& axis) noexcept {
 
 /**
  * @brief Produces lookAt matrix
- * 
+ *
  * @param eye:		position of the camera
  * @param center:	position of the object to look at
  * @param up:		up vector, usually (0, 0, 1). Used to determine
@@ -214,7 +246,7 @@ inline Mat4	lookAt(const Vect3& eye, const Vect3& center, const Vect3& up) noexc
 
 /**
  * @brief Produces orthographic projection matrix
- * 
+ *
  * @param fov			field of view in radians
  * @param aspect_ratio	aspect ratio of the screen
  * @param near			near clipping plane
@@ -238,10 +270,10 @@ inline Mat4	perspective(float fov, float aspect_ratio, float near, float far) no
 
 /**
  * @brief Scales the matrix by the given vector
- * 
+ *
  * @param mat:		matrix to scale
  * @param scale:	vector to scale by
- * 
+ *
  * @note			only scales the first 3 rows of the matrix
 */
 inline Mat4	scale(const Mat4& mat, const Vect3& scale) noexcept {

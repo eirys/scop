@@ -6,12 +6,11 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:36 by eli               #+#    #+#             */
-/*   Updated: 2023/05/15 10:54:22 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/16 16:49:31 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef WINDOW_HPP
-# define WINDOW_HPP
+#pragma once
 
 // Window handler
 # include <GLFW/glfw3.h>
@@ -76,5 +75,3 @@ private:
 }; // class Window
 
 } // namespace scop
-
-#endif
