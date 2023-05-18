@@ -6,14 +6,14 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 20:12:41 by eli               #+#    #+#             */
-/*   Updated: 2023/05/17 17:13:34 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/18 15:41:21 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef UNIFORM_BUFFER_OBJECT_HPP
 # define UNIFORM_BUFFER_OBJECT_HPP
 
-# define __ALIGNMENT 16
+# define __ALIGNMENT 64
 
 # include "matrix.hpp"
 
@@ -26,9 +26,11 @@ public:
 	/* ========================================================================= */
 
 	struct Camera {
-		scop::Mat4	model;
+		scop::Mat4	rotation;
 		scop::Mat4	view;
 		scop::Mat4	proj;
+		scop::Mat4	zoom;
+		scop::Vect3	translation;
 	};
 
 	struct Texture {

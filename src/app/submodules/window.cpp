@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:42 by eli               #+#    #+#             */
-/*   Updated: 2023/05/18 14:16:30 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/18 15:30:53 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,33 +165,44 @@ void	keyCallback(
 	int mods
 ) {
 	(void)scancode;
-	(void)mods;
 
-	if (action != GLFW_PRESS) {
-		return;
-	}
-	// Ignore everything but those keys
-	switch (key) {
-		case GLFW_KEY_1:
-			return App::toggleRotation(RotationAxis::ROTATION_X);
-		case GLFW_KEY_2:
-			return App::toggleRotation(RotationAxis::ROTATION_Y);
-		case GLFW_KEY_3:
-			return App::toggleRotation(RotationAxis::ROTATION_Z);
-		case GLFW_KEY_4:
-			return App::toggleRotation(RotationAxis::ROTATION_NONE);
-		case GLFW_KEY_SPACE:
-			return toggleTextureCallback();
-		case GLFW_KEY_ESCAPE:
-			return glfwSetWindowShouldClose(window, GLFW_TRUE);
-		case GLFW_KEY_Q:
-			return App::changeUpAxis(UpAxis::UP_X);
-		case GLFW_KEY_W:
-			return App::changeUpAxis(UpAxis::UP_Y);
-		case GLFW_KEY_E:
-			return App::changeUpAxis(UpAxis::UP_Z);
-		default:
-			break;
+	RotationInput	rotation_input = (
+		mods & GLFW_MOD_CONTROL ?
+			RotationInput::ROTATION_INPUT_SUB :
+			RotationInput::ROTATION_INPUT_ADD
+	);
+
+	if (action == GLFW_PRESS) {
+		switch (key) {
+			case GLFW_KEY_SPACE:
+				return toggleTextureCallback();
+			case GLFW_KEY_ESCAPE:
+				return glfwSetWindowShouldClose(window, GLFW_TRUE);
+			case GLFW_KEY_TAB:
+				return App::changeUpAxis();
+			case GLFW_KEY_1:
+				return App::updateRotation(
+					RotationAxis::ROTATION_AXIS_X,
+					rotation_input
+				);
+			case GLFW_KEY_2:
+				return App::updateRotation(
+					RotationAxis::ROTATION_AXIS_Y,
+					rotation_input
+				);
+			case GLFW_KEY_3:
+				return App::updateRotation(
+					RotationAxis::ROTATION_AXIS_Z,
+					rotation_input
+				);
+			case GLFW_KEY_4:
+				return App::updateRotation(
+					RotationAxis::ROTATION_NONE,
+					RotationInput::ROTATION_INPUT_NONE
+				);
+			default:
+				break;
+		}
 	}
 }
 
@@ -201,8 +212,6 @@ void	keyCallback(
 void	toggleTextureCallback() noexcept {
 	using std::chrono::steady_clock;
 
-	// TODO: try disabling delay
-
 	static steady_clock::time_point	key_pressed{};
 
 	steady_clock::time_point	now = steady_clock::now();
@@ -211,7 +220,7 @@ void	toggleTextureCallback() noexcept {
 			now - key_pressed
 		);
 
-	// Avoid key spamming
+	// Waits for the color transition to finish
 	if (duration < Window::spam_delay) {
 		return;
 	}

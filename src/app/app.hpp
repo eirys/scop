@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/16 16:01:51 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/18 15:39:18 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,24 +22,13 @@
 # include <GLFW/glfw3.h>
 
 // Std
-# include <iostream>
-# include <stdexcept>
-# include <cstdlib>
-# include <vector>
-# include <optional>
-# include <limits>
-# include <algorithm>
-# include <cassert>
-# include <chrono>
-# include <unordered_map>
-# include <memory>
+# include <memory> // std::unique_ptr
 
 # include "window.hpp"
 # include "utils.hpp"
+# include "matrix.hpp"
 # include "vertex.hpp"
-# include "uniform_buffer_object.hpp"
 # include "image_handler.hpp"
-# include "ppm_loader.hpp"
 # include "graphics_pipeline.hpp"
 
 # define SCOP_TEXTURE_FILE_HAMSTER_PPM	"textures/hammy.ppm"
@@ -47,22 +36,22 @@
 namespace scop {
 
 enum RotationAxis {
-	ROTATION_X,
-	ROTATION_Y,
-	ROTATION_Z,
-	ROTATION_NONE
+	ROTATION_AXIS_X = 0,
+	ROTATION_AXIS_Y = 1,
+	ROTATION_AXIS_Z = 2,
+	ROTATION_NONE = -1
+};
+
+enum RotationInput {
+	ROTATION_INPUT_ADD,
+	ROTATION_INPUT_SUB,
+	ROTATION_INPUT_NONE
 };
 
 enum ZoomInput {
 	ZOOM_IN,
 	ZOOM_OUT,
 	ZOOM_NONE
-};
-
-enum UpAxis {
-	UP_X,
-	UP_Y,
-	UP_Z
 };
 
 /**
@@ -78,7 +67,7 @@ private:
 
 public:
 
-	friend class graphics::DescriptorSet;
+	friend graphics::DescriptorSet;
 
 	/* ========================================================================= */
 	/*                               CONST MEMBERS                               */
@@ -102,9 +91,12 @@ public:
 
 	void								run();
 	static void							toggleTexture() noexcept;
-	static void							toggleRotation(RotationAxis axis) noexcept;
+	static void							updateRotation(
+		RotationAxis axis, 
+		RotationInput value
+	) noexcept;
 	static void							toggleZoom(ZoomInput input) noexcept;
-	static void							changeUpAxis(UpAxis axis) noexcept;
+	static void							changeUpAxis() noexcept;
 
 private:
 	/* ========================================================================= */
@@ -124,21 +116,20 @@ private:
 
 	static bool							texture_enabled;
 	static std::optional<time_point>	texture_enabled_start;
-	static std::optional<Vect3>			rotation_axis;
+	static std::array<scop::Mat4, 3>	rotation_matrices;
+	static std::array<float, 3>			rotation_angles;
 	static float						zoom_input;
-	static Vect3						up_axis;
+	static size_t						selected_up_axis;
+	static scop::Vect3					translation;
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
 	/* ========================================================================= */
 
-	void							drawFrame();
-
-	void							loadModel(
-		const std::string& path
-	);
-	void							loadTexture(const std::string& path);
-
+	void								drawFrame();
+	void								loadModel(const std::string& path);
+	void								loadTexture(const std::string& path);
+	void								updateRotation(size_t i);
 
 }; // class App
 

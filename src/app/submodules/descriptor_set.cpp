@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:56:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/18 14:24:05 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/18 15:40:35 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,10 +62,9 @@ void	DescriptorSet::destroy(
  * Update transformation of vertices
 */
 void	DescriptorSet::updateUniformBuffer(VkExtent2D extent) {
-	time_point	current_time = std::chrono::high_resolution_clock::now();
 
-	updateVertexPart(extent, current_time);
-	updateFragmentPart(current_time);
+	updateVertexPart(extent);
+	updateFragmentPart();
 }
 
 /* ========================================================================== */
@@ -252,35 +251,28 @@ void	DescriptorSet::initUniformBuffer() noexcept {
 }
 
 void	DescriptorSet::updateVertexPart(
-	VkExtent2D extent,
-	time_point current_time
+	VkExtent2D extent
 ) {
-	static time_point	start_time = std::chrono::high_resolution_clock::now();
-	float	time = std::chrono::duration<float, std::chrono::seconds::period>(
-		current_time - start_time
-	).count();
-
 	UniformBufferObject::Camera	camera{};
 
+	static const std::array<Vect3, 3>	up_axis = {
+		Vect3(1.0f, 0.0f, 0.0f),
+		Vect3(0.0f, 1.0f, 0.0f),
+		Vect3(0.0f, 0.0f, 1.0f)
+	};
+
 	// Define object transformation model
-	if (scop::App::rotation_axis.has_value()) {
-		camera.model = scop::rotate(
-			time * scop::math::radians(90.0f),
-			scop::App::rotation_axis.value()
-		);
-	} else {
-		camera.model = scop::Mat4(1.0f);
-	}
+	camera.rotation = (
+		App::rotation_matrices[0] *
+		App::rotation_matrices[1] *
+		App::rotation_matrices[2]
+	);
 
 	// Define camera transformation view
-	scop::Mat4	zoom = scop::scale(
-		scop::Mat4(1.0f),
-		scop::Vect3(scop::App::zoom_input, scop::App::zoom_input, scop::App::zoom_input)
-	);
-	camera.view = zoom * scop::lookAt(
+	camera.view = scop::lookAt(
 		scop::Vect3(5.0f, 1.0f, 5.0f),
 		scop::Vect3(0.0f, 0.0f, 0.0f),
-		App::up_axis
+		up_axis[App::selected_up_axis]
 	);
 
 	// Define persp. projection transformation
@@ -293,6 +285,18 @@ void	DescriptorSet::updateVertexPart(
 	// Invert y axis (because y axis is inverted in Vulkan)
 	camera.proj[5] *= -1;
 
+	// Define zoom factor
+	camera.zoom = scop::scale(
+		scop::Mat4(1.0f),
+		scop::Vect3(
+			scop::App::zoom_input,
+			scop::App::zoom_input,
+			scop::App::zoom_input
+		)
+	);
+
+	camera.translation = App::translation;
+
 	memcpy(
 		uniform_buffers_mapped,
 		&camera,
@@ -300,15 +304,13 @@ void	DescriptorSet::updateVertexPart(
 	);
 }
 
-void	DescriptorSet::updateFragmentPart(
-	time_point current_time
-) {
+void	DescriptorSet::updateFragmentPart() {
 	// Only udpate if it was recently toggled
 	if (!App::texture_enabled_start.has_value()) {
 		return;
 	}
-
 	UniformBufferObject::Texture	texture;
+	time_point	current_time = std::chrono::high_resolution_clock::now();
 
 	// Transition from 0 to 1 in /*transition_duration*/ ms	float
 	float	time = std::chrono::duration<float, std::chrono::milliseconds::period>(

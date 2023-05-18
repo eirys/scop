@@ -6,24 +6,33 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/17 18:08:29 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/18 15:41:51 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "app.hpp"
-#include "matrix.hpp"
 #include "model.hpp"
 #include "parser.hpp"
-#include "image_handler.hpp"
+#include "ppm_loader.hpp"
 #include "math.hpp"
 
 namespace scop {
 
 bool							App::texture_enabled = true;
 std::optional<App::time_point>	App::texture_enabled_start;
-std::optional<Vect3>			App::rotation_axis;
+
+std::array<float, 3>			App::rotation_angles = { 0.0f, 0.0f, 0.0f };
+std::array<scop::Mat4, 3>		App::rotation_matrices = {
+	scop::Mat4(1.0f),
+	scop::Mat4(1.0f),
+	scop::Mat4(1.0f)
+};
+
 float							App::zoom_input = 1.0f;
-Vect3							App::up_axis = Vect3(0.0f, 1.0f, 0.0f);
+
+size_t							App::selected_up_axis = 1;
+
+scop::Vect3						App::translation = scop::Vect3(0.0f, 0.0f, 0.0f);
 
 /* ========================================================================== */
 /*                                   PUBLIC                                   */
@@ -67,15 +76,34 @@ void	App::toggleTexture() noexcept {
 /**
  * On toggle, changes the rotation of the model.
 */
-void	App::toggleRotation(RotationAxis axis) noexcept {
-	if (axis == RotationAxis::ROTATION_X) {
-		rotation_axis = Vect3(1.0f, 0.0f, 0.0f);
-	} else if (axis == RotationAxis::ROTATION_Y) {
-		rotation_axis = Vect3(0.0f, 1.0f, 0.0f);
-	} else if (axis == RotationAxis::ROTATION_Z) {
-		rotation_axis = Vect3(0.0f, 0.0f, 1.0f);
-	} else {
-		rotation_axis.reset();
+void	App::updateRotation(RotationAxis dir, RotationInput value) noexcept {
+	if (dir == RotationAxis::ROTATION_NONE) {
+		rotation_matrices[0] = scop::Mat4(1.0f);
+		rotation_matrices[1] = scop::Mat4(1.0f);
+		rotation_matrices[2] = scop::Mat4(1.0f);
+
+		rotation_angles[0] = 0.0f;
+		rotation_angles[1] = 0.0f;
+		rotation_angles[2] = 0.0f;
+		return;
+	}
+
+	static const std::array<scop::Vect3, 3>	axis = {
+		scop::Vect3(1.0f, 0.0f, 0.0f),
+		scop::Vect3(0.0f, 1.0f, 0.0f),
+		scop::Vect3(0.0f, 0.0f, 1.0f)
+	};
+
+	for (size_t i = 0; i < 4; ++i) {
+		if (i == static_cast<size_t>(dir)) {
+			rotation_angles[i] += (
+				value == RotationInput::ROTATION_INPUT_ADD ? +10 :-10
+			);
+			rotation_matrices[i] = scop::rotate(
+				scop::math::radians(rotation_angles[i]),
+				axis[i]
+			);
+		}
 	}
 }
 
@@ -90,26 +118,14 @@ void	App::toggleZoom(ZoomInput zoom) noexcept {
 	}
 }
 
-void	App::changeUpAxis(UpAxis axis) noexcept {
-	if (axis == UpAxis::UP_X) {
-		up_axis = Vect3(1.0f, 0.0f, 0.0f);
-	} else if (axis == UpAxis::UP_Y) {
-		up_axis = Vect3(0.0f, 1.0f, 0.0f);
-	} else if (axis == UpAxis::UP_Z) {
-		up_axis = Vect3(0.0f, 0.0f, 1.0f);
-	}
+void	App::changeUpAxis() noexcept {
+	selected_up_axis = (selected_up_axis + 1) % 3;
 }
 
 /* ========================================================================== */
 /*                                   PRIVATE                                  */
 /* ========================================================================== */
 
-/**
- * Fence awaited: the cpu waits until the frame is ready to be retrieved.
- *
- * Semaphores awaited: the gpu waits until the command buffer
- * is done executing, aka the image is available in the swap chain.
-*/
 void	App::drawFrame() {
 	graphics_pipeline.render(window, indices.size());
 }
