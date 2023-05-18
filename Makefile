@@ -6,7 +6,7 @@
 #    By: etran <etran@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/05/13 23:16:22 by etran            ###   ########.fr        #
+#    Updated: 2023/05/18 13:56:12 by etran            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -75,10 +75,14 @@ SHD_BIN		:=	$(addsuffix .spv,$(SHD))
 
 # compiler
 CXX			:=	c++
-EXTRA		:=	-Wall -Werror -Wextra
 INCLUDES	:=	$(addprefix -I./,\
 				$(INC_SUBDIRS) \
 				$(STB_PATH))
+EXTRA		:=	-Wall -Werror -Wextra
+
+ifdef school
+	EXTRA	+=	-Wno-unused-private-field
+endif
 
 CFLAGS		:=	$(EXTRA) \
 				-std=c++17 \
@@ -120,7 +124,7 @@ $(NAME): $(SHD_BIN) $(OBJ)
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(INC)
 	@mkdir -p $(OBJ_DIR) $(OBJ_SUBDIRS)
 	@echo "Compiling file $<..."
-	@$(CXX) $(CFLAGS) -c $< -o $@ $(LDFLAGS)
+	@$(CXX) $(CFLAGS) -c $< -o $@
 
 $(SHD_DIR)/%.spv: $(SHD_DIR)/shader.%
 	@echo "Compiling shader $<..."
