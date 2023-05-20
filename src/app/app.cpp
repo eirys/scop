@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/18 16:43:53 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/19 01:26:48 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ std::array<scop::Mat4, 3>		App::rotation_matrices = {
 	scop::Mat4(1.0f)
 };
 scop::Vect3						App::movement = scop::Vect3(0.0f, 0.0f, 0.0f);
+scop::Vect3						App::position = scop::Vect3(0.0f, 0.0f, 0.0f);
 
 float							App::zoom_input = 1.0f;
 
@@ -72,21 +73,22 @@ void	App::toggleTexture() noexcept {
 	);
 }
 
+void	App::resetModel() noexcept {
+	rotation_matrices[0] = scop::Mat4(1.0f);
+	rotation_matrices[1] = scop::Mat4(1.0f);
+	rotation_matrices[2] = scop::Mat4(1.0f);
+
+	rotation_angles[0] = 0.0f;
+	rotation_angles[1] = 0.0f;
+	rotation_angles[2] = 0.0f;
+
+	position = scop::Vect3(0.0f, 0.0f, 0.0f);
+}
+
 /**
  * On toggle, changes the rotation of the model.
 */
 void	App::updateRotation(RotationAxis dir, RotationInput value) noexcept {
-	if (dir == RotationAxis::ROTATION_NONE) {
-		rotation_matrices[0] = scop::Mat4(1.0f);
-		rotation_matrices[1] = scop::Mat4(1.0f);
-		rotation_matrices[2] = scop::Mat4(1.0f);
-
-		rotation_angles[0] = 0.0f;
-		rotation_angles[1] = 0.0f;
-		rotation_angles[2] = 0.0f;
-		return;
-	}
-
 	static const std::array<scop::Vect3, 3>	axis = {
 		scop::Vect3(1.0f, 0.0f, 0.0f),
 		scop::Vect3(0.0f, 1.0f, 0.0f),
@@ -106,6 +108,9 @@ void	App::updateRotation(RotationAxis dir, RotationInput value) noexcept {
 	}
 }
 
+/**
+ * On toggle, the model is moved in the given direction.
+*/
 void	App::toggleMove(ObjectDirection dir) noexcept {
 	switch (dir) {
 		case ObjectDirection::MOVE_FORWARD:
@@ -137,6 +142,9 @@ void	App::toggleMove(ObjectDirection dir) noexcept {
 	}
 }
 
+/**
+ * On untoggle, the model stops moving in the given direction.
+*/
 void	App::untoggleMove(ObjectDirection dir) noexcept {
 	if (
 		dir == ObjectDirection::MOVE_FORWARD ||
@@ -181,7 +189,7 @@ void	App::drawFrame() {
 
 void	App::loadModel(const std::string& path) {
 	scop::obj::Parser	parser;
-	scop::obj::Model	model = parser.parseFile(path.c_str());
+	scop::obj::Model	model = parser.parseFile(path.c_str(), *image);
 	std::unordered_map<scop::Vertex, uint32_t>	unique_vertices{};
 
 	const auto&	model_vertices = model.getVertexCoords();

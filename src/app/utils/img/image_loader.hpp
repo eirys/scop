@@ -6,12 +6,11 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 10:12:47 by eli               #+#    #+#             */
-/*   Updated: 2023/05/15 01:04:26 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/18 22:45:59 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef IMAGE_LOADER_HPP
-# define IMAGE_LOADER_HPP
+#pragma once
 
 // Std
 # include <string>
@@ -95,5 +94,3 @@ protected:
 }; // class ImageLoader
 
 } // namespace scop
-
-#endif

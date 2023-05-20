@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:39:20 by etran             #+#    #+#             */
-/*   Updated: 2023/05/18 15:19:54 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/19 01:10:06 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,10 +82,8 @@ private:
 	);
 	void					createUniformBuffers(Device& device);
 	void					initUniformBuffer() noexcept;
-	void					updateVertexPart(
-		VkExtent2D extent
-	);
-	void					updateFragmentPart();
+	void					updateCamera(VkExtent2D extent);
+	void					updateTexture();
 
 }; // class DescriptorSet
 

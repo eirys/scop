@@ -6,12 +6,11 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:02:06 by etran             #+#    #+#             */
-/*   Updated: 2023/05/15 01:03:54 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/18 22:45:21 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PARSER_HPP
-# define PARSER_HPP
+#pragma once
 
 // Std
 # include <string>
@@ -26,6 +25,8 @@ static constexpr const uint8_t	normal_bit = 1 << 2; // 4
 static constexpr const size_t	nb_line_types = 10;
 
 namespace scop {
+class Image;
+
 namespace obj {
 
 /**
@@ -58,7 +59,10 @@ public:
 
 	/* ========================================================================= */
 
-	Model			parseFile(const std::string& file_name);
+	Model			parseFile(
+		const std::string& file_name,
+		const scop::Image& texture
+	);
 
 private:
 	/* ========================================================================= */
@@ -161,7 +165,7 @@ private:
 	void				storeTriangles(
 		const std::vector<Model::Index>& indices
 	);
-	void				fixMissingIndices();
+	void				fixMissingIndices(const scop::Image& img) noexcept;
 
 }; // class Parser
 
@@ -179,5 +183,3 @@ class Parser {
 
 } // namespace mtl
 } // namespace scop
-
-#endif

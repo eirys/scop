@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:42 by eli               #+#    #+#             */
-/*   Updated: 2023/05/18 16:21:38 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/19 01:23:51 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,11 +201,6 @@ void	keyCallback(
 						RotationInput::ROTATION_INPUT_SUB :
 						RotationInput::ROTATION_INPUT_ADD
 				);
-			case GLFW_KEY_4:
-				return App::updateRotation(
-					RotationAxis::ROTATION_NONE,
-					RotationInput::ROTATION_INPUT_NONE
-				);
 
 			// Translation
 			case GLFW_KEY_W:
@@ -221,11 +216,18 @@ void	keyCallback(
 			case GLFW_KEY_LEFT_CONTROL:
 				return App::toggleMove(ObjectDirection::MOVE_DOWN);
 
+			// Reset
+			case GLFW_KEY_R:
+				return App::resetModel();
+
 			default:
 				break;
 		}
 	} else if (action == GLFW_RELEASE) {
 		switch (key) {
+			// TODO: Rotation
+
+			// Translation
 			case GLFW_KEY_W:
 				return App::untoggleMove(ObjectDirection::MOVE_FORWARD);
 			case GLFW_KEY_S:

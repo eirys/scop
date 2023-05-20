@@ -6,12 +6,11 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 20:12:41 by eli               #+#    #+#             */
-/*   Updated: 2023/05/18 17:03:41 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/19 00:59:37 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef UNIFORM_BUFFER_OBJECT_HPP
-# define UNIFORM_BUFFER_OBJECT_HPP
+#pragma once
 
 # define __ALIGNMENT 64
 
@@ -31,6 +30,7 @@ public:
 		scop::Mat4	proj;
 		scop::Mat4	zoom;
 		scop::Vect3	translation;
+		scop::Vect3 barycenter;
 	};
 
 	struct Texture {
@@ -63,5 +63,3 @@ public:
 };
 
 } // namespace scop
-
-#endif

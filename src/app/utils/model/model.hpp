@@ -6,30 +6,38 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 19:23:53 by eli               #+#    #+#             */
-/*   Updated: 2023/05/14 18:09:27 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/19 01:04:15 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MODEL_HPP
-# define MODEL_HPP
+#pragma once
 
 // Std
 # include <vector>
 # include <array>
 # include <map>
-
-# include "vector.hpp"
-# include "vertex.hpp"
+# include <stdexcept>
 
 namespace scop {
+class Image;
+struct Vect2;
+struct Vect3;
+struct Vertex;
+
 namespace obj {
 
+/**
+ * Contains .obj file data.
+*/
 class Model {
 public:
 	/* ========================================================================= */
 	/*                                HELPER CLASS                               */
 	/* ========================================================================= */
 
+	/**
+	 * Contains vertex, texture and normal indices of a set. (Face parsing)
+	*/
 	struct Index {
 		int							vertex;
 		int							texture;
@@ -53,21 +61,12 @@ public:
 		}
 	};
 
+	/**
+	 * Contains 3 sets of indices of a triangle.
+	*/
 	struct Triangle {
 		std::array<Index, 3>		indices;
 	};
-
-	/* ========================================================================= */
-	/*                               CONST MEMBERS                               */
-	/* ========================================================================= */
-
-	const std::vector<Vect2>		default_texture_coords = {
-		{ 0.0f, 0.0f },
-		{ 1.0f, 0.0f },
-		{ 1.0f, 1.0f },
-		{ 0.0f, 1.0f }
-	};
-	const std::vector<Vect3>		default_normal_coords = {};	// TODO
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
@@ -82,35 +81,33 @@ public:
 
 	/* ========================================================================= */
 
-	void								addVertex(const Vect3& vertex);
-	void								addTexture(const Vect2& texture);
-	void								addNormal(const Vect3& normal);
-	void								addIndex(const Index& index);
-	void								addTriangle(const Triangle& triangle);
+	void							addVertex(const Vect3& vertex);
+	void							addTexture(const Vect2& texture);
+	void							addNormal(const Vect3& normal);
+	void							addIndex(const Index& index);
+	void							addTriangle(const Triangle& triangle);
 
-	void								setDefaultTextureCoords();
-	void								setDefaultNormalCoords();
+	void							setDefaultTextureCoords(const scop::Image& img);
+	void							setDefaultNormalCoords();
 
-	const std::vector<Vect3>&			getVertexCoords() const noexcept;
-	const std::vector<Vect2>&			getTextureCoords() const noexcept;
-	const std::vector<Vect3>&			getNormalCoords() const noexcept;
-	const std::vector<Index>&			getIndices() const noexcept;
-	const std::vector<Triangle>&		getTriangles() const noexcept;
+	const std::vector<Vect3>&		getVertexCoords() const noexcept;
+	const std::vector<Vect2>&		getTextureCoords() const noexcept;
+	const std::vector<Vect3>&		getNormalCoords() const noexcept;
+	const std::vector<Index>&		getIndices() const noexcept;
+	const std::vector<Triangle>&	getTriangles() const noexcept;
 
 private:
 	/* ========================================================================= */
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
 
-	std::vector<Vect3>		vertex_coords;
-	std::vector<Vect2>		texture_coords;
-	std::vector<Vect3>		normal_coords;
-	std::vector<Index>		indices;
-	std::vector<Triangle>	triangles;
+	std::vector<scop::Vect3>		vertex_coords;
+	std::vector<scop::Vect2>		texture_coords;
+	std::vector<scop::Vect3>		normal_coords;
+	std::vector<Index>				indices;
+	std::vector<Triangle>			triangles;
 
 }; // class Model
 
 } // namespace obj
 } // namespace scop
-
-#endif

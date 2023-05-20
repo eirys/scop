@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/16 13:03:48 by etran             #+#    #+#             */
-/*   Updated: 2023/05/16 17:35:45 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/18 19:34:16 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ void	VertexInput::createIndexBuffer(
 	VkCommandPool command_pool,
 	const std::vector<uint32_t>& indices
 ) {
-	VkDeviceSize	buffer_size = sizeof(indices[0]) * indices.size();
+	VkDeviceSize	buffer_size = sizeof(uint32_t) * indices.size();
 	VkBuffer		staging_buffer;
 	VkDeviceMemory	staging_buffer_memory;
 

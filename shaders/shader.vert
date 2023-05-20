@@ -19,12 +19,9 @@ void	main() {
 	gl_Position = (
 		camera_ubo.proj
 		* camera_ubo.view
-		* camera_ubo.model
 		* camera_ubo.zoom
-		* (
-			vec4(in_position, 1.0) +
-			vec4(camera_ubo.translation, 0.0)
-		)
+		* camera_ubo.model
+		* vec4(in_position, 1.0)
 	);
 	frag_color = in_color;
 	frag_tex_coord = in_tex_coord;

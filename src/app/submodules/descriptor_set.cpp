@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:56:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/18 17:03:33 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/19 12:14:54 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,9 +62,8 @@ void	DescriptorSet::destroy(
  * Update transformation of vertices
 */
 void	DescriptorSet::updateUniformBuffer(VkExtent2D extent) {
-
-	updateVertexPart(extent);
-	updateFragmentPart();
+	updateCamera(extent);
+	updateTexture();
 }
 
 /* ========================================================================== */
@@ -157,7 +156,7 @@ void	DescriptorSet::createDescriptorSets(
 	VkDescriptorBufferInfo	ubo_info_vertex{};
 	ubo_info_vertex.buffer = uniform_buffers;
 	ubo_info_vertex.offset = 0;
-	ubo_info_vertex.range = offsetof(UniformBufferObject, texture);
+	ubo_info_vertex.range = sizeof(UniformBufferObject::Camera); //offsetof(UniformBufferObject, texture);
 
 	// Texture sampler
 	VkDescriptorImageInfo	image_info{};
@@ -169,7 +168,7 @@ void	DescriptorSet::createDescriptorSets(
 	VkDescriptorBufferInfo	ubo_info_fragment{};
 	ubo_info_fragment.buffer = uniform_buffers;
 	ubo_info_fragment.offset = offsetof(UniformBufferObject, texture);
-	ubo_info_fragment.range = sizeof(UniformBufferObject) - offsetof(UniformBufferObject, texture);
+	ubo_info_fragment.range = sizeof(UniformBufferObject::Texture); //- offsetof(UniformBufferObject, texture);
 
 	// Allow buffer udpate using descriptor write
 	std::array<VkWriteDescriptorSet, 3>	descriptor_writes{};
@@ -247,15 +246,14 @@ void	DescriptorSet::initUniformBuffer() noexcept {
 	ubo.texture.enabled = scop::App::texture_enabled;
 	ubo.texture.mix = -1.0f;
 
-	memcpy(uniform_buffers_mapped, &ubo, sizeof(ubo));
+	memcpy(uniform_buffers_mapped, &ubo, sizeof(UniformBufferObject));
 }
 
-void	DescriptorSet::updateVertexPart(
+void	DescriptorSet::updateCamera(
 	VkExtent2D extent
 ) {
 	UniformBufferObject::Camera	camera{};
 
-	static scop::Vect3	translation = Vect3{ 0.0f, 0.0f, 0.0f };
 	static const std::array<scop::Vect3, 3>	up_axis = {
 		scop::Vect3(1.0f, 0.0f, 0.0f),
 		scop::Vect3(0.0f, 1.0f, 0.0f),
@@ -263,14 +261,17 @@ void	DescriptorSet::updateVertexPart(
 	};
 
 	// Add translation (object movement)
-	translation += App::movement;
-	camera.translation = translation;
+	App::position += App::movement;
+	camera.translation = App::position;
 
 	// Define object transformation model
 	camera.model = (
 		App::rotation_matrices[0] *
 		App::rotation_matrices[1] *
 		App::rotation_matrices[2]
+	) * scop::translate(
+		scop::Mat4(1.0f),
+		App::position
 	);
 
 	// Define camera transformation view
@@ -285,7 +286,7 @@ void	DescriptorSet::updateVertexPart(
 		scop::math::radians(45.0f),
 		extent.width / static_cast<float>(extent.height),
 		0.1f,
-		15.0f
+		10.0f
 	);
 	// Invert y axis (because y axis is inverted in Vulkan)
 	camera.proj[5] *= -1;
@@ -303,11 +304,11 @@ void	DescriptorSet::updateVertexPart(
 	memcpy(
 		uniform_buffers_mapped,
 		&camera,
-		offsetof(UniformBufferObject, texture)
+		sizeof(UniformBufferObject::Camera)
 	);
 }
 
-void	DescriptorSet::updateFragmentPart() {
+void	DescriptorSet::updateTexture() {
 	// Only udpate if it was recently toggled
 	if (!App::texture_enabled_start.has_value()) {
 		return;
@@ -325,7 +326,7 @@ void	DescriptorSet::updateFragmentPart() {
 	memcpy(
 		(char*)uniform_buffers_mapped + offsetof(UniformBufferObject, texture),
 		&texture,
-		sizeof(texture)
+		sizeof(UniformBufferObject::Texture)
 	);
 
 	// Reset texture_enabled_start if time is up

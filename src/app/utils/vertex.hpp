@@ -6,12 +6,11 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/26 15:25:04 by etran             #+#    #+#             */
-/*   Updated: 2023/05/12 23:31:31 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/18 22:46:21 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef VERTEX_HPP
-# define VERTEX_HPP
+#pragma once
 
 // Graphics
 # include <vulkan/vulkan.h>
@@ -109,5 +108,3 @@ namespace std {
 	};
 
 } // namespace std
-
-#endif

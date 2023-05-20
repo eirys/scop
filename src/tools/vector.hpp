@@ -6,12 +6,11 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 13:54:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/17 17:56:42 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/18 22:45:11 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef VECTOR_HPP
-# define VECTOR_HPP
+#pragma once
 
 // Std
 # include <cmath>
@@ -122,43 +121,6 @@ struct Vect3 {
 		return res.operator/=(rhs);
 	}
 
-	/* ========================================================================= */
-
-	/**
-	 * @brief Returns the dot product of the vector with another vector
-	 */
-	float	dot(const Vect3& rhs) const noexcept {
-		return static_cast<float>(
-			std::fma(x, rhs.x, std::fma(y, rhs.y, std::fma(z, rhs.z, 0)))
-		);
-	}
-
-	/**
-	 * @brief Returns the norm of the vector
-	*/
-	float	norm() const {
-		return std::sqrt(dot(*this));
-	}
-
-	/**
-	 * @brief Returns a normalized vector
-	*/
-	Vect3	normalize() const {
-		float	n = norm();
-		return Vect3{ x / n, y / n, z / n };
-	}
-
-	/**
-	 * @brief Returns the cross product of the vector with another vector
-	*/
-	Vect3	cross(const Vect3& rhs) const noexcept {
-		return Vect3{
-			static_cast<float>(std::fma(y, rhs.z, std::fma(-z, rhs.y, 0))),
-			static_cast<float>(std::fma(z, rhs.x, std::fma(-x, rhs.z, 0))),
-			static_cast<float>(std::fma(x, rhs.y, std::fma(-y, rhs.x, 0)))
-		};
-	}
-
 	/* BOOLEAN COMPARISON ====================================================== */
 
 	bool	operator==(const Vect3& rhs) const noexcept {
@@ -166,6 +128,41 @@ struct Vect3 {
 	}
 
 }; // struct Vect3
+
+/**
+ * @brief Returns the dot product of the vector with another vector
+ */
+inline float	dot(const Vect3& lhs, const Vect3& rhs) noexcept {
+	return static_cast<float>(
+		std::fma(lhs.x, rhs.x, std::fma(lhs.y, rhs.y, std::fma(lhs.z, rhs.z, 0)))
+	);
+}
+
+/**
+ * @brief Returns the norm of the vector
+*/
+inline float	norm(const Vect3& vec) {
+	return std::sqrt(dot(vec, vec));
+}
+
+/**
+ * @brief Returns a normalized vector
+*/
+inline Vect3	normalize(const Vect3& vec) {
+	float	n = norm(vec);
+	return Vect3{ vec.x / n, vec.y / n, vec.z / n };
+}
+
+/**
+ * @brief Returns the cross product of the vector with another vector
+*/
+inline Vect3	cross(const Vect3& lhs, const Vect3& rhs) noexcept {
+	return Vect3{
+		static_cast<float>(std::fma(lhs.y, rhs.z, std::fma(-lhs.z, rhs.y, 0))),
+		static_cast<float>(std::fma(lhs.z, rhs.x, std::fma(-lhs.x, rhs.z, 0))),
+		static_cast<float>(std::fma(lhs.x, rhs.y, std::fma(-lhs.y, rhs.x, 0)))
+	};
+}
 
 struct Vect2 {
 	/* ========================================================================= */
@@ -283,5 +280,3 @@ struct hash<scop::Vect2> {
 };
 
 } // namespace std
-
-#endif

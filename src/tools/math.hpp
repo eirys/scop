@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/17 18:03:49 by etran             #+#    #+#             */
-/*   Updated: 2023/05/17 18:29:35 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/19 23:11:49 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ namespace scop {
 namespace math {
 	
 /**
- * Converts degrees to radians.
+ * @brief Converts degrees to radians.
 */
 inline float	radians(float degrees) noexcept {
 	return degrees * M_PI / 180;
@@ -24,6 +24,7 @@ inline float	radians(float degrees) noexcept {
 
 /**
  * @brief Generates a random float between 0.0f and 1.0f.
+ * 
  * @note Uses a Mersenne Twister pseudo-random generator.
 */
 inline float	generateRandomFloat() {
@@ -34,7 +35,7 @@ inline float	generateRandomFloat() {
 }
 
 /**
- * Generates a random vibrant color.
+ * @brief Generates a random vibrant color.
 */
 inline void	generateVibrantColor(float& red, float& green, float& blue) {
 	red = generateRandomFloat();
@@ -65,8 +66,8 @@ inline void	generateVibrantColor(float& red, float& green, float& blue) {
 /**
  * @brief Computes the linear interpolation between two values.
  *
- * @param x,y The values to interpolate between.
- * @param t The interpolation factor.
+ * @param x,y	The values to interpolate between.
+ * @param t		The interpolation factor.
  * 
  * @note T must be a basic type (float, int, etc.).
 */

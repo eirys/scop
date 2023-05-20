@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/14 13:49:27 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/19 00:56:27 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,10 @@ namespace obj {
 /*                                   PUBLIC                                   */
 /* ========================================================================== */
 
-Model	Parser::parseFile(const std::string& file_name) {
+Model	Parser::parseFile(
+	const std::string& file_name,
+	const scop::Image& texture
+) {
 	checkFile(file_name);
 	std::ifstream	file;
 
@@ -51,7 +54,7 @@ Model	Parser::parseFile(const std::string& file_name) {
 		throw std::invalid_argument("Error while reading file " + file_name);
 	}
 	// Fix empty indices in face
-	fixMissingIndices();
+	fixMissingIndices(texture);
 
 	return model_output;
 }
@@ -65,7 +68,7 @@ void	Parser::checkFile(const std::string& file) const {
 		throw std::invalid_argument("Empty file name");
 	}
 	size_t	extension_pos = file.rfind('.');
-	
+
 	if (extension_pos == std::string::npos) {
 		throw std::invalid_argument("File '" + file + "' has no extension");
 	} else if (file.substr(extension_pos) != ".obj") {
@@ -327,7 +330,7 @@ void	Parser::storeTriangles(
 			};
 
 		Model::Triangle	triangle{};
-		
+
 		triangle.indices[0] = {
 			.vertex = selectIndex(0, 0),
 			.texture = selectIndex(0, 1),
@@ -351,9 +354,9 @@ void	Parser::storeTriangles(
  * Check if there are missing indices,
  * and add default ones.
 */
-void	Parser::fixMissingIndices() {
+void	Parser::fixMissingIndices(const scop::Image& image) noexcept {
 	if (model_output.getTextureCoords().empty()) {
-		model_output.setDefaultTextureCoords();
+		model_output.setDefaultTextureCoords(image);
 	}
 	if (model_output.getNormalCoords().empty()) {
 		model_output.setDefaultNormalCoords();

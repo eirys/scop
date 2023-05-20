@@ -6,12 +6,11 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 13:57:01 by eli               #+#    #+#             */
-/*   Updated: 2023/05/15 01:04:35 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/18 22:45:52 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PPM_LOADER_HPP
-# define PPM_LOADER_HPP
+#pragma once
 
 // Std
 # include <string>
@@ -104,4 +103,3 @@ private:
 }; // class PpmLoader
 
 } // namespace scop
-#endif

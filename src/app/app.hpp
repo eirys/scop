@@ -6,12 +6,11 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/18 16:41:17 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/19 01:29:58 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef APP_HPP
-# define APP_HPP
+#pragma once
 
 // Graphics
 # ifndef GLFW_INCLUDE_VULKAN
@@ -39,14 +38,21 @@ namespace scop {
 enum RotationAxis {
 	ROTATION_AXIS_X = 0,
 	ROTATION_AXIS_Y = 1,
-	ROTATION_AXIS_Z = 2,
-	ROTATION_NONE = -1
+	ROTATION_AXIS_Z = 2
 };
 
 enum RotationInput {
 	ROTATION_INPUT_ADD,
-	ROTATION_INPUT_SUB,
-	ROTATION_INPUT_NONE
+	ROTATION_INPUT_SUB
+};
+
+enum ObjectDirection {
+	MOVE_FORWARD		= 1 << 0,
+	MOVE_BACKWARD		= 1 << 1,
+	MOVE_LEFT			= 1 << 2,
+	MOVE_RIGHT			= 1 << 3,
+	MOVE_UP				= 1 << 4,
+	MOVE_DOWN			= 1 << 5
 };
 
 enum ZoomInput {
@@ -55,27 +61,10 @@ enum ZoomInput {
 	ZOOM_NONE
 };
 
-enum ObjectDirection {
-	MOVE_FORWARD,
-	MOVE_BACKWARD,
-	MOVE_LEFT,
-	MOVE_RIGHT,
-	MOVE_UP,
-	MOVE_DOWN,
-	MOVE_NONE
-};
-
 /**
  * Core engine.
 */
 class App {
-private:
-	/* ========================================================================= */
-	/*                                  TYPEDEF                                  */
-	/* ========================================================================= */
-
-	typedef	std::chrono::high_resolution_clock::time_point	time_point;
-
 public:
 
 	friend graphics::DescriptorSet;
@@ -102,6 +91,7 @@ public:
 
 	void								run();
 	static void							toggleTexture() noexcept;
+	static void							resetModel() noexcept;
 	static void							updateRotation(
 		RotationAxis axis, 
 		RotationInput value
@@ -116,6 +106,12 @@ public:
 	static void							changeUpAxis() noexcept;
 
 private:
+	/* ========================================================================= */
+	/*                                  TYPEDEF                                  */
+	/* ========================================================================= */
+
+	typedef	std::chrono::high_resolution_clock::time_point	time_point;
+
 	/* ========================================================================= */
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
@@ -135,6 +131,7 @@ private:
 	static std::optional<time_point>	texture_enabled_start;
 	static std::array<scop::Mat4, 3>	rotation_matrices;
 	static std::array<float, 3>			rotation_angles;
+	static scop::Vect3					position;
 	static scop::Vect3					movement;
 	static float						zoom_input;
 	static size_t						selected_up_axis;
@@ -150,5 +147,3 @@ private:
 }; // class App
 
 } // namespace scop
-
-#endif
