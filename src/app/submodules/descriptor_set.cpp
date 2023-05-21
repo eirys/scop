@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:56:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/21 11:14:20 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/21 11:45:50 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,9 @@
 #include <stdexcept> // std::runtime_error
 #include <chrono> // std::chrono
 #include <optional> // std::optional
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace scop {
 namespace graphics {
@@ -264,11 +267,34 @@ void	DescriptorSet::updateCamera(
 	App::position += App::movement;
 
 	// Define object transformation model
-	camera.model = (
-		App::rotation_matrices[0] *
-		App::rotation_matrices[1] *
-		App::rotation_matrices[2]
+	
+	glm::mat4	mat = glm::rotate(
+		glm::rotate(
+			glm::rotate(
+				glm::translate(								// Translate object first
+					glm::mat4(1.0f),
+					glm::vec3(App::position.x, App::position.y, App::position.z)
+				),
+				scop::math::radians(App::rotation_angles[0]),	// Rotate around x
+				glm::vec3(1.0f, 0.0f, 0.0f)
+			),
+			scop::math::radians(App::rotation_angles[1]),		// Rotate around y
+			glm::vec3(0.0f, 1.0f, 0.0f)
+		),
+		scop::math::radians(App::rotation_angles[2]),			// Rotate around z
+		glm::vec3(0.0f, 0.0f, 1.0f)
 	);
+
+	for (int i = 0; i < 4; ++i)
+		for (int j = 0; j < 4; ++j)
+			camera.model[i*4 + j] = mat[i][j];
+	// camera.model
+
+	// (
+	// 	App::rotation_matrices[0] *
+	// 	App::rotation_matrices[1] *
+	// 	App::rotation_matrices[2]
+	// );
 
 	// Define camera transformation view
 	camera.view = scop::lookAt(

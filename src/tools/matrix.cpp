@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/19 23:18:11 by etran             #+#    #+#             */
-/*   Updated: 2023/05/20 20:28:40 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/21 11:51:33 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -330,10 +330,11 @@ float	Mat2::det() const {
 /**
  * @brief Produces rotation matrix around the given axis
  *
+ * @param mat:		matrix to rotate
  * @param angle:	angle in radians
  * @param axis:		axis of rotation
 */
-Mat4	rotate(float angle, const Vect3& axis) noexcept {
+Mat4	rotate(const Mat4& mat, float angle, const Vect3& axis) noexcept {
 	const float	c = std::cos(angle);
 	const float	s = std::sin(angle);
 	const Vect3	u = scop::normalize(axis);
@@ -365,7 +366,7 @@ Mat4	rotate(float angle, const Vect3& axis) noexcept {
 		0,
 		// Row 4
 		0, 0, 0, 1
-	};
+	} * mat;
 }
 
 /**

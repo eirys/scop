@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/19 01:26:48 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/21 11:41:16 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,6 @@ bool							App::texture_enabled = true;
 std::optional<App::time_point>	App::texture_enabled_start;
 
 std::array<float, 3>			App::rotation_angles = { 0.0f, 0.0f, 0.0f };
-std::array<scop::Mat4, 3>		App::rotation_matrices = {
-	scop::Mat4(1.0f),
-	scop::Mat4(1.0f),
-	scop::Mat4(1.0f)
-};
 scop::Vect3						App::movement = scop::Vect3(0.0f, 0.0f, 0.0f);
 scop::Vect3						App::position = scop::Vect3(0.0f, 0.0f, 0.0f);
 
@@ -74,10 +69,6 @@ void	App::toggleTexture() noexcept {
 }
 
 void	App::resetModel() noexcept {
-	rotation_matrices[0] = scop::Mat4(1.0f);
-	rotation_matrices[1] = scop::Mat4(1.0f);
-	rotation_matrices[2] = scop::Mat4(1.0f);
-
 	rotation_angles[0] = 0.0f;
 	rotation_angles[1] = 0.0f;
 	rotation_angles[2] = 0.0f;
@@ -89,20 +80,10 @@ void	App::resetModel() noexcept {
  * On toggle, changes the rotation of the model.
 */
 void	App::updateRotation(RotationAxis dir, RotationInput value) noexcept {
-	static const std::array<scop::Vect3, 3>	axis = {
-		scop::Vect3(1.0f, 0.0f, 0.0f),
-		scop::Vect3(0.0f, 1.0f, 0.0f),
-		scop::Vect3(0.0f, 0.0f, 1.0f)
-	};
-
 	for (size_t i = 0; i < 4; ++i) {
 		if (i == static_cast<size_t>(dir)) {
 			rotation_angles[i] += (
 				value == RotationInput::ROTATION_INPUT_ADD ? +10 :-10
-			);
-			rotation_matrices[i] = scop::rotate(
-				scop::math::radians(rotation_angles[i]),
-				axis[i]
 			);
 		}
 	}

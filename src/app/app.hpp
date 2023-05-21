@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/19 01:29:58 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/21 11:40:52 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,6 @@ private:
 
 	static bool							texture_enabled;
 	static std::optional<time_point>	texture_enabled_start;
-	static std::array<scop::Mat4, 3>	rotation_matrices;
 	static std::array<float, 3>			rotation_angles;
 	static scop::Vect3					position;
 	static scop::Vect3					movement;

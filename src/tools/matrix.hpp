@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 14:11:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/21 11:15:02 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/21 11:39:01 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,7 @@
 # include "vector.hpp"
 
 namespace scop {
-
-struct Mat2;
+struct Mat2;	// Forward declaration
 struct Mat3;
 
 struct Mat4 {
@@ -69,9 +68,9 @@ struct Mat4 {
 
 }; // struct Mat4
 
-Mat4	rotate(float angle, const Vect3& axis) noexcept;
 Mat4	lookAt(const Vect3& eye, const Vect3& center, const Vect3& up) noexcept;
 Mat4	perspective(float fov, float aspect_ratio, float near, float far) noexcept;
+Mat4	rotate(const Mat4& mat, float angle, const Vect3& axis) noexcept;
 Mat4	scale(const Mat4& mat, const Vect3& scale) noexcept;
 Mat4	translate(const Mat4& mat, const Vect3& dir) noexcept;
 Mat4	inverse(const Mat4& mat);
