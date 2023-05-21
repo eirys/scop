@@ -12,7 +12,6 @@ layout(binding = 0) uniform Camera {
 	mat4 view;
 	mat4 proj;
 	mat4 zoom;
-	vec3 translation;
 } camera_ubo;
 
 void	main() {

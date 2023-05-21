@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 20:12:41 by eli               #+#    #+#             */
-/*   Updated: 2023/05/19 00:59:37 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/20 19:43:35 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,13 +29,19 @@ public:
 		scop::Mat4	view;
 		scop::Mat4	proj;
 		scop::Mat4	zoom;
-		scop::Vect3	translation;
-		scop::Vect3 barycenter;
+
+		static constexpr size_t size() noexcept {
+			return sizeof(Camera);
+		}
 	};
 
 	struct Texture {
 		bool	enabled;
 		float	mix;
+
+		static constexpr size_t size() noexcept {
+			return sizeof(Texture);
+		}
 	};
 
 	/* ========================================================================= */
@@ -47,6 +53,19 @@ public:
 	UniformBufferObject(UniformBufferObject&& other) = default;
 	UniformBufferObject& operator=(const UniformBufferObject& other) = default;
 	~UniformBufferObject() = default;
+
+	static constexpr size_t size() noexcept {
+		return sizeof(UniformBufferObject);
+	}
+	
+	static constexpr size_t offset_camera() noexcept {
+		return 0;
+	}
+
+	static size_t offset_texture() noexcept {
+		static UniformBufferObject* ptr = nullptr;
+		return reinterpret_cast<size_t>(&ptr->texture);
+	}
 
 	/* ========================================================================= */
 	/*                               CLASS MEMBERS                               */

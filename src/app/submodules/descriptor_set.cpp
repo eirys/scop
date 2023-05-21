@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:56:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/19 12:14:54 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/20 20:35:20 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,7 +156,7 @@ void	DescriptorSet::createDescriptorSets(
 	VkDescriptorBufferInfo	ubo_info_vertex{};
 	ubo_info_vertex.buffer = uniform_buffers;
 	ubo_info_vertex.offset = 0;
-	ubo_info_vertex.range = sizeof(UniformBufferObject::Camera); //offsetof(UniformBufferObject, texture);
+	ubo_info_vertex.range = UniformBufferObject::Camera::size();
 
 	// Texture sampler
 	VkDescriptorImageInfo	image_info{};
@@ -167,8 +167,8 @@ void	DescriptorSet::createDescriptorSets(
 	// Ubo Texture
 	VkDescriptorBufferInfo	ubo_info_fragment{};
 	ubo_info_fragment.buffer = uniform_buffers;
-	ubo_info_fragment.offset = offsetof(UniformBufferObject, texture);
-	ubo_info_fragment.range = sizeof(UniformBufferObject::Texture); //- offsetof(UniformBufferObject, texture);
+	ubo_info_fragment.offset = UniformBufferObject::offset_texture();
+	ubo_info_fragment.range = UniformBufferObject::Texture::size();
 
 	// Allow buffer udpate using descriptor write
 	std::array<VkWriteDescriptorSet, 3>	descriptor_writes{};
@@ -215,7 +215,7 @@ void	DescriptorSet::createDescriptorSets(
  * Create uniform buffers
 */
 void	DescriptorSet::createUniformBuffers(Device& device) {
-	VkDeviceSize	buffer_size = sizeof(scop::UniformBufferObject);
+	VkDeviceSize	buffer_size = sizeof(UniformBufferObject);
 
 	// Create the buffer and allocate memory
 	device.createBuffer(
@@ -262,16 +262,12 @@ void	DescriptorSet::updateCamera(
 
 	// Add translation (object movement)
 	App::position += App::movement;
-	camera.translation = App::position;
 
 	// Define object transformation model
 	camera.model = (
 		App::rotation_matrices[0] *
 		App::rotation_matrices[1] *
 		App::rotation_matrices[2]
-	) * scop::translate(
-		scop::Mat4(1.0f),
-		App::position
 	);
 
 	// Define camera transformation view
@@ -302,9 +298,9 @@ void	DescriptorSet::updateCamera(
 	);
 
 	memcpy(
-		uniform_buffers_mapped,
+		(char*)uniform_buffers_mapped + UniformBufferObject::offset_camera(),
 		&camera,
-		sizeof(UniformBufferObject::Camera)
+		UniformBufferObject::Camera::size()
 	);
 }
 
@@ -324,9 +320,9 @@ void	DescriptorSet::updateTexture() {
 	texture.enabled = App::texture_enabled;
 	texture.mix = App::texture_enabled ? time : 1.0f - time;
 	memcpy(
-		(char*)uniform_buffers_mapped + offsetof(UniformBufferObject, texture),
+		(char*)uniform_buffers_mapped + UniformBufferObject::offset_texture(),
 		&texture,
-		sizeof(UniformBufferObject::Texture)
+		UniformBufferObject::Texture::size()
 	);
 
 	// Reset texture_enabled_start if time is up

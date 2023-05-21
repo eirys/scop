@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/19 23:18:11 by etran             #+#    #+#             */
-/*   Updated: 2023/05/20 12:38:07 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/20 20:28:40 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,7 +173,7 @@ Mat3	Mat4::minor(size_t row, size_t column) const {
 		if (line != row) {
 			for (size_t col = 0; col < 4; ++col) {
 				if (col != column) {
-					submatrix[y * 4 + x] = mat[line * 4 + col];
+					submatrix[y * 3 + x] = mat[line * 3 + col];
 					++x;
 				}
 			}
@@ -254,8 +254,6 @@ const float&	Mat3::operator[](size_t index) const {
 	return mat[index];
 }
 
-// Mat3	Mat3::operator+(const)
-
 /* ========================================================================== */
 
 Mat2	Mat3::minor(size_t row, size_t column) const {
@@ -267,7 +265,7 @@ Mat2	Mat3::minor(size_t row, size_t column) const {
 		if (line != row) {
 			for (size_t col = 0; col < 3; ++col) {
 				if (col != column) {
-					submatrix[3 * y + x] = mat[3 * line + col];
+					submatrix[2 * y + x] = mat[2 * line + col];
 					++x;
 				}
 			}
@@ -318,8 +316,6 @@ const float& Mat2::operator[](size_t index) const {
 	}
 	return mat[index];
 }
-
-/* OPERATORS ================================================================ */
 
 /* ========================================================================== */
 

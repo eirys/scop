@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 14:11:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/20 12:35:30 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/20 19:34:53 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,13 +101,6 @@ struct Mat3: public Matrix {
 	float&	operator[](size_t index);
 	const float&	operator[](size_t index) const;
 
-	/* OPERATORS =============================================================== */
-
-	Mat3	operator+(const Mat3& rhs) const noexcept;
-	Mat3	operator-(const Mat3& rhs) const noexcept;
-	Mat3	operator*(const Mat3& rhs) const noexcept;
-	Mat3	operator*(float rhs) const noexcept;
-
 	/* ========================================================================= */
 
 	Mat2	minor(size_t row, size_t col) const;
@@ -129,13 +122,6 @@ struct Mat2: public Matrix {
 
 	float&	operator[](size_t index);
 	const float&	operator[](size_t index) const;
-
-	/* OPERATORS =============================================================== */
-
-	Mat2	operator+(const Mat2& rhs) const noexcept;
-	Mat2	operator-(const Mat2& rhs) const noexcept;
-	Mat2	operator*(const Mat2& rhs) const noexcept;
-	Mat2	operator*(float rhs) const noexcept;
 
 	/* ========================================================================= */
 
