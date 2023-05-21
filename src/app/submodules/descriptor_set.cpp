@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:56:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/20 20:35:20 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/21 11:14:20 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,7 +156,7 @@ void	DescriptorSet::createDescriptorSets(
 	VkDescriptorBufferInfo	ubo_info_vertex{};
 	ubo_info_vertex.buffer = uniform_buffers;
 	ubo_info_vertex.offset = 0;
-	ubo_info_vertex.range = UniformBufferObject::Camera::size();
+	ubo_info_vertex.range = sizeof(UniformBufferObject::Camera);
 
 	// Texture sampler
 	VkDescriptorImageInfo	image_info{};
@@ -167,8 +167,8 @@ void	DescriptorSet::createDescriptorSets(
 	// Ubo Texture
 	VkDescriptorBufferInfo	ubo_info_fragment{};
 	ubo_info_fragment.buffer = uniform_buffers;
-	ubo_info_fragment.offset = UniformBufferObject::offset_texture();
-	ubo_info_fragment.range = UniformBufferObject::Texture::size();
+	ubo_info_fragment.offset = offsetof(UniformBufferObject, texture);
+	ubo_info_fragment.range = sizeof(UniformBufferObject::Texture);
 
 	// Allow buffer udpate using descriptor write
 	std::array<VkWriteDescriptorSet, 3>	descriptor_writes{};
@@ -298,9 +298,9 @@ void	DescriptorSet::updateCamera(
 	);
 
 	memcpy(
-		(char*)uniform_buffers_mapped + UniformBufferObject::offset_camera(),
+		(char*)uniform_buffers_mapped,
 		&camera,
-		UniformBufferObject::Camera::size()
+		sizeof(UniformBufferObject::Camera)
 	);
 }
 
@@ -320,9 +320,9 @@ void	DescriptorSet::updateTexture() {
 	texture.enabled = App::texture_enabled;
 	texture.mix = App::texture_enabled ? time : 1.0f - time;
 	memcpy(
-		(char*)uniform_buffers_mapped + UniformBufferObject::offset_texture(),
+		(char*)uniform_buffers_mapped + offsetof(UniformBufferObject, texture),
 		&texture,
-		UniformBufferObject::Texture::size()
+		sizeof(UniformBufferObject::Texture)
 	);
 
 	// Reset texture_enabled_start if time is up

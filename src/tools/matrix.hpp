@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 14:11:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/20 19:34:53 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/21 11:15:02 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,7 @@ namespace scop {
 struct Mat2;
 struct Mat3;
 
-struct Matrix {
-protected:
-	virtual ~Matrix() = default;
-	virtual float	det() const = 0;
-};
-
-struct Mat4: public Matrix {
+struct Mat4 {
 	/* ========================================================================= */
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
@@ -86,7 +80,7 @@ Mat4	inverse(const Mat4& mat);
 /*                                 UTILITARIES                                */
 /* ========================================================================== */
 
-struct Mat3: public Matrix {
+struct Mat3 {
 
 	float	mat[9];
 
@@ -108,7 +102,7 @@ struct Mat3: public Matrix {
 
 }; // struct Mat3
 
-struct Mat2: public Matrix {
+struct Mat2 {
 
 	float	mat[4];
 

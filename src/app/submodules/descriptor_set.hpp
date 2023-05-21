@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:39:20 by etran             #+#    #+#             */
-/*   Updated: 2023/05/19 01:10:06 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/21 11:07:48 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@
 
 namespace scop {
 namespace graphics {
-
 class GraphicsPipeline;
 
 class DescriptorSet {
