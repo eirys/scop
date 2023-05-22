@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:42 by eli               #+#    #+#             */
-/*   Updated: 2023/05/22 13:28:07 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/23 01:47:54 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ static void	keyCallback(
 	int mods
 ) {
 	(void)scancode;
+	(void)mods;
 
 	if (action == GLFW_PRESS) {
 		switch (key) {
@@ -84,26 +85,17 @@ static void	keyCallback(
 
 			// Rotation
 			case GLFW_KEY_1:
-				return App::updateRotation(
-					RotationAxis::ROTATION_AXIS_X,
-					mods & GLFW_MOD_SHIFT ?
-						RotationInput::ROTATION_INPUT_SUB :
-						RotationInput::ROTATION_INPUT_ADD
-				);
+				return App::toggleRotation(RotationInput::ROTATION_SUB_X);
+			case GLFW_KEY_7:
+				return App::toggleRotation(RotationInput::ROTATION_ADD_X);
 			case GLFW_KEY_2:
-				return App::updateRotation(
-					RotationAxis::ROTATION_AXIS_Y,
-					mods & GLFW_MOD_SHIFT ?
-						RotationInput::ROTATION_INPUT_SUB :
-						RotationInput::ROTATION_INPUT_ADD
-				);
+				return App::toggleRotation(RotationInput::ROTATION_SUB_Y);
+			case GLFW_KEY_8:
+				return App::toggleRotation(RotationInput::ROTATION_ADD_Y);
 			case GLFW_KEY_3:
-				return App::updateRotation(
-					RotationAxis::ROTATION_AXIS_Z,
-					mods & GLFW_MOD_SHIFT ?
-						RotationInput::ROTATION_INPUT_SUB :
-						RotationInput::ROTATION_INPUT_ADD
-				);
+				return App::toggleRotation(RotationInput::ROTATION_SUB_Z);
+			case GLFW_KEY_9:
+				return App::toggleRotation(RotationInput::ROTATION_ADD_Z);
 
 			// Translation
 			case GLFW_KEY_W:
@@ -128,7 +120,19 @@ static void	keyCallback(
 		}
 	} else if (action == GLFW_RELEASE) {
 		switch (key) {
-			// TODO: Rotation
+			// Rotation
+			case GLFW_KEY_1:
+				return App::untoggleRotation(RotationInput::ROTATION_SUB_X);
+			case GLFW_KEY_7:
+				return App::untoggleRotation(RotationInput::ROTATION_ADD_X);
+			case GLFW_KEY_2:
+				return App::untoggleRotation(RotationInput::ROTATION_SUB_Y);
+			case GLFW_KEY_8:
+				return App::untoggleRotation(RotationInput::ROTATION_ADD_Y);
+			case GLFW_KEY_3:
+				return App::untoggleRotation(RotationInput::ROTATION_SUB_Z);
+			case GLFW_KEY_9:
+				return App::untoggleRotation(RotationInput::ROTATION_ADD_Z);
 
 			// Translation
 			case GLFW_KEY_W:

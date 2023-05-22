@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/22 17:46:44 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/23 01:45:47 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@
 
 # define SCOP_TEXTURE_FILE_HAMSTER_PPM	"textures/hammy.ppm"
 # define SCOP_MOVE_SPEED				0.005f
+# define SCOP_ROTATION_SPEED			0.25f // deg
 
 namespace scop {
 
@@ -43,8 +44,12 @@ enum RotationAxis {
 };
 
 enum RotationInput {
-	ROTATION_INPUT_ADD,
-	ROTATION_INPUT_SUB
+	ROTATION_ADD_X = 1,
+	ROTATION_SUB_X = -1,
+	ROTATION_ADD_Y = 2,
+	ROTATION_SUB_Y = -2,
+	ROTATION_ADD_Z = 3,
+	ROTATION_SUB_Z = -3
 };
 
 enum ObjectDirection {
@@ -96,8 +101,15 @@ public:
 
 	static void							toggleTexture() noexcept;
 	static void							resetModel() noexcept;
-	static void							updateRotation(
-		RotationAxis axis, 
+	// static void							updateRotation(
+	// 	RotationAxis axis,
+	// 	RotationInput value
+	// ) noexcept;
+
+	static void							toggleRotation(
+		RotationInput value
+	) noexcept;
+	static void							untoggleRotation(
 		RotationInput value
 	) noexcept;
 	static void							toggleMove(
@@ -133,11 +145,17 @@ private:
 
 	static bool							texture_enabled;
 	static std::optional<time_point>	texture_enabled_start;
-	static std::array<float, 3>			rotation_angles;
+
 	static
-	std::map<ObjectDirection, bool>		keys_pressed;
+	std::map<RotationInput, bool>		keys_pressed_rotations;
+	static std::array<float, 3>			rotation_angles;
+	static std::array<float, 3>			rotating_input;
+
+	static
+	std::map<ObjectDirection, bool>		keys_pressed_directions;
 	static scop::Vect3					movement;
 	static scop::Vect3					position;
+
 	static float						zoom_input;
 	static size_t						selected_up_axis;
 
@@ -155,6 +173,7 @@ private:
 /*                                    OTHER                                   */
 /* ========================================================================== */
 
-std::map<ObjectDirection, bool>	populateKeyMap();
+std::map<ObjectDirection, bool>	populateDirectionKeys();
+std::map<RotationInput, bool>	populateRotationKeys();
 
 } // namespace scop

@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/19 23:18:11 by etran             #+#    #+#             */
-/*   Updated: 2023/05/21 11:51:33 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/23 01:36:37 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -440,16 +440,32 @@ Mat4	scale(const Mat4& mat, const Vect3& scale) noexcept {
 
 /**
  * @brief Produces a translation matrix from the given vector
- * 
+ *
  * @param mat	matrix to translate
  * @param dir	vector to translate by
 */
 Mat4	translate(const Mat4& mat, const Vect3& dir) noexcept {
 	Mat4	result(mat);
-
-	result[3] = dir.x;
-	result[7] = dir.y;
-	result[11] = dir.z;
+	result[12] = std::fma(
+		mat[0],
+		dir.x,
+		std::fma(mat[4], dir.y, std::fma(mat[8], dir.z, mat[12]))
+	);
+	result[13] = std::fma(
+		mat[1],
+		dir.x,
+		std::fma(mat[5], dir.y, std::fma(mat[9], dir.z, mat[13]))
+	);
+	result[14] = std::fma(
+		mat[2],
+		dir.x,
+		std::fma(mat[6], dir.y, std::fma(mat[10], dir.z, mat[14]))
+	);
+	result[15] = std::fma(
+		mat[3],
+		dir.x,
+		std::fma(mat[7], dir.y, std::fma(mat[11], dir.z, mat[15]))
+	);
 	return result;
 }
 

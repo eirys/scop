@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:56:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/21 11:45:50 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/23 01:48:44 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,6 @@
 #include <stdexcept> // std::runtime_error
 #include <chrono> // std::chrono
 #include <optional> // std::optional
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 
 namespace scop {
 namespace graphics {
@@ -266,35 +263,32 @@ void	DescriptorSet::updateCamera(
 	// Add translation (object movement)
 	App::position += App::movement;
 
+	App::rotation_angles[RotationAxis::ROTATION_AXIS_X] +=
+		App::rotating_input[RotationAxis::ROTATION_AXIS_X];
+
+	App::rotation_angles[RotationAxis::ROTATION_AXIS_Y] +=
+		App::rotating_input[RotationAxis::ROTATION_AXIS_Y];
+
+	App::rotation_angles[RotationAxis::ROTATION_AXIS_Z] +=
+		App::rotating_input[RotationAxis::ROTATION_AXIS_Z];
+
 	// Define object transformation model
-	
-	glm::mat4	mat = glm::rotate(
-		glm::rotate(
-			glm::rotate(
-				glm::translate(								// Translate object first
-					glm::mat4(1.0f),
-					glm::vec3(App::position.x, App::position.y, App::position.z)
+	camera.model = scop::rotate(
+		scop::rotate(
+			scop::rotate(
+				scop::translate(								// Translate object first
+					scop::Mat4(1.0f),
+					scop::Vect3(App::position.x, App::position.y, App::position.z)
 				),
 				scop::math::radians(App::rotation_angles[0]),	// Rotate around x
-				glm::vec3(1.0f, 0.0f, 0.0f)
+				scop::Vect3(1.0f, 0.0f, 0.0f)
 			),
 			scop::math::radians(App::rotation_angles[1]),		// Rotate around y
-			glm::vec3(0.0f, 1.0f, 0.0f)
+			scop::Vect3(0.0f, 1.0f, 0.0f)
 		),
 		scop::math::radians(App::rotation_angles[2]),			// Rotate around z
-		glm::vec3(0.0f, 0.0f, 1.0f)
+		scop::Vect3(0.0f, 0.0f, 1.0f)
 	);
-
-	for (int i = 0; i < 4; ++i)
-		for (int j = 0; j < 4; ++j)
-			camera.model[i*4 + j] = mat[i][j];
-	// camera.model
-
-	// (
-	// 	App::rotation_matrices[0] *
-	// 	App::rotation_matrices[1] *
-	// 	App::rotation_matrices[2]
-	// );
 
 	// Define camera transformation view
 	camera.view = scop::lookAt(
@@ -308,7 +302,7 @@ void	DescriptorSet::updateCamera(
 		scop::math::radians(45.0f),
 		extent.width / static_cast<float>(extent.height),
 		0.1f,
-		10.0f
+		100.0f
 	);
 	// Invert y axis (because y axis is inverted in Vulkan)
 	camera.proj[5] *= -1;
