@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/22 14:12:47 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/22 17:46:57 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ bool							App::texture_enabled = true;
 std::optional<App::time_point>	App::texture_enabled_start;
 
 std::array<float, 3>			App::rotation_angles = { 0.0f, 0.0f, 0.0f };
-std::map<ObjectDirection, bool>	keys_pressed = populateKeyMap();
+std::map<ObjectDirection, bool>	App::keys_pressed = populateKeyMap();
 scop::Vect3						App::movement = scop::Vect3(0.0f, 0.0f, 0.0f);
 scop::Vect3						App::position = scop::Vect3(0.0f, 0.0f, 0.0f);
 
@@ -99,34 +99,34 @@ void	App::toggleMove(ObjectDirection dir) noexcept {
 	switch (dir) {
 		case ObjectDirection::MOVE_FORWARD: {
 			keys_pressed[ObjectDirection::MOVE_FORWARD] = true;
-			if (keys_pressed[ObjectDirection::MOVE_BACKWARD] == false)
-				movement.z = -SCOP_MOVE_SPEED;
+			movement.z = -SCOP_MOVE_SPEED;
 			break;
 		}
 		case ObjectDirection::MOVE_BACKWARD: {
 			keys_pressed[ObjectDirection::MOVE_BACKWARD] = true;
-			if (keys_pressed[ObjectDirection::MOVE_FORWARD] == false)
-				movement.z = SCOP_MOVE_SPEED;
+			movement.z = SCOP_MOVE_SPEED;
 			break;
 		}
 		case ObjectDirection::MOVE_RIGHT: {
 			keys_pressed[ObjectDirection::MOVE_RIGHT] = true;
-			if (keys_pressed[ObjectDirection::MOVE_LEFT] == false)
-				movement.x = SCOP_MOVE_SPEED;
+			movement.x = SCOP_MOVE_SPEED;
 			break;
 		}
-		case ObjectDirection::MOVE_LEFT:
-			if (movement.x == 0.0f)
-				movement.x = -SCOP_MOVE_SPEED;
+		case ObjectDirection::MOVE_LEFT: {
+			keys_pressed[ObjectDirection::MOVE_LEFT] = true;
+			movement.x = -SCOP_MOVE_SPEED;
 			break;
-		case ObjectDirection::MOVE_UP:
-			if (movement.y == 0.0f)
-				movement.y = SCOP_MOVE_SPEED;
+		}
+		case ObjectDirection::MOVE_UP: {
+			keys_pressed[ObjectDirection::MOVE_UP] = true;
+			movement.y = SCOP_MOVE_SPEED;
 			break;
-		case ObjectDirection::MOVE_DOWN:
-			if (movement.y == 0.0f)
-				movement.y = -SCOP_MOVE_SPEED;
+		}
+		case ObjectDirection::MOVE_DOWN: {
+			keys_pressed[ObjectDirection::MOVE_DOWN] = true;
+			movement.y = -SCOP_MOVE_SPEED;
 			break;
+		}
 		default:
 			return;
 	}
@@ -136,21 +136,26 @@ void	App::toggleMove(ObjectDirection dir) noexcept {
  * On untoggle, the model stops moving in the given direction.
 */
 void	App::untoggleMove(ObjectDirection dir) noexcept {
-	if (
-		dir == ObjectDirection::MOVE_FORWARD ||
-		dir == ObjectDirection::MOVE_BACKWARD
-	) {
-		movement.z = 0.0f;
-	} else if (
-		dir == ObjectDirection::MOVE_RIGHT ||
-		dir == ObjectDirection::MOVE_LEFT
-	) {
-		movement.x = 0.0f;
-	} else if (
-		dir == ObjectDirection::MOVE_UP ||
-		dir == ObjectDirection::MOVE_DOWN
-	) {
-		movement.y = 0.0f;
+	keys_pressed[dir] = false;
+	if (keys_pressed[static_cast<ObjectDirection>(-dir)] == false) {
+		if (
+			dir == ObjectDirection::MOVE_FORWARD ||
+			dir == ObjectDirection::MOVE_BACKWARD
+		) {
+			movement.z = 0.0f;
+		} else if (
+			dir == ObjectDirection::MOVE_RIGHT ||
+			dir == ObjectDirection::MOVE_LEFT
+		) {
+			movement.x = 0.0f;
+		} else if (
+			dir == ObjectDirection::MOVE_UP ||
+			dir == ObjectDirection::MOVE_DOWN
+		) {
+			movement.y = 0.0f;
+		}
+	} else {
+		toggleMove(static_cast<ObjectDirection>(-dir));
 	}
 }
 
@@ -254,7 +259,7 @@ void	App::loadTexture(const std::string& path) {
 /* ========================================================================== */
 
 std::map<ObjectDirection, bool>	populateKeyMap() {
-	std::vector<ObjectDirection, bool>	map;
+	std::map<ObjectDirection, bool>	map;
 
 	map[ObjectDirection::MOVE_FORWARD] = false;
 	map[ObjectDirection::MOVE_BACKWARD] = false;

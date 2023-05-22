@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/22 14:10:35 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/22 17:46:44 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,12 +48,12 @@ enum RotationInput {
 };
 
 enum ObjectDirection {
-	MOVE_FORWARD,
-	MOVE_BACKWARD,
-	MOVE_LEFT,
-	MOVE_RIGHT,
-	MOVE_UP,
-	MOVE_DOWN
+	MOVE_FORWARD = 1,
+	MOVE_BACKWARD = -1,
+	MOVE_LEFT = 2,
+	MOVE_RIGHT = -2,
+	MOVE_UP = 3,
+	MOVE_DOWN = -3
 };
 
 enum ZoomInput {
