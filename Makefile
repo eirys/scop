@@ -6,7 +6,7 @@
 #    By: etran <etran@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/05/20 14:53:58 by etran            ###   ########.fr        #
+#    Updated: 2023/05/22 01:03:41 by etran            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -109,8 +109,7 @@ endif
 CFLAGS		:=	$(EXTRA)\
 				-std=c++17 \
 				$(INCLUDES) \
-				-DNDEBUG \
-				-D__DEBUG
+				-DNDEBUG
 
 LDFLAGS		:=	-lglfw \
 				-lvulkan \

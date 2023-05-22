@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/21 11:41:16 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/22 14:12:47 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ bool							App::texture_enabled = true;
 std::optional<App::time_point>	App::texture_enabled_start;
 
 std::array<float, 3>			App::rotation_angles = { 0.0f, 0.0f, 0.0f };
+std::map<ObjectDirection, bool>	keys_pressed = populateKeyMap();
 scop::Vect3						App::movement = scop::Vect3(0.0f, 0.0f, 0.0f);
 scop::Vect3						App::position = scop::Vect3(0.0f, 0.0f, 0.0f);
 
@@ -69,10 +70,12 @@ void	App::toggleTexture() noexcept {
 }
 
 void	App::resetModel() noexcept {
+	// Reset rotation
 	rotation_angles[0] = 0.0f;
 	rotation_angles[1] = 0.0f;
 	rotation_angles[2] = 0.0f;
 
+	// Reset translation
 	position = scop::Vect3(0.0f, 0.0f, 0.0f);
 }
 
@@ -94,18 +97,24 @@ void	App::updateRotation(RotationAxis dir, RotationInput value) noexcept {
 */
 void	App::toggleMove(ObjectDirection dir) noexcept {
 	switch (dir) {
-		case ObjectDirection::MOVE_FORWARD:
-			if (movement.z == 0.0f)
+		case ObjectDirection::MOVE_FORWARD: {
+			keys_pressed[ObjectDirection::MOVE_FORWARD] = true;
+			if (keys_pressed[ObjectDirection::MOVE_BACKWARD] == false)
 				movement.z = -SCOP_MOVE_SPEED;
 			break;
-		case ObjectDirection::MOVE_BACKWARD:
-			if (movement.z == 0.0f)
+		}
+		case ObjectDirection::MOVE_BACKWARD: {
+			keys_pressed[ObjectDirection::MOVE_BACKWARD] = true;
+			if (keys_pressed[ObjectDirection::MOVE_FORWARD] == false)
 				movement.z = SCOP_MOVE_SPEED;
 			break;
-		case ObjectDirection::MOVE_RIGHT:
-			if (movement.x == 0.0f)
+		}
+		case ObjectDirection::MOVE_RIGHT: {
+			keys_pressed[ObjectDirection::MOVE_RIGHT] = true;
+			if (keys_pressed[ObjectDirection::MOVE_LEFT] == false)
 				movement.x = SCOP_MOVE_SPEED;
 			break;
+		}
 		case ObjectDirection::MOVE_LEFT:
 			if (movement.x == 0.0f)
 				movement.x = -SCOP_MOVE_SPEED;
@@ -238,6 +247,28 @@ void	App::loadTexture(const std::string& path) {
 	}
 	image_loader.reset(new PpmLoader(file));
 	image = std::make_unique<scop::Image>(image_loader->load());
+}
+
+/* ========================================================================== */
+/*                                    OTHER                                   */
+/* ========================================================================== */
+
+std::map<ObjectDirection, bool>	populateKeyMap() {
+	std::vector<ObjectDirection, bool>	map;
+
+	map[ObjectDirection::MOVE_FORWARD] = false;
+	map[ObjectDirection::MOVE_BACKWARD] = false;
+	map[ObjectDirection::MOVE_LEFT] = false;
+	map[ObjectDirection::MOVE_RIGHT] = false;
+	map[ObjectDirection::MOVE_UP] = false;
+	map[ObjectDirection::MOVE_DOWN] = false;
+	// map[ObjectDirection::MOVE_] = false;	//rotation
+	// map[ObjectDirection::MOVE_] = false;
+	// map[ObjectDirection::MOVE_] = false;
+	// map[ObjectDirection::MOVE_] = false;
+	// map[ObjectDirection::MOVE_] = false;
+	// map[ObjectDirection::MOVE_] = false;
+	return map;
 }
 
 } // namespace scop

@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/21 11:40:52 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/22 14:10:35 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 
 // Std
 # include <memory> // std::unique_ptr
+# include <map> // std::map
 
 # include "window.hpp"
 # include "utils.hpp"
@@ -47,12 +48,12 @@ enum RotationInput {
 };
 
 enum ObjectDirection {
-	MOVE_FORWARD		= 1 << 0,
-	MOVE_BACKWARD		= 1 << 1,
-	MOVE_LEFT			= 1 << 2,
-	MOVE_RIGHT			= 1 << 3,
-	MOVE_UP				= 1 << 4,
-	MOVE_DOWN			= 1 << 5
+	MOVE_FORWARD,
+	MOVE_BACKWARD,
+	MOVE_LEFT,
+	MOVE_RIGHT,
+	MOVE_UP,
+	MOVE_DOWN
 };
 
 enum ZoomInput {
@@ -87,9 +88,12 @@ public:
 	App(App&& x) = delete;
 	App& operator=(const App& rhs) = delete;
 
-	/* ========================================================================= */
+	/* MAIN FUNCTION =========================================================== */
 
 	void								run();
+
+	/* ========================================================================= */
+
 	static void							toggleTexture() noexcept;
 	static void							resetModel() noexcept;
 	static void							updateRotation(
@@ -130,8 +134,10 @@ private:
 	static bool							texture_enabled;
 	static std::optional<time_point>	texture_enabled_start;
 	static std::array<float, 3>			rotation_angles;
-	static scop::Vect3					position;
+	static
+	std::map<ObjectDirection, bool>		keys_pressed;
 	static scop::Vect3					movement;
+	static scop::Vect3					position;
 	static float						zoom_input;
 	static size_t						selected_up_axis;
 
@@ -144,5 +150,11 @@ private:
 	void								loadTexture(const std::string& path);
 
 }; // class App
+
+/* ========================================================================== */
+/*                                    OTHER                                   */
+/* ========================================================================== */
+
+std::map<ObjectDirection, bool>	populateKeyMap();
 
 } // namespace scop
