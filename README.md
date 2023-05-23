@@ -18,10 +18,12 @@ You can press `escape` to close the window.
 - `space`	upward
 
 **Rotation keys**:
-- `1`	around X axis of the object (`shift` + `1` to rotate counter clockwise)
-- `2`	around Y axis of the object (`shift` + `2` to rotate counter clockwise)
-- `3`	around Z axis of the object (`shift` + `3` to rotate counter clockwise)
-- `4`	reset rotation
+- `1`	around X axis of the object (`7` to rotate counter clockwise)
+- `2`	around Y axis of the object (`8` to rotate counter clockwise)
+- `3`	around Z axis of the object (`9` to rotate counter clockwise)
+
+**Reset model edits**
+- `r`	reset model
 
 **Camera orientation keys**
 - `tab`	camera orientation: +90°, 0° or -90°

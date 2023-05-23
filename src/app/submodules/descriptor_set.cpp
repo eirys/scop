@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:56:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/23 01:48:44 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/23 02:02:39 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,9 +211,6 @@ void	DescriptorSet::createDescriptorSets(
 	);
 }
 
-/**
- * Create uniform buffers
-*/
 void	DescriptorSet::createUniformBuffers(Device& device) {
 	VkDeviceSize	buffer_size = sizeof(UniformBufferObject);
 
@@ -249,12 +246,15 @@ void	DescriptorSet::initUniformBuffer() noexcept {
 	memcpy(uniform_buffers_mapped, &ubo, sizeof(UniformBufferObject));
 }
 
+/**
+ * Update the camera part of the uniform buffer.
+*/
 void	DescriptorSet::updateCamera(
 	VkExtent2D extent
 ) {
 	UniformBufferObject::Camera	camera{};
 
-	static const std::array<scop::Vect3, 3>	up_axis = {
+	static const std::array<scop::Vect3, 3>	axis = {
 		scop::Vect3(1.0f, 0.0f, 0.0f),
 		scop::Vect3(0.0f, 1.0f, 0.0f),
 		scop::Vect3(0.0f, 0.0f, 1.0f)
@@ -276,25 +276,29 @@ void	DescriptorSet::updateCamera(
 	camera.model = scop::rotate(
 		scop::rotate(
 			scop::rotate(
-				scop::translate(								// Translate object first
+				// Translate object first
+				scop::translate(
 					scop::Mat4(1.0f),
-					scop::Vect3(App::position.x, App::position.y, App::position.z)
+					App::position
 				),
-				scop::math::radians(App::rotation_angles[0]),	// Rotate around x
-				scop::Vect3(1.0f, 0.0f, 0.0f)
+				// Rotate around x
+				scop::math::radians(App::rotation_angles[0]),
+				axis[static_cast<int>(RotationAxis::ROTATION_AXIS_X)]
 			),
-			scop::math::radians(App::rotation_angles[1]),		// Rotate around y
-			scop::Vect3(0.0f, 1.0f, 0.0f)
+			// Rotate around y
+			scop::math::radians(App::rotation_angles[1]),
+			axis[static_cast<int>(RotationAxis::ROTATION_AXIS_Y)]
 		),
-		scop::math::radians(App::rotation_angles[2]),			// Rotate around z
-		scop::Vect3(0.0f, 0.0f, 1.0f)
+		// Rotate around z
+		scop::math::radians(App::rotation_angles[2]),
+		axis[static_cast<int>(RotationAxis::ROTATION_AXIS_Z)]
 	);
 
 	// Define camera transformation view
 	camera.view = scop::lookAt(
 		scop::Vect3(1.0f, 1.0f, 2.0f),
 		scop::Vect3(0.0f, 0.0f, 0.0f),
-		up_axis[App::selected_up_axis]
+		axis[App::selected_up_axis]
 	);
 
 	// Define persp. projection transformation
@@ -317,6 +321,7 @@ void	DescriptorSet::updateCamera(
 		)
 	);
 
+	// Copy to uniform buffer
 	memcpy(
 		(char*)uniform_buffers_mapped,
 		&camera,
@@ -324,6 +329,9 @@ void	DescriptorSet::updateCamera(
 	);
 }
 
+/**
+ * Update the texture part of the uniform buffer.
+*/
 void	DescriptorSet::updateTexture() {
 	// Only udpate if it was recently toggled
 	if (!App::texture_enabled_start.has_value()) {

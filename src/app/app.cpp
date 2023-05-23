@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/23 01:45:47 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/23 01:54:57 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,9 @@ void	App::toggleTexture() noexcept {
 	);
 }
 
+/**
+ * Resets the model to its original position and rotation.
+*/
 void	App::resetModel() noexcept {
 	// Reset rotation
 	rotation_angles[RotationAxis::ROTATION_AXIS_X] = 0.0f;
@@ -84,16 +87,6 @@ void	App::resetModel() noexcept {
 /**
  * On toggle, changes the rotation of the model.
 */
-// void	App::updateRotation(RotationAxis dir, RotationInput value) noexcept {
-// 	for (size_t i = 0; i < 4; ++i) {
-// 		if (i == static_cast<size_t>(dir)) {
-// 			rotation_angles[i] += (
-// 				value == RotationInput::ROTATION_ADD ? +10 :-10
-// 			);
-// 		}
-// 	}
-// }
-
 void	App::toggleRotation(RotationInput value) noexcept {
 	keys_pressed_rotations[value] = true;
 	switch (value) {
@@ -126,6 +119,9 @@ void	App::toggleRotation(RotationInput value) noexcept {
 	}
 }
 
+/**
+ * On untoggle, stops the rotation of the model.
+*/
 void	App::untoggleRotation(RotationInput value) noexcept {
 	keys_pressed_rotations[value] = false;
 	if (keys_pressed_rotations[static_cast<RotationInput>(-value)] == false) {
