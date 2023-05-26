@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 13:32:56 by etran             #+#    #+#             */
-/*   Updated: 2023/05/27 01:27:52 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 01:31:25 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,7 +170,10 @@ void	MtlParser::parseIllum() {
 		throw base::parse_error("Expected transparency value");
 	if (checkNumberType(token) != TokenType::TOKEN_INT)
 		throw base::parse_error("Expected integer value");
-	material_output.illum = std::stoul(token);
+	const std::size_t	illum = std::stoul(token);
+	if (illum > 10)
+		throw base::parse_error("Illumination model out of range");
+	material_output.illum = static_cast<IlluminationModel>(illum);
 }
 
 void	MtlParser::ignore() noexcept {
