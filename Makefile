@@ -6,7 +6,7 @@
 #    By: etran <etran@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/05/26 13:18:27 by etran            ###   ########.fr        #
+#    Updated: 2023/05/26 13:32:00 by etran            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -49,7 +49,9 @@ INC_FILES	:=	$(TOOLS_DIR)/utils.hpp \
 				$(UTILS_DIR)/vertex.hpp \
 				$(UTILS_DIR)/uniform_buffer_object.hpp \
 				$(MODEL_DIR)/model.hpp \
+				$(MODEL_DIR)/material.hpp \
 				$(MODEL_DIR)/obj_parser.hpp \
+				$(MODEL_DIR)/mtl_parser.hpp \
 				$(IMG_DIR)/image_loader.hpp \
 				$(IMG_DIR)/image_handler.hpp \
 				$(IMG_DIR)/ppm_loader.hpp \
@@ -67,7 +69,9 @@ INC_FILES	:=	$(TOOLS_DIR)/utils.hpp \
 
 SRC_FILES	:=	$(TOOLS_DIR)/matrix.cpp \
 				$(MODEL_DIR)/model.cpp \
+				$(MODEL_DIR)/material.cpp \
 				$(MODEL_DIR)/obj_parser.cpp \
+				$(MODEL_DIR)/mtl_parser.cpp \
 				$(IMG_DIR)/ppm_loader.cpp \
 				$(IMG_DIR)/image_handler.cpp \
 				$(SUBMOD_DIR)/window.cpp \
