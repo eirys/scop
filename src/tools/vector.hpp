@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 13:54:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/18 22:45:11 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 01:18:04 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ struct Vect3 {
 
 	/* ACCESSORS =============================================================== */
 
-	const float&	operator[](size_t index) const {
+	const float&	operator[](std::size_t index) const {
 		switch (index) {
 			case 0:
 				return x;
@@ -54,7 +54,7 @@ struct Vect3 {
 		}
 	}
 
-	float&	operator[](size_t index) {
+	float&	operator[](std::size_t index) {
 		switch (index) {
 			case 0:
 				return x;
@@ -185,7 +185,7 @@ struct Vect2 {
 
 	/* ACCESSORS =============================================================== */
 
-	float&	operator[](size_t index) {
+	float&	operator[](std::size_t index) {
 		switch (index) {
 			case 0:
 				return x;

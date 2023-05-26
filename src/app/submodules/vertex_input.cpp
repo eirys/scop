@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/16 13:03:48 by etran             #+#    #+#             */
-/*   Updated: 2023/05/18 19:34:16 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 01:18:04 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ void	VertexInput::createVertexBuffer(
 	// Fill staging buffer
 	void*	data;
 	vkMapMemory(device.logical_device, staging_buffer_memory, 0, buffer_size, 0, &data);
-	memcpy(data, vertices.data(), static_cast<size_t>(buffer_size));
+	memcpy(data, vertices.data(), static_cast<std::size_t>(buffer_size));
 	vkUnmapMemory(device.logical_device, staging_buffer_memory);
 
 	// Create vertex buffer that'll interact with gpu
@@ -120,7 +120,7 @@ void	VertexInput::createIndexBuffer(
 	// Fill staging buffer with indices
 	void*	data;
 	vkMapMemory(device.logical_device, staging_buffer_memory, 0, buffer_size, 0, &data);
-	memcpy(data, indices.data(), static_cast<size_t>(buffer_size));
+	memcpy(data, indices.data(), static_cast<std::size_t>(buffer_size));
 	vkUnmapMemory(device.logical_device, staging_buffer_memory);
 
 	device.createBuffer(

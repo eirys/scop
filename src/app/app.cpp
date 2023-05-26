@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/26 23:26:30 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 01:18:04 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -292,7 +292,7 @@ void	App::loadTexture(const std::string& path) {
 	if (path.empty()) {
 		file = SCOP_TEXTURE_FILE_HAMSTER_PPM;
 	} else {
-		size_t	extension_pos = path.rfind('.');
+		std::size_t	extension_pos = path.rfind('.');
 		if (extension_pos == std::string::npos) {
 			throw std::invalid_argument(
 				"No extention found for texture file (must be .ppm)"

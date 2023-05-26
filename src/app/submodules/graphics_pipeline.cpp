@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 16:34:03 by etran             #+#    #+#             */
-/*   Updated: 2023/05/18 15:55:38 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 01:18:04 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ void	GraphicsPipeline::idle() {
 
 void	GraphicsPipeline::render(
 	scop::Window& window,
-	size_t indices_size
+	std::size_t indices_size
 ) {
 	// Wait fence available, lock it
 	vkWaitForFences(device.logical_device, 1, &in_flight_fences, VK_TRUE, UINT64_MAX);
@@ -489,7 +489,7 @@ VkShaderModule	GraphicsPipeline::createShaderModule(const std::vector<char>& cod
  *  Write commands to command buffer to be subimtted to queue.
  */
 void	GraphicsPipeline::recordCommandBuffer(
-	size_t indices_size,
+	std::size_t indices_size,
 	VkCommandBuffer command_buffer,
 	uint32_t image_index
 ) {

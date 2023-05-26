@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 23:38:54 by etran             #+#    #+#             */
-/*   Updated: 2023/05/27 00:06:22 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 01:18:04 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ bool	Parser::getWord() {
 	if (current_pos == std::string::npos) {
 		return false;
 	}
-	size_t	end_pos = line.find_first_of(cs_whitespaces, current_pos);
+	std::size_t	end_pos = line.find_first_of(cs_whitespaces, current_pos);
 	token = line.substr(current_pos, end_pos - current_pos);
 	current_pos = end_pos;
 	return true;
@@ -57,7 +57,7 @@ TokenType	Parser::checkNumberType(const std::string& word) const {
 		throw Parser::parse_error("expecting number");
 	}
 
-	size_t	pos_checked = word.find(cs_negate);
+	std::size_t	pos_checked = word.find(cs_negate);
 
 	// Check if first negate
 	if (pos_checked != std::string::npos && pos_checked != 0) {
@@ -75,7 +75,7 @@ TokenType	Parser::checkNumberType(const std::string& word) const {
 	}
 
 	// Check if there's a dot after digits
-	size_t	dot_pos = word.find(cs_dot, pos_checked);
+	std::size_t	dot_pos = word.find(cs_dot, pos_checked);
 	if (dot_pos == std::string::npos) {
 		checkJunkAfterNumber(word, pos_checked);
 		return TokenType::TOKEN_INT;
@@ -89,7 +89,7 @@ TokenType	Parser::checkNumberType(const std::string& word) const {
 */
 void	Parser::checkJunkAfterNumber(
 	const std::string& word,
-	size_t pos
+	std::size_t pos
 ) const {
 	if (word.find_first_not_of(cs_digit, pos) != std::string::npos) {
 		throw Parser::parse_error("unexpected character after value");

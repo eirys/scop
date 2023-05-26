@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 19:23:47 by eli               #+#    #+#             */
-/*   Updated: 2023/05/26 23:44:12 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 01:18:04 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ void	Model::setDefaultTextureCoords() {
 		{ 0.0f, 1.0f }
 	};
 
-	size_t	i = 0;
+	std::size_t	i = 0;
 	for (auto& triangle: triangles) {
 		if (i++ % 2) {
 			triangle.indices[0].texture = 0;

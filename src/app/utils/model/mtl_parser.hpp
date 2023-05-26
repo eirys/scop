@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 13:15:11 by etran             #+#    #+#             */
-/*   Updated: 2023/05/27 00:43:34 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 01:22:11 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,14 @@ private:
 	};
 
 	const ParseFunction	parseLineFn[nb_line_size] = {
-		
+		&MtlParser::ignore,
+		&MtlParser::parseNewmtl,
+		&MtlParser::parseKa,
+		&MtlParser::parseKd,
+		&MtlParser::parseKs,
+		&MtlParser::parseTr,
+		&MtlParser::parseNs,
+		&MtlParser::parseIllum
 	};
 
 	/* ========================================================================= */
@@ -92,7 +99,11 @@ private:
 	void				parseKs();
 	void				parseTr();
 	void				parseNs();
+	void				parseIllum();
+	void				ignore() noexcept;
+
 	scop::Vect3			parseColors();
+
 
 }; // class MtlParser
 

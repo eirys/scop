@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 10:23:32 by eli               #+#    #+#             */
-/*   Updated: 2023/05/26 12:59:23 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 01:20:23 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,8 @@ public:
 		const std::string& path,
 		// ImageType type,
 		std::vector<uint32_t>&& pixels,
-		size_t width,
-		size_t height
+		std::size_t width,
+		std::size_t height
 	);
 
 	Image(Image&& x) = default;
@@ -50,8 +50,8 @@ public:
 
 	const std::string&			getPath() const noexcept;
 	const uint32_t*				getPixels() const noexcept;
-	size_t						getWidth() const noexcept;
-	size_t						getHeight() const noexcept;
+	std::size_t					getWidth() const noexcept;
+	std::size_t					getHeight() const noexcept;
 
 private:
 	/* ========================================================================= */
@@ -61,8 +61,8 @@ private:
 	const std::string			path;
 	// ImageType					type;
 	const std::vector<uint32_t>	pixels;
-	size_t						width;
-	size_t						height;
+	std::size_t					width;
+	std::size_t					height;
 
 }; // class Image
 

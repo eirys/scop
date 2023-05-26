@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 23:30:12 by etran             #+#    #+#             */
-/*   Updated: 2023/05/26 23:45:10 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 01:18:04 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ protected:
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
 
-	size_t				current_pos;
+	std::size_t				current_pos;
 	std::string			line;
 	std::string			token;
 
@@ -93,7 +93,7 @@ protected:
 	TokenType			checkNumberType(const std::string& word) const;
 	void				checkJunkAfterNumber(
 		const std::string& word,
-		size_t pos
+		std::size_t pos
 	) const;
 
 }; // class Parser

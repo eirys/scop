@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/19 23:18:11 by etran             #+#    #+#             */
-/*   Updated: 2023/05/23 01:36:37 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 01:18:04 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,13 @@ Mat4::Mat4() {
 }
 
 Mat4::Mat4(const Mat4& other) {
-	for (size_t i = 0; i < 16; ++i) {
+	for (std::size_t i = 0; i < 16; ++i) {
 		mat[i] = other.mat[i];
 	}
 }
 
 Mat4::Mat4(float x) {
-	for (size_t i = 0; i < 16; ++i) {
+	for (std::size_t i = 0; i < 16; ++i) {
 		if (i % 5 == 0)
 			mat[i] = x;
 		else
@@ -43,13 +43,13 @@ Mat4::Mat4(std::initializer_list<float> list) {
 	if (list.size() != 16) {
 		throw std::invalid_argument("Mat4 initializer list must have 16 elements");
 	}
-	for (size_t i = 0; i < list.size(); ++i) {
+	for (std::size_t i = 0; i < list.size(); ++i) {
 		mat[i] = *(list.begin() + i);
 	}
 }
 
 Mat4&	Mat4::operator=(const Mat4& rhs) noexcept {
-	for (size_t i = 0; i < 16; ++i) {
+	for (std::size_t i = 0; i < 16; ++i) {
 		mat[i] = rhs.mat[i];
 	}
 	return *this;
@@ -57,14 +57,14 @@ Mat4&	Mat4::operator=(const Mat4& rhs) noexcept {
 
 /* ACCESSORS =============================================================== */
 
-float&	Mat4::operator[](size_t index) {
+float&	Mat4::operator[](std::size_t index) {
 	if (index >= 16) {
 		throw std::out_of_range("Matrix index out of range");
 	}
 	return mat[index];
 }
 
-const float&	Mat4::operator[](size_t index) const {
+const float&	Mat4::operator[](std::size_t index) const {
 	if (index >= 16) {
 		throw std::out_of_range("Matrix index out of range");
 	}
@@ -74,7 +74,7 @@ const float&	Mat4::operator[](size_t index) const {
 /* OPERATORS =============================================================== */
 
 Mat4&	Mat4::operator+=(const Mat4& rhs) noexcept {
-	for (size_t i = 0; i < 16; i++) {
+	for (std::size_t i = 0; i < 16; i++) {
 		mat[i] += rhs.mat[i];
 	}
 	return *this;
@@ -86,7 +86,7 @@ Mat4	Mat4::operator+(const Mat4& rhs) const noexcept {
 }
 
 Mat4&	Mat4::operator-=(const Mat4& rhs) noexcept {
-	for (size_t i = 0; i < 16; i++) {
+	for (std::size_t i = 0; i < 16; i++) {
 		mat[i] -= rhs.mat[i];
 	}
 	return *this;
@@ -99,9 +99,9 @@ Mat4	Mat4::operator-(const Mat4& rhs) const noexcept {
 
 Mat4&	Mat4::operator*=(const Mat4& rhs) noexcept {
 	Mat4	result;
-	for (size_t i = 0; i < 4; i++) {
-		for (size_t j = 0; j < 4; j++) {
-			for (size_t k = 0; k < 4; k++) {
+	for (std::size_t i = 0; i < 4; i++) {
+		for (std::size_t j = 0; j < 4; j++) {
+			for (std::size_t k = 0; k < 4; k++) {
 				result[i * 4 + j] = static_cast<float>(
 					std::fma(mat[i * 4 + k], rhs.mat[k * 4 + j], result[i * 4 + j])
 				);
@@ -120,7 +120,7 @@ Mat4	Mat4::operator*(const Mat4& rhs) const noexcept {
 /* ========================================================================= */
 
 Mat4&	Mat4::operator*=(float rhs) noexcept {
-	for (size_t i = 0; i < 16; i++) {
+	for (std::size_t i = 0; i < 16; i++) {
 		mat[i] *= rhs;
 	}
 	return *this;
@@ -164,14 +164,14 @@ Vect3	Mat4::operator*(const Vect3& rhs) const noexcept {
  * @param row		The line to remove.
  * @param column	The column to remove.
 */
-Mat3	Mat4::minor(size_t row, size_t column) const {
+Mat3	Mat4::minor(std::size_t row, std::size_t column) const {
 	Mat3	submatrix{};
-	size_t	x = 0;
-	size_t	y = 0;
+	std::size_t	x = 0;
+	std::size_t	y = 0;
 
-	for (size_t line = 0; line < 4; ++line) {
+	for (std::size_t line = 0; line < 4; ++line) {
 		if (line != row) {
-			for (size_t col = 0; col < 4; ++col) {
+			for (std::size_t col = 0; col < 4; ++col) {
 				if (col != column) {
 					submatrix[y * 3 + x] = mat[line * 3 + col];
 					++x;
@@ -190,7 +190,7 @@ Mat3	Mat4::minor(size_t row, size_t column) const {
 float	Mat4::det() const {
 	float	sum{};
 
-	for (size_t j = 0; j < 4; ++j) {
+	for (std::size_t j = 0; j < 4; ++j) {
 		sum = std::fma(
 			std::pow(-1.0f, j),
 			std::fma(
@@ -207,8 +207,8 @@ float	Mat4::det() const {
 Mat4	Mat4::adjugate() const {
 	Mat4	cofactor{};
 
-	for (size_t i = 0; i < 4; ++i) {
-		for (size_t j = 0; j < 4; ++j) {
+	for (std::size_t i = 0; i < 4; ++i) {
+		for (std::size_t j = 0; j < 4; ++j) {
 			cofactor[4 * i + j] = std::fma(
 				std::pow(-1.0, i + j),
 				minor(i, j).det(),
@@ -222,8 +222,8 @@ Mat4	Mat4::adjugate() const {
 Mat4	Mat4::transpose() const {
 	Mat4	result{};
 
-	for (size_t i = 0; i < 4; ++i) {
-		for (size_t j = 0; j < 4; ++j) {
+	for (std::size_t i = 0; i < 4; ++i) {
+		for (std::size_t j = 0; j < 4; ++j) {
 			result[4 * i + j] = mat[4 * j + i];
 		}
 	}
@@ -240,14 +240,14 @@ Mat3::Mat3() {
 
 /* ACCESSORS ================================================================ */
 
-float&	Mat3::operator[](size_t index) {
+float&	Mat3::operator[](std::size_t index) {
 	if (index >= 9) {
 		throw std::out_of_range("Mat3 index out of range");
 	}
 	return mat[index];
 }
 
-const float&	Mat3::operator[](size_t index) const {
+const float&	Mat3::operator[](std::size_t index) const {
 	if (index >= 9) {
 		throw std::out_of_range("Mat3 index out of range");
 	}
@@ -256,14 +256,14 @@ const float&	Mat3::operator[](size_t index) const {
 
 /* ========================================================================== */
 
-Mat2	Mat3::minor(size_t row, size_t column) const {
+Mat2	Mat3::minor(std::size_t row, std::size_t column) const {
 	Mat2	submatrix{};
-	size_t	x = 0;
-	size_t	y = 0;
+	std::size_t	x = 0;
+	std::size_t	y = 0;
 
-	for (size_t line = 0; line < 3; ++line) {
+	for (std::size_t line = 0; line < 3; ++line) {
 		if (line != row) {
-			for (size_t col = 0; col < 3; ++col) {
+			for (std::size_t col = 0; col < 3; ++col) {
 				if (col != column) {
 					submatrix[2 * y + x] = mat[2 * line + col];
 					++x;
@@ -279,7 +279,7 @@ Mat2	Mat3::minor(size_t row, size_t column) const {
 float	Mat3::det() const {
 	float	sum{};
 
-	for (size_t j = 0; j < 3; ++j) {
+	for (std::size_t j = 0; j < 3; ++j) {
 		sum = std::fma(
 			std::pow(-1.0f, j),
 			std::fma(
@@ -303,14 +303,14 @@ Mat2::Mat2() {
 
 /* ACCESSORS ================================================================ */
 
-float& Mat2::operator[](size_t index) {
+float& Mat2::operator[](std::size_t index) {
 	if (index >= 4) {
 		throw std::out_of_range("Mat2 index out of range");
 	}
 	return mat[index];
 }
 
-const float& Mat2::operator[](size_t index) const {
+const float& Mat2::operator[](std::size_t index) const {
 	if (index >= 4) {
 		throw std::out_of_range("Mat2 index out of range");
 	}
@@ -430,8 +430,8 @@ Mat4	perspective(float fov, float aspect_ratio, float near, float far) noexcept 
 Mat4	scale(const Mat4& mat, const Vect3& scale) noexcept {
 	Mat4	result(mat);
 
-	for (size_t j = 0; j < 3; ++j) {
-		for (size_t i = 0; i < 3; ++i) {
+	for (std::size_t j = 0; j < 3; ++j) {
+		for (std::size_t i = 0; i < 3; ++i) {
 			result[j * 4 + i] *= scale[j];
 		}
 	}

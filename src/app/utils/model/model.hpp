@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 19:23:53 by eli               #+#    #+#             */
-/*   Updated: 2023/05/26 23:25:21 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 01:18:04 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ public:
 		int							texture;
 		int							normal;
 
-		int	operator[](size_t i) const {
+		int	operator[](std::size_t i) const {
 			switch (i) {
 				case 0: return vertex;
 				case 1: return texture;
@@ -51,7 +51,7 @@ public:
 				default: throw std::out_of_range("Index out of range");
 			}
 		}
-		int&	operator[](size_t i) {
+		int&	operator[](std::size_t i) {
 			switch (i) {
 				case 0: return vertex;
 				case 1: return texture;

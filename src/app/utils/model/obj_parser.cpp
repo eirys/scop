@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/27 00:38:37 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 01:18:04 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ Model	ObjParser::parseFile(const std::string& file_name) {
 		throw std::invalid_argument("Could not open file " + file_name);
 	}
 
-	for (size_t current_line = 1; file.good(); ++current_line) {
+	for (std::size_t current_line = 1; file.good(); ++current_line) {
 		std::getline(file, line);
 
 		try {
@@ -64,7 +64,7 @@ void	ObjParser::checkFile(const std::string& file) const {
 	if (file.empty()) {
 		throw std::invalid_argument("Empty file name");
 	}
-	size_t	extension_pos = file.rfind('.');
+	std::size_t	extension_pos = file.rfind('.');
 
 	if (extension_pos == std::string::npos) {
 		throw std::invalid_argument("File '" + file + "' has no extension");
@@ -75,13 +75,13 @@ void	ObjParser::checkFile(const std::string& file) const {
 
 void	ObjParser::processLine() {
 	if (line.empty()) {
-		return skipComment();
+		return;
 	}
 	current_pos = 0;
 
 	// Check line type
 	getWord();
-	for (size_t i = 0; i < nb_line_types; ++i) {
+	for (std::size_t i = 0; i < nb_line_types; ++i) {
 		if (token == line_begin[i]) {
 			skipWhitespace();
 			try {
@@ -113,7 +113,7 @@ void	ObjParser::processLine() {
 void	ObjParser::parseVertex() {
 	scop::Vect3	vertex{};
 
-	for (size_t i = 0; i < 3; ++i) {
+	for (std::size_t i = 0; i < 3; ++i) {
 		if (!getWord())
 			throw base::parse_error("expecting 3 coordinates");
 		checkNumberType(token);
@@ -132,7 +132,7 @@ void	ObjParser::parseVertex() {
 void	ObjParser::parseTexture() {
 	scop::Vect2	texture{};
 
-	for (size_t i = 0; i < 2; ++i) {
+	for (std::size_t i = 0; i < 2; ++i) {
 		if (!getWord())
 			throw base::parse_error("expecting 2 coordinates");
 		checkNumberType(token);
@@ -151,7 +151,7 @@ void	ObjParser::parseTexture() {
 void	ObjParser::parseNormal() {
 	scop::Vect3	normal{};
 
-	for (size_t i = 0; i < 3; ++i) {
+	for (std::size_t i = 0; i < 3; ++i) {
 		if (!getWord())
 			throw base::parse_error("expecting 3 coordinates");
 		checkNumberType(token);
@@ -192,10 +192,10 @@ void	ObjParser::parseFace() {
 
 		// Extract expected indices from chunk
 		Model::Index	index{};
-		size_t	begin_pos = 0;
-		for (size_t i = 0; i < 3; ++i) {
+		std::size_t	begin_pos = 0;
+		for (std::size_t i = 0; i < 3; ++i) {
 			if (format.value() & (1 << i)) {
-				size_t	end_pos = token.find(cs_slash, begin_pos);
+				std::size_t	end_pos = token.find(cs_slash, begin_pos);
 				if (end_pos == std::string::npos) {
 					end_pos = token.size();
 				}
@@ -228,17 +228,17 @@ void	ObjParser::parseFace() {
 void	ObjParser::storeTriangles(
 	const std::vector<Model::Index>& indices
 ) {
-	size_t	attr_sizes[3] = {
+	std::size_t	attr_sizes[3] = {
 		model_output.getVertexCoords().size(),
 		model_output.getTextureCoords().size(),
 		model_output.getNormalCoords().size()
 	};
-	size_t	nb_triangles = indices.size() - 2;
+	std::size_t	nb_triangles = indices.size() - 2;
 
-	for (size_t i = 0; i < nb_triangles; ++i) {
+	for (std::size_t i = 0; i < nb_triangles; ++i) {
 		// Replace occurence of -1 by last element of corresponding list
 		auto	selectIndex =
-			[indices, attr_sizes](size_t pos, size_t attr) -> int {
+			[indices, attr_sizes](std::size_t pos, std::size_t attr) -> int {
 				if (indices[pos][attr] < 0) {
 					return attr_sizes[attr] - 1;
 				} else {
@@ -274,8 +274,8 @@ void	ObjParser::ignore() noexcept {
 /* ========================================================================== */
 
 uint8_t	ObjParser::getFormat() const noexcept {
-	size_t	first_slash = token.find(cs_slash);
-	size_t	last_slash = token.rfind(cs_slash);
+	std::size_t	first_slash = token.find(cs_slash);
+	std::size_t	last_slash = token.rfind(cs_slash);
 
 	if (first_slash == std::string::npos && last_slash == std::string::npos) {
 		return vertex_bit;

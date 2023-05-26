@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:02:06 by etran             #+#    #+#             */
-/*   Updated: 2023/05/27 00:03:46 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 01:22:46 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,9 +58,9 @@ private:
 
 	Model				model_output;
 
-	// /* ========================================================================= */
-	// /*                               CONST MEMBERS                               */
-	// /* ========================================================================= */
+	/* ========================================================================= */
+	/*                               CONST MEMBERS                               */
+	/* ========================================================================= */
 
 	/**
 	 * Bitmask for indice type.
@@ -76,11 +76,11 @@ private:
 	 * List of possible line type in .obj file.
 	*/
 	const std::string	line_begin[nb_line_types] = {
+		"#",
 		"v",
 		"vn",
 		"vt",
 		"f",
-		"#",
 		"mtllib",	// TODO
 		"usemtl", 	// TODO
 		"o",		// TODO
@@ -89,11 +89,11 @@ private:
 	};
 
 	const ParseFunction		parseLineFun[nb_line_types] = {
+		&ObjParser::ignore,
 		&ObjParser::parseVertex,
 		&ObjParser::parseNormal,
 		&ObjParser::parseTexture,
 		&ObjParser::parseFace,
-		&ObjParser::ignore,
 		&ObjParser::ignore,
 		&ObjParser::ignore,
 		&ObjParser::ignore,

@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 13:57:01 by eli               #+#    #+#             */
-/*   Updated: 2023/05/18 22:45:52 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 01:20:48 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,8 +65,8 @@ private:
 
 	Format		format;
 	uint8_t		max_color;
-	size_t		cursor = 0;	// Used to parse the file
-	size_t		line = 1;
+	std::size_t	cursor = 0;	// Used to parse the file
+	std::size_t	line = 1;
 
 	/* ========================================================================= */
 

@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 13:32:56 by etran             #+#    #+#             */
-/*   Updated: 2023/05/27 00:40:39 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 01:27:52 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,106 @@ void	MtlParser::processLine() {
 
 	// Check line type.
 	getWord();
-	
+	for (std::size_t i = 0; i < nb_line_size; ++i) {
+		if (line == line_begin[i]) {
+			skipWhitespace();
+			try {
+				(this->*parseLineFn[i])();
+			} catch (const std::out_of_range& oor) {
+				throw base::parse_error("Value overflow");
+			}
+			if (current_pos != std::string::npos) {
+				if (line[current_pos] == '#') {
+					skipComment();
+				} else {
+					throw base::parse_error("unexpected token");
+				}
+			}
+			return;
+		}
+	}
+	throw base::parse_error("unknown line type");
+}
+
+/* ========================================================================== */
+
+/**
+ * @brief Parses a `newmtl` line (name).
+ * 
+ * @note The line should be in the format `newmtl <name>`.
+*/
+void	MtlParser::parseNewmtl() {
+	material_output.name = getWord();
+}
+
+/**
+ * @brief Parses a `Ka` line (ambient color).
+ * 
+ * @note The line should be in the format `Ka <r> <g> <b>`.
+*/
+void	MtlParser::parseKa() {
+	material_output.ambient_color = parseColors();
+}
+
+/**
+ * @brief Parses a `Kd` line (diffuse color).
+ * 
+ * @note The line should be in the format `Kd <r> <g> <b>`.
+*/
+void	MtlParser::parseKd() {
+	material_output.diffuse_color = parseColors();
+}
+
+/**
+ * @brief Parses a `Ks` line (specular color).
+ * 
+ * @note The line should be in the format `Ks <r> <g> <b>`.
+*/
+void	MtlParser::parseKs() {
+	material_output.specular_color = parseColors();
+}
+
+/**
+ * @brief Parses transparency.
+ * 
+ * @note The line should be in the format `d <float>`.
+*/
+void	MtlParser::parseTr() {
+	if (!getWord())
+		throw base::parse_error("Expected transparency value");
+	if (checkNumberType(token) != TokenType::TOKEN_FLOAT)
+		throw base::parse_error("Expected float value");
+	material_output.transparency = std::stof(token);
+}
+
+/**
+ * @brief Parses a `Ns` line (shininess exponent).
+ * 
+ * @note The line should be in the format `Ns <int>`.
+*/
+void	MtlParser::parseNs() {
+	if (!getWord())
+		throw base::parse_error("Expected transparency value");
+	if (checkNumberType(token) != TokenType::TOKEN_INT)
+		throw base::parse_error("Expected integer value");
+	material_output.shininess = std::stoul(token);
+}
+
+/**
+ * @brief Parses a `illum` line (illumination model).
+ * 
+ * @note The line should be in the format `illum <int>`.
+*/
+void	MtlParser::parseIllum() {
+	if (!getWord())
+		throw base::parse_error("Expected transparency value");
+	if (checkNumberType(token) != TokenType::TOKEN_INT)
+		throw base::parse_error("Expected integer value");
+	material_output.illum = std::stoul(token);
+}
+
+void	MtlParser::ignore() noexcept {
+	return skipComment();
 }
 
 /* ========================================================================== */
@@ -95,9 +194,6 @@ scop::Vect3	MtlParser::parseColors() {
 	}
 	return rgb;
 }
-
-/* ========================================================================== */
-
 
 } // namespace mtl
 } // namespace scop

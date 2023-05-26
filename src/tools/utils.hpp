@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 14:23:35 by eli               #+#    #+#             */
-/*   Updated: 2023/05/17 18:09:49 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 01:24:00 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ inline std::vector<char>	readFile(const std::string& filename) {
 		throw std::runtime_error("failed to open file: " + filename);
 	}
 
-	size_t				file_size = static_cast<size_t>(file.tellg());
+	std::size_t			file_size = static_cast<std::size_t>(file.tellg());
 	std::vector<char>	buffer(file_size);
 	file.seekg(0);
 	file.read(buffer.data(), file_size);

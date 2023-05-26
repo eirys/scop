@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 14:11:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/21 11:39:01 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 01:18:04 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,8 @@ struct Mat4 {
 
 	/* ACCESSORS =============================================================== */
 
-	float&	operator[](size_t index);
-	const float&	operator[](size_t index) const;
+	float&	operator[](std::size_t index);
+	const float&	operator[](std::size_t index) const;
 
 	/* OPERATORS =============================================================== */
 
@@ -61,7 +61,7 @@ struct Mat4 {
 	Mat4	operator*(float rhs) const noexcept;
 	Vect3	operator*(const Vect3& rhs) const noexcept;
 
-	Mat3	minor(size_t row, size_t col) const;
+	Mat3	minor(std::size_t row, std::size_t col) const;
 	float	det() const;
 	Mat4	adjugate() const;
 	Mat4	transpose() const;
@@ -91,12 +91,12 @@ struct Mat3 {
 
 	/* ACCESSORS =============================================================== */
 
-	float&	operator[](size_t index);
-	const float&	operator[](size_t index) const;
+	float&	operator[](std::size_t index);
+	const float&	operator[](std::size_t index) const;
 
 	/* ========================================================================= */
 
-	Mat2	minor(size_t row, size_t col) const;
+	Mat2	minor(std::size_t row, std::size_t col) const;
 	float	det() const;
 
 }; // struct Mat3
@@ -113,8 +113,8 @@ struct Mat2 {
 
 	/* ACCESSORS =============================================================== */
 
-	float&	operator[](size_t index);
-	const float&	operator[](size_t index) const;
+	float&	operator[](std::size_t index);
+	const float&	operator[](std::size_t index) const;
 
 	/* ========================================================================= */
 

@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:25:44 by etran             #+#    #+#             */
-/*   Updated: 2023/05/18 22:00:29 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 01:18:04 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ void	TextureSampler::createTextureImage(
 	// Map buffer, copy image load into buffer
 	void*	data;
 	vkMapMemory(device.logical_device, staging_buffer_memory, 0, image_size, 0, &data);
-	memcpy(data, image.getPixels(), static_cast<size_t>(image_size));
+	memcpy(data, image.getPixels(), static_cast<std::size_t>(image_size));
 	vkUnmapMemory(device.logical_device, staging_buffer_memory);
 
 	// Create texture image to be filled

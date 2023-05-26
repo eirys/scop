@@ -246,11 +246,19 @@ void	RenderTarget::createSwapChainObject(
 void	RenderTarget::destroySwapChain(Device& device) {
 	resources.destroy(device);
 
-	for (size_t i = 0; i < swap_chain_frame_buffers.size(); ++i) {
-		vkDestroyFramebuffer(device.logical_device, swap_chain_frame_buffers[i], nullptr);
+	for (std::size_t i = 0; i < swap_chain_frame_buffers.size(); ++i) {
+		vkDestroyFramebuffer(
+			device.logical_device,
+			swap_chain_frame_buffers[i],
+			nullptr
+		);
 	}
-	for (size_t i = 0; i < swap_chain_image_views.size(); ++i) {
-		vkDestroyImageView(device.logical_device, swap_chain_image_views[i], nullptr);
+	for (std::size_t i = 0; i < swap_chain_image_views.size(); ++i) {
+		vkDestroyImageView(
+			device.logical_device,
+			swap_chain_image_views[i],
+			nullptr
+		);
 	}
 
 	// Remove swap chain handler
@@ -262,7 +270,7 @@ void	RenderTarget::destroySwapChain(Device& device) {
 */
 void	RenderTarget::createFrameBuffers(Device& device) {
 	swap_chain_frame_buffers.resize(swap_chain_image_views.size());
-	for (size_t i = 0; i < swap_chain_image_views.size(); ++i) {
+	for (std::size_t i = 0; i < swap_chain_image_views.size(); ++i) {
 		std::array<VkImageView, 3>	attachments = {
 			resources.color_image_view,
 			resources.depth_image_view,
@@ -292,7 +300,7 @@ void	RenderTarget::createImageViews(Device& device) {
 	// Create image view for each images
 	swap_chain_image_views.resize(swap_chain_images.size());
 
-	for (size_t i = 0; i < swap_chain_images.size(); ++i) {
+	for (std::size_t i = 0; i < swap_chain_images.size(); ++i) {
 		swap_chain_image_views[i] = createImageView(
 			device.logical_device,
 			swap_chain_images[i],

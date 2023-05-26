@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 15:00:15 by eli               #+#    #+#             */
-/*   Updated: 2023/05/26 13:00:43 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 01:18:04 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,7 @@ PpmLoader::Pixels	PpmLoader::parseBody() {
 
 	ParseNumberFn	parseChannelFn(format == Format::P6 ? readExcept : readNb);
 	PpmLoader::Pixels	pixels(base::width * base::height * sizeof(uint32_t));
-	size_t	row = 0;
+	std::size_t	row = 0;
 
 	while (row < base::height) {
 		uint8_t	r, g, b;
@@ -169,7 +169,7 @@ uint32_t	PpmLoader::expectNumber() {
 		throw PpmParseError("missing value");
 	}
 
-	size_t	start = cursor;
+	std::size_t	start = cursor;
 	while (
 		base::data[cursor] >= '0' &&
 		base::data[cursor] <= '9'

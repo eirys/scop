@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 16:27:44 by etran             #+#    #+#             */
-/*   Updated: 2023/05/16 17:19:51 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 01:19:12 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ public:
 	/* ========================================================================= */
 
 	static const std::vector<const char*>	validation_layers;
-	static constexpr size_t					max_frames_in_flight = 1;
+	static constexpr std::size_t			max_frames_in_flight = 1;
 
 	#ifndef NDEBUG
 	static constexpr bool					enable_validation_layers = false;
@@ -81,8 +81,8 @@ public:
 
 	void						idle();
 	void						render(
-	scop::Window& window,
-		size_t indices_size
+		scop::Window& window,
+		std::size_t indices_size
 	);
 
 private:
@@ -139,7 +139,7 @@ private:
 		const std::vector<char>& code
 	);
 	void							recordCommandBuffer(
-		size_t indices_size,
+		std::size_t indices_size,
 		VkCommandBuffer command_buffer,
 		uint32_t image_index
 	);
