@@ -6,15 +6,13 @@
 #    By: etran <etran@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/06 03:40:09 by eli               #+#    #+#              #
-#    Updated: 2023/05/22 01:03:41 by etran            ###   ########.fr        #
+#    Updated: 2023/05/26 12:58:27 by etran            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 # ============================================================================ #
 #                                    TARGETS                                   #
 # ============================================================================ #
-
-school		:=	$(shell env | grep 42paris | wc -l)
 
 # final binary
 NAME		:=	scop
@@ -102,10 +100,6 @@ INCLUDES	:=	$(addprefix -I./,\
 				$(INC_SUBDIRS) \
 				$(STB_PATH))
 
-ifdef school!=0
-	EXTRA	+=	-Wno-unused-private-field
-endif
-
 CFLAGS		:=	$(EXTRA)\
 				-std=c++17 \
 				$(INCLUDES) \
@@ -120,11 +114,7 @@ LDFLAGS		:=	-lglfw \
 				-lXrandr \
 				-lXi
 
-ifdef school!=0
-	GLSLC	:=	~/my_sgoinfre/glslc
-else
-	GLSLC	:=	glslc
-endif
+GLSLC		:=	~/my_sgoinfre/glslc
 
 # misc
 RM			:=	rm -rf

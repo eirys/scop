@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 10:23:32 by eli               #+#    #+#             */
-/*   Updated: 2023/05/18 22:46:13 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/26 12:59:23 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,18 +28,12 @@ namespace scop {
 class Image {
 public:
 	/* ========================================================================= */
-	/*                                  TYPEDEF                                  */
-	/* ========================================================================= */
-
-	typedef		enum ImageType	ImageType;
-
-	/* ========================================================================= */
 	/*                                  METHODS                                  */
 	/* ========================================================================= */
 
 	Image(
 		const std::string& path,
-		ImageType type,
+		// ImageType type,
 		std::vector<uint32_t>&& pixels,
 		size_t width,
 		size_t height
@@ -65,7 +59,7 @@ private:
 	/* ========================================================================= */
 
 	const std::string			path;
-	ImageType					type;
+	// ImageType					type;
 	const std::vector<uint32_t>	pixels;
 	size_t						width;
 	size_t						height;

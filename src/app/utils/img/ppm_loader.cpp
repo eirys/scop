@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 15:00:15 by eli               #+#    #+#             */
-/*   Updated: 2023/05/13 10:20:50 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/26 13:00:43 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ Image	PpmLoader::load() {
 
 		return Image(
 			base::path,
-			base::type,
+			// base::type,
 			std::move(pixels),
 			width,
 			height
