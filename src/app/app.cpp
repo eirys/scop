@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/26 13:15:52 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/26 15:19:40 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -251,12 +251,16 @@ void	App::loadModel(const std::string& path) {
 				model_textures[index.texture].x,
 				1.0f - model_textures[index.texture].y
 			};
-			math::generateVibrantColor(
-				vertex.color.x,
-				vertex.color.y,
-				vertex.color.z
+			vertex.color = { 0.5f, 0.5f, 0.5f }; // grayscale
+			// math::generateVibrantColor(
+			// 	vertex.color.x,
+			// 	vertex.color.y,
+			// 	vertex.color.z
+			// );
+
+			// generate normals from vertices
+			vertex.normal = scop::cross(
 			);
-			// vertex.normal = model_normals[index.normal_index];
 
 			if (unique_vertices.count(vertex) == 0) {
 				unique_vertices[vertex] = static_cast<uint32_t>(vertices.size());

@@ -13,6 +13,7 @@ layout(binding = 2) uniform Texture {
 } texture_ubo;
 
 void main() {
+	vec4	light_pos = vec4(0.0, 10.0, 10.0, 1.0);
 	vec4	tex_color = texture(tex_sampler, frag_tex_coord);
 	vec4	input_color = vec4(frag_color, 1.0);
 

@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:02:06 by etran             #+#    #+#             */
-/*   Updated: 2023/05/26 13:14:52 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/26 14:49:27 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,9 +91,6 @@ private:
 	const std::string	cs_digit		= "0123456789";
 	const std::string	cs_dot			= ".";
 	const std::string	cs_negate		= "-";
-	const std::string	cs_lowercase	= "abcdefghijklmnopqrstuvwxyz";
-	const std::string	cs_uppercase	= "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	const std::string	cs_hash			= "#";
 	const std::string	cs_slash		= "/";
 	const std::string	cs_whitespaces	= " \t";
 
