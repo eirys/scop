@@ -6,13 +6,13 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/23 01:54:57 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/26 13:15:52 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "app.hpp"
 #include "model.hpp"
-#include "parser.hpp"
+#include "obj_parser.hpp"
 #include "ppm_loader.hpp"
 #include "math.hpp"
 
@@ -232,7 +232,7 @@ void	App::drawFrame() {
 }
 
 void	App::loadModel(const std::string& path) {
-	scop::obj::Parser	parser;
+	scop::obj::ObjParser	parser;
 	scop::obj::Model	model = parser.parseFile(path.c_str(), *image);
 	std::unordered_map<scop::Vertex, uint32_t>	unique_vertices{};
 

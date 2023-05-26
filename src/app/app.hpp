@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/23 01:45:47 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/26 13:16:45 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,11 +101,6 @@ public:
 
 	static void							toggleTexture() noexcept;
 	static void							resetModel() noexcept;
-	// static void							updateRotation(
-	// 	RotationAxis axis,
-	// 	RotationInput value
-	// ) noexcept;
-
 	static void							toggleRotation(
 		RotationInput value
 	) noexcept;

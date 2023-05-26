@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parser.cpp                                         :+:      :+:    :+:   */
+/*   obj_parser.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/19 00:56:27 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/26 13:15:52 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "parser.hpp"
+#include "obj_parser.hpp"
 #include "utils.hpp"	// LOG
 
 #include <fstream>		// ifstream
@@ -25,7 +25,7 @@ namespace obj {
 /*                                   PUBLIC                                   */
 /* ========================================================================== */
 
-Model	Parser::parseFile(
+Model	ObjParser::parseFile(
 	const std::string& file_name,
 	const scop::Image& texture
 ) {
@@ -42,7 +42,7 @@ Model	Parser::parseFile(
 
 		try {
 			processLine();
-		} catch (const Parser::parse_error& error) {
+		} catch (const ObjParser::parse_error& error) {
 			throw std::invalid_argument(
 				"Error while parsing '" + file_name +
 				"' at line " + std::to_string(current_line) + ": " +
@@ -63,7 +63,7 @@ Model	Parser::parseFile(
 /*                                   PRIVATE                                  */
 /* ========================================================================== */
 
-void	Parser::checkFile(const std::string& file) const {
+void	ObjParser::checkFile(const std::string& file) const {
 	if (file.empty()) {
 		throw std::invalid_argument("Empty file name");
 	}
@@ -76,7 +76,7 @@ void	Parser::checkFile(const std::string& file) const {
 	}
 }
 
-void	Parser::processLine() {
+void	ObjParser::processLine() {
 	if (line.empty()) {
 		return skipComment();
 	}
@@ -90,19 +90,19 @@ void	Parser::processLine() {
 			try {
 				(this->*parseLineFun[i])();
 			} catch (const std::out_of_range& oor) {
-				throw Parser::parse_error("value overflow");
+				throw ObjParser::parse_error("value overflow");
 			}
 			if (current_pos != std::string::npos) {
 				if (line[current_pos] == '#') {
 					skipComment();
 				} else {
-					throw Parser::parse_error("unexpected token");
+					throw ObjParser::parse_error("unexpected token");
 				}
 			}
 			return;
 		}
 	}
-	throw Parser::parse_error("undefined line type");
+	throw ObjParser::parse_error("undefined line type");
 }
 
 /**
@@ -111,12 +111,12 @@ void	Parser::processLine() {
  *
  * Retrieves a vertex.
 */
-void	Parser::parseVertex() {
+void	ObjParser::parseVertex() {
 	scop::Vect3	vertex{};
 
 	for (size_t i = 0; i < 3; ++i) {
 		if (!getWord())
-			throw Parser::parse_error("expecting 3 coordinates");
+			throw ObjParser::parse_error("expecting 3 coordinates");
 		checkNumberType(token);
 		vertex[i] = std::stof(token);
 		skipWhitespace();
@@ -130,12 +130,12 @@ void	Parser::parseVertex() {
  *
  * Retrieves a texture coordinates.
 */
-void	Parser::parseTexture() {
+void	ObjParser::parseTexture() {
 	scop::Vect2	texture{};
 
 	for (size_t i = 0; i < 2; ++i) {
 		if (!getWord())
-			throw Parser::parse_error("expecting 2 coordinates");
+			throw ObjParser::parse_error("expecting 2 coordinates");
 		checkNumberType(token);
 		texture[i] = std::stof(token);
 		skipWhitespace();
@@ -149,12 +149,12 @@ void	Parser::parseTexture() {
  *
  * Retrieves a normal.
 */
-void	Parser::parseNormal() {
+void	ObjParser::parseNormal() {
 	scop::Vect3	normal{};
 
 	for (size_t i = 0; i < 3; ++i) {
 		if (!getWord())
-			throw Parser::parse_error("expecting 3 coordinates");
+			throw ObjParser::parse_error("expecting 3 coordinates");
 		checkNumberType(token);
 		normal[i] = std::stof(token);
 		skipWhitespace();
@@ -171,7 +171,7 @@ void	Parser::parseNormal() {
  *
  * Retrives at least one triangle.
 */
-void	Parser::parseFace() {
+void	ObjParser::parseFace() {
 	std::optional<uint8_t>			format;
 	std::vector<Model::Index>		indices;
 
@@ -181,14 +181,14 @@ void	Parser::parseFace() {
 		// Verify nb indices
 		size_t	nb_slashes = std::count(token.begin(), token.end(), '/');
 		if (nb_slashes > 2) {
-			throw Parser::parse_error("expecting at most 3 indices");
+			throw ObjParser::parse_error("expecting at most 3 indices");
 		}
 
 		// If first chunk, determine format
 		if (!format.has_value()) {
 			format = getFormat();
 		} else if (format.value() != getFormat()) {
-			throw Parser::parse_error("inconsistent format");
+			throw ObjParser::parse_error("inconsistent format");
 		}
 
 		// Extract expected indices from chunk
@@ -202,7 +202,7 @@ void	Parser::parseFace() {
 				}
 				std::string	index_str = token.substr(begin_pos, end_pos - begin_pos);
 				if (checkNumberType(index_str) != TOKEN_INT) {
-					throw Parser::parse_error("expecting integer index");
+					throw ObjParser::parse_error("expecting integer index");
 				}
 				index[i] = std::stoi(index_str);
 				begin_pos = end_pos + 1;
@@ -211,7 +211,7 @@ void	Parser::parseFace() {
 			}
 		}
 		if (index.vertex == 0) {
-			throw Parser::parse_error("expecting vertex index");
+			throw ObjParser::parse_error("expecting vertex index");
 		}
 		model_output.addIndex(index);
 		indices.emplace_back(index);
@@ -219,7 +219,7 @@ void	Parser::parseFace() {
 	}
 
 	if (indices.size() < 3) {
-		throw Parser::parse_error("expecting at least 3 vertices");
+		throw ObjParser::parse_error("expecting at least 3 vertices");
 	}
 
 	// Store triangles
@@ -233,7 +233,7 @@ void	Parser::parseFace() {
  * or up until the charset parameter.
  * Returns false if line is empty.
 */
-bool	Parser::getWord() {
+bool	ObjParser::getWord() {
 	if (current_pos == std::string::npos) {
 		return false;
 	}
@@ -243,24 +243,24 @@ bool	Parser::getWord() {
 	return true;
 }
 
-void	Parser::skipComment() noexcept {
+void	ObjParser::skipComment() noexcept {
 	current_pos = std::string::npos;
 }
 
-void	Parser::skipWhitespace() noexcept {
+void	ObjParser::skipWhitespace() noexcept {
 	current_pos = line.find_first_not_of(cs_whitespaces, current_pos);
 }
 
-Parser::TokenType	Parser::checkNumberType(const std::string& word) const {
+ObjParser::TokenType	ObjParser::checkNumberType(const std::string& word) const {
 	if (word.empty()) {
-		throw Parser::parse_error("expecting number");
+		throw ObjParser::parse_error("expecting number");
 	}
 
 	size_t	pos_checked = word.find(cs_negate);
 
 	// Check if first negate
 	if (pos_checked != std::string::npos && pos_checked != 0) {
-		throw Parser::parse_error("unexpected '-' character");
+		throw ObjParser::parse_error("unexpected '-' character");
 	} else if (pos_checked == 0) {
 		pos_checked += 1;
 	} else {
@@ -270,7 +270,7 @@ Parser::TokenType	Parser::checkNumberType(const std::string& word) const {
 	// Check if there are only digits
 	pos_checked = word.find_first_of(cs_digit, pos_checked);
 	if (pos_checked == std::string::npos) {
-		throw Parser::parse_error("expecting digits after '-'");
+		throw ObjParser::parse_error("expecting digits after '-'");
 	}
 
 	// Check if there's a dot after digits
@@ -286,13 +286,13 @@ Parser::TokenType	Parser::checkNumberType(const std::string& word) const {
 /**
  * Check if there's junk after digits in word.
 */
-void	Parser::checkJunkAfterNumber(const std::string& word, size_t pos) const {
+void	ObjParser::checkJunkAfterNumber(const std::string& word, size_t pos) const {
 	if (word.find_first_not_of(cs_digit, pos) != std::string::npos) {
-		throw Parser::parse_error("unexpected character after value");
+		throw ObjParser::parse_error("unexpected character after value");
 	}
 }
 
-uint8_t	Parser::getFormat() const noexcept {
+uint8_t	ObjParser::getFormat() const noexcept {
 	size_t	first_slash = token.find(cs_slash);
 	size_t	last_slash = token.rfind(cs_slash);
 
@@ -307,7 +307,7 @@ uint8_t	Parser::getFormat() const noexcept {
 	}
 }
 
-void	Parser::storeTriangles(
+void	ObjParser::storeTriangles(
 	const std::vector<Model::Index>& indices
 ) {
 	size_t	attr_sizes[3] = {
@@ -354,7 +354,7 @@ void	Parser::storeTriangles(
  * Check if there are missing indices,
  * and add default ones.
 */
-void	Parser::fixMissingIndices(const scop::Image& image) noexcept {
+void	ObjParser::fixMissingIndices(const scop::Image& image) noexcept {
 	if (model_output.getTextureCoords().empty()) {
 		model_output.setDefaultTextureCoords(image);
 	}

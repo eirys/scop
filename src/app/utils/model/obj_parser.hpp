@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parser.hpp                                         :+:      :+:    :+:   */
+/*   obj_parser.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:02:06 by etran             #+#    #+#             */
-/*   Updated: 2023/05/18 22:45:21 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/26 13:14:52 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,20 +42,20 @@ enum TokenType {
 };
 
 /**
- * Parser for .obj files.
+ * ObjParser for .obj files.
 */
-class Parser {
+class ObjParser {
 public:
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
 	/* ========================================================================= */
 
-	Parser() = default;
-	Parser(Parser&& x) = default;
-	~Parser() = default;
+	ObjParser() = default;
+	ObjParser(ObjParser&& x) = default;
+	~ObjParser() = default;
 
-	Parser(const Parser& x) = delete;
-	Parser&	operator=(const Parser& x) = delete;
+	ObjParser(const ObjParser& x) = delete;
+	ObjParser&	operator=(const ObjParser& x) = delete;
 
 	/* ========================================================================= */
 
@@ -70,7 +70,7 @@ private:
 	/* ========================================================================= */
 
 	typedef		enum TokenType			TokenType;
-	typedef		void (Parser::*ParseFunction)();
+	typedef		void (ObjParser::*ParseFunction)();
 
 	/* ======================================================================== */
 	/*                               CLASS MEMBERS                              */
@@ -114,16 +114,16 @@ private:
 	};
 
 	ParseFunction		parseLineFun[nb_line_types] = {
-		&Parser::parseVertex,
-		&Parser::parseVertex,
-		&Parser::parseTexture,
-		&Parser::parseFace,
-		&Parser::skipComment,
-		&Parser::skipComment,
-		&Parser::skipComment,
-		&Parser::skipComment,
-		&Parser::skipComment,
-		&Parser::skipComment
+		&ObjParser::parseVertex,
+		&ObjParser::parseVertex,
+		&ObjParser::parseTexture,
+		&ObjParser::parseFace,
+		&ObjParser::skipComment,
+		&ObjParser::skipComment,
+		&ObjParser::skipComment,
+		&ObjParser::skipComment,
+		&ObjParser::skipComment,
+		&ObjParser::skipComment
 	};
 
 	/* ========================================================================= */
@@ -167,19 +167,7 @@ private:
 	);
 	void				fixMissingIndices(const scop::Image& img) noexcept;
 
-}; // class Parser
+}; // class ObjParser
 
 } // namespace obj
-
-namespace mtl {
-
-/**
- * Parser for .mtl files.
- * 
- * TODO
-*/
-class Parser {
-}; // class Parser
-
-} // namespace mtl
 } // namespace scop
