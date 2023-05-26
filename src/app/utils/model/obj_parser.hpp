@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:02:06 by etran             #+#    #+#             */
-/*   Updated: 2023/05/26 14:49:27 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 00:03:46 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,7 @@
 
 # include "model.hpp"
 # include "vertex.hpp"
-
-static constexpr const uint8_t	vertex_bit = 1 << 0;// 1
-static constexpr const uint8_t	texture_bit = 1 << 1; // 2
-static constexpr const uint8_t	normal_bit = 1 << 2; // 4
-
-static constexpr const size_t	nb_line_types = 10;
+# include "parser.hpp"
 
 namespace scop {
 class Image;
@@ -30,21 +25,9 @@ class Image;
 namespace obj {
 
 /**
- * List of possible token type in .obj file.
-*/
-enum TokenType {
-	TOKEN_INT,
-	TOKEN_FLOAT,
-	// TOKEN_STRING,
-	// TOKEN_HASH,
-	// TOKEN_SLASH,
-	// TOKEN_UNKNOWN
-};
-
-/**
  * ObjParser for .obj files.
 */
-class ObjParser {
+class ObjParser: private scop::Parser {
 public:
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
@@ -59,17 +42,14 @@ public:
 
 	/* ========================================================================= */
 
-	Model			parseFile(
-		const std::string& file_name,
-		const scop::Image& texture
-	);
+	Model			parseFile(const std::string& file_name);
 
 private:
 	/* ========================================================================= */
 	/*                                  TYPEDEF                                  */
 	/* ========================================================================= */
 
-	typedef		enum TokenType			TokenType;
+	typedef		scop::Parser	base;
 	typedef		void (ObjParser::*ParseFunction)();
 
 	/* ======================================================================== */
@@ -77,23 +57,21 @@ private:
 	/* ======================================================================== */
 
 	Model				model_output;
-	size_t				current_pos;
-	std::string			line;
-	std::string			token;
 
-	/* ========================================================================= */
-	/*                               CONST MEMBERS                               */
-	/* ========================================================================= */
+	// /* ========================================================================= */
+	// /*                               CONST MEMBERS                               */
+	// /* ========================================================================= */
 
 	/**
-	 * Charsets.
+	 * Bitmask for indice type.
 	*/
-	const std::string	cs_digit		= "0123456789";
-	const std::string	cs_dot			= ".";
-	const std::string	cs_negate		= "-";
-	const std::string	cs_slash		= "/";
-	const std::string	cs_whitespaces	= " \t";
+	const uint8_t		vertex_bit = 1 << 0;// 1
+	const uint8_t		texture_bit = 1 << 1; // 2
+	const uint8_t		normal_bit = 1 << 2; // 4
 
+	static constexpr
+	const std::size_t	nb_line_types = 10;
+	
 	/**
 	 * List of possible line type in .obj file.
 	*/
@@ -110,59 +88,34 @@ private:
 		"s"			// TODO
 	};
 
-	ParseFunction		parseLineFun[nb_line_types] = {
+	const ParseFunction		parseLineFun[nb_line_types] = {
 		&ObjParser::parseVertex,
-		&ObjParser::parseVertex,
+		&ObjParser::parseNormal,
 		&ObjParser::parseTexture,
 		&ObjParser::parseFace,
-		&ObjParser::skipComment,
-		&ObjParser::skipComment,
-		&ObjParser::skipComment,
-		&ObjParser::skipComment,
-		&ObjParser::skipComment,
-		&ObjParser::skipComment
-	};
-
-	/* ========================================================================= */
-	/*                                 EXCEPTION                                 */
-	/* ========================================================================= */
-
-	class parse_error: public std::exception {
-		public:
-			parse_error() = delete;
-			parse_error(const std::string& error_msg): error_msg(error_msg) {}
-
-			const char* what() const noexcept override {
-				return error_msg.c_str();
-			}
-
-		private:
-			const std::string	error_msg;
+		&ObjParser::ignore,
+		&ObjParser::ignore,
+		&ObjParser::ignore,
+		&ObjParser::ignore,
+		&ObjParser::ignore,
+		&ObjParser::ignore
 	};
 
 	/* ======================================================================== */
 
-	void				checkFile(const std::string& file) const;
-	void				processLine();
+	void				checkFile(const std::string& file) const override;
+	void				processLine() override;
 
 	void				parseVertex();
 	void				parseTexture();
 	void				parseNormal();
 	void				parseFace();
+	void				storeTriangles(const std::vector<Model::Index>& indices);
+	void				ignore() noexcept;
 
-	bool				getWord();
-	void				skipComment() noexcept;
-	void				skipWhitespace() noexcept;
-	TokenType			checkNumberType(const std::string& word) const;
-	void				checkJunkAfterNumber(
-		const std::string& word,
-		size_t pos
-	) const;
 	uint8_t				getFormat() const noexcept;
-	void				storeTriangles(
-		const std::vector<Model::Index>& indices
-	);
-	void				fixMissingIndices(const scop::Image& img) noexcept;
+
+	void				fixMissingIndices() noexcept;
 
 }; // class ObjParser
 

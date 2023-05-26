@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/26 16:43:31 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/26 23:26:30 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ scop::Vect3						App::movement = scop::Vect3(0.0f, 0.0f, 0.0f);
 scop::Vect3						App::position = scop::Vect3(0.0f, 0.0f, 0.0f);
 
 float							App::zoom_input = 1.0f;
-size_t							App::selected_up_axis = 1;
+std::size_t						App::selected_up_axis = 1;
 
 /* ========================================================================== */
 /*                                   PUBLIC                                   */
@@ -233,7 +233,7 @@ void	App::drawFrame() {
 
 void	App::loadModel(const std::string& path) {
 	scop::obj::ObjParser	parser;
-	scop::obj::Model	model = parser.parseFile(path.c_str(), *image);
+	scop::obj::Model	model = parser.parseFile(path.c_str());
 	std::unordered_map<scop::Vertex, uint32_t>	unique_vertices{};
 
 	const auto&	model_vertices = model.getVertexCoords();
@@ -251,7 +251,9 @@ void	App::loadModel(const std::string& path) {
 				model_textures[index.texture].x,
 				1.0f - model_textures[index.texture].y
 			};
-			vertex.color = { 0.5f, 0.5f, 0.5f }; // grayscale
+			//TODO Remove
+			vertex.color = { 0.5f, 0.5f, 0.5f };
+
 			// math::generateVibrantColor(
 			// 	vertex.color.x,
 			// 	vertex.color.y,
@@ -259,9 +261,7 @@ void	App::loadModel(const std::string& path) {
 			// );
 
 			// generate normals from vertices
-			vertex.normal = scop::cross(
-				vertex.pos.x
-			);
+			// vertex.normal = model_normals[index.normal];
 
 			if (unique_vertices.count(vertex) == 0) {
 				unique_vertices[vertex] = static_cast<uint32_t>(vertices.size());

@@ -6,13 +6,14 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 13:15:11 by etran             #+#    #+#             */
-/*   Updated: 2023/05/26 15:06:36 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 00:43:34 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 # include "material.hpp"
+# include "parser.hpp"
 
 namespace scop {
 namespace mtl {
@@ -20,7 +21,7 @@ namespace mtl {
 /**
  * MtlParser for .mtl files.
 */
-class MtlParser {
+class MtlParser: private scop::Parser {
 public:
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
@@ -44,46 +45,54 @@ public:
 
 private:
 	/* ========================================================================= */
+	/*                                  TYPEDEFS                                 */
+	/* ========================================================================= */
+
+	typedef		scop::Parser		base;
+	typedef		void (MtlParser::*ParseFunction)();
+
+	/* ========================================================================= */
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
 
 	Material			material_output;
-	size_t				current_pos;
-	std::string			line;
-	std::string			token;
 
 	/* ========================================================================= */
 	/*                               CONST MEMBERS                               */
 	/* ========================================================================= */
 
-	const std::string	whitespaces = " \t\n \r";
+	static constexpr
+	const std::size_t	nb_line_size = 8;
 
-	/* ========================================================================= */
-	/*                                 EXCEPTIONS                                */
-	/* ========================================================================= */
+	const std::string	line_begin[nb_line_size] = {
+		"#",
+		"newmtl",
+		"Ka",
+		"Kd",
+		"Ks",
+		"Tr",
+		"Ns",
+		"illum"
+	};
 
-	class parse_error: public std::exception {
-		public:
-			parse_error() = delete;
-			parse_error(const std::string& msg): _msg(msg) {}
-
-			const char* what() const noexcept override {
-				return _msg.c_str();
-			}
-
-		private:
-			const std::string _msg;
+	const ParseFunction	parseLineFn[nb_line_size] = {
+		
 	};
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
 	/* ========================================================================= */
 
-	void				checkFile(const std::string& path) const;
-	void				processLine();
+	void				checkFile(const std::string& path) const override;
+	void				processLine() override;
 
-	bool				getWord();
-	void				skipComment() noexcept;
+	void				parseNewmtl();
+	void				parseKa();
+	void				parseKd();
+	void				parseKs();
+	void				parseTr();
+	void				parseNs();
+	scop::Vect3			parseColors();
 
 }; // class MtlParser
 

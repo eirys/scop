@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 13:32:56 by etran             #+#    #+#             */
-/*   Updated: 2023/05/26 15:13:07 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 00:40:39 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ Material	MtlParser::parseFile(const std::string& file_name) {
 
 		try {
 			processLine();
-		} catch (const MtlParser::parse_error& error) {
+		} catch (const base::parse_error& error) {
 			throw std::invalid_argument(
 				"Error while parsing '" + file_name +
 				"' at line " + std::to_string(current_line) + ": " +
@@ -68,27 +68,35 @@ void	MtlParser::checkFile(const std::string& path) const {
 }
 
 void	MtlParser::processLine() {
+	if (line.empty()) {
+		return;
+	}
+	current_pos = 0;
+
+	// Check line type.
+	getWord();
 	
 }
 
-void	MtlParser::skipComment() noexcept {
-	current_pos = std::string::npos;
-}
+/* ========================================================================== */
 
 /**
- * Retrieve word (chunk of non-whitespace character),
- * or up until the charset parameter.
- * Returns false if line is empty.
+ * @brief Parses a color, in a format of Vect3.
 */
-bool	MtlParser::getWord() {
-	if (current_pos == std::string::npos) {
-		return false;
+scop::Vect3	MtlParser::parseColors() {
+	scop::Vect3	rgb{};
+
+	for (std::size_t i = 0; i < 3; ++i) {
+		if (!getWord())
+			throw base::parse_error("Expected 3 values");
+		checkNumberType(token);
+		rgb[i] = std::stof(token);
+		skipWhitespace();
 	}
-	size_t	end_pos = line.find_first_of(whitespaces, current_pos);
-	token = line.substr(current_pos, end_pos - current_pos);
-	current_pos = end_pos;
-	return true;
+	return rgb;
 }
+
+/* ========================================================================== */
 
 
 } // namespace mtl

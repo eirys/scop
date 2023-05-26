@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 22:44:13 by eli               #+#    #+#             */
-/*   Updated: 2023/05/26 12:59:30 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/26 19:00:25 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,11 @@ const uint32_t*		Image::getPixels() const noexcept {
 	return pixels.data();
 }
 
-size_t				Image::getWidth() const noexcept {
+std::size_t	Image::getWidth() const noexcept {
 	return width;
 }
 
-size_t				Image::getHeight() const noexcept {
+std::size_t	Image::getHeight() const noexcept {
 	return height;
 }
 

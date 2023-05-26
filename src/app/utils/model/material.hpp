@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 13:27:15 by etran             #+#    #+#             */
-/*   Updated: 2023/05/26 14:42:39 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/26 19:42:00 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ struct Material {
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
 
-	const std::string	name;
+	std::string			name;
 	scop::Vect3			ambient_color;	// Ka
 	scop::Vect3			diffuse_color;	// Kd
 	scop::Vect3			specular_color;	// Ks

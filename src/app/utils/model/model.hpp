@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 19:23:53 by eli               #+#    #+#             */
-/*   Updated: 2023/05/19 01:04:15 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/26 23:25:21 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ public:
 	void							addIndex(const Index& index);
 	void							addTriangle(const Triangle& triangle);
 
-	void							setDefaultTextureCoords(const scop::Image& img);
+	void							setDefaultTextureCoords();
 	void							setDefaultNormalCoords();
 
 	const std::vector<Vect3>&		getVertexCoords() const noexcept;
