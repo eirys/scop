@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/27 11:54:16 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 01:27:10 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include "obj_parser.hpp"
 #include "ppm_loader.hpp"
 #include "math.hpp"
+#include "mtl_parser.hpp"
 
 namespace scop {
 
@@ -36,11 +37,7 @@ std::size_t						App::selected_up_axis = 1;
 /*                                   PUBLIC                                   */
 /* ========================================================================== */
 
-App::App(
-	const std::string& model_file,
-	const std::string& texture_file
-): window(model_file) {
-	loadTexture(texture_file);
+App::App(const std::string& model_file): window(model_file) {
 	loadModel(model_file);
 	graphics_pipeline.init(window, *image, vertices, indices);
 }
@@ -275,37 +272,42 @@ void	App::loadModel(const std::string& path) {
 	for (auto& vertex: vertices) {
 		vertex.pos -= barycenter;
 	}
+
+	// Set texture
+	image.reset(std::move(model.getMaterial().value().ambient_texture.get()));
 }
 
-/**
- * @brief	Creates texture loader object. If no path is provided, default
- * 			texture is loaded.
- *
- * @todo	Handle other image formats
-*/
-void	App::loadTexture(const std::string& path) {
-	std::unique_ptr<scop::ImageLoader>	image_loader;
-	std::string	file;
 
-	// Only handle ppm files for now
-	if (path.empty()) {
-		file = SCOP_TEXTURE_FILE_HAMSTER_PPM;
-	} else {
-		std::size_t	extension_pos = path.rfind('.');
-		if (extension_pos == std::string::npos) {
-			throw std::invalid_argument(
-				"No extention found for texture file (must be .ppm)"
-			);
-		} else if (path.find("ppm", extension_pos) == std::string::npos) {
-			throw std::invalid_argument(
-				"Texture file must be a ppm file (.ppm)"
-			);
-		}
-		file = path;
-	}
-	image_loader.reset(new PpmLoader(file));
-	image = std::make_unique<scop::Image>(image_loader->load());
-}
+// // TODO: remove and update..
+// /**
+//  * @brief	Creates texture loader object. If no path is provided, default
+//  * 			texture is loaded.
+//  *
+//  * @todo	Handle other image formats
+// */
+// void	App::loadTexture(const std::string& path) {
+// 	std::unique_ptr<scop::ImageLoader>	image_loader;
+// 	std::string	file;
+
+// 	// Only handle ppm files for now
+// 	if (path.empty()) {
+// 		file = SCOP_TEXTURE_FILE_DEFAULT;
+// 	} else {
+// 		std::size_t	extension_pos = path.rfind('.');
+// 		if (extension_pos == std::string::npos) {
+// 			throw std::invalid_argument(
+// 				"No extention found for texture file (must be .ppm)"
+// 			);
+// 		} else if (path.find("ppm", extension_pos) == std::string::npos) {
+// 			throw std::invalid_argument(
+// 				"Texture file must be a ppm file (.ppm)"
+// 			);
+// 		}
+// 		file = path;
+// 	}
+// 	image_loader.reset(new PpmLoader(file));
+// 	image = std::make_unique<scop::Image>(image_loader->load());
+// }
 
 /* ========================================================================== */
 /*                                    OTHER                                   */

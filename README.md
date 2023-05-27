@@ -8,6 +8,7 @@ You can press `escape` to close the window.
 
 **Texture enabling keys**:
 - `t`	toggles/untoggles texture
+- `l`	toggle/untoggle light (*Todo*)
 
 **Object moving keys**
 - `w`		forward
@@ -45,3 +46,12 @@ You can press `escape` to close the window.
 
 **Color toggled while rotating**
 ![Basic cube, with color transition](./resource/basic_cube_rot_trans.png)
+
+
+## Awesome resources
+
+**Wavefront .obj format:**
+https://www.loc.gov/preservation/digital/formats/fdd/fdd000507.shtml
+
+**Wavefront mtl format:**
+https://www.loc.gov/preservation/digital/formats/fdd/fdd000508.shtml

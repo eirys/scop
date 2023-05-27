@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/27 01:18:50 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 01:27:44 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@
 # include "image_handler.hpp"
 # include "graphics_pipeline.hpp"
 
-# define SCOP_TEXTURE_FILE_HAMSTER_PPM	"textures/hammy.ppm"
 # define SCOP_MOVE_SPEED				0.005f
 # define SCOP_ROTATION_SPEED			0.25f // deg
 
@@ -85,7 +84,7 @@ public:
 	/*                                  METHODS                                  */
 	/* ========================================================================= */
 
-	App(const std::string& model_file, const std::string& texture_file);
+	App(const std::string& model_file);
 	~App();
 
 	App() = delete;
@@ -127,12 +126,12 @@ private:
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
 
-	std::unique_ptr<scop::Image>		image;
 	scop::Window						window;
-	scop::graphics::GraphicsPipeline	graphics_pipeline;
+	scop::graphics::GraphicsPipeline	graphics_pipeline; // TODO: rename
 
 	std::vector<scop::Vertex>			vertices;
 	std::vector<uint32_t>				indices;
+	std::unique_ptr<scop::Image>		image;
 
 	/* ========================================================================= */
 	/*                               STATIC MEMBERS                              */
@@ -160,7 +159,6 @@ private:
 
 	void								drawFrame();
 	void								loadModel(const std::string& path);
-	void								loadTexture(const std::string& path);
 
 }; // class App
 

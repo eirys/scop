@@ -6,16 +6,16 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 13:32:56 by etran             #+#    #+#             */
-/*   Updated: 2023/05/27 14:36:50 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 00:47:01 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "mtl_parser.hpp"
+#include "utils.hpp"
+#include "ppm_loader.hpp"
 
 #include <fstream> // std::ifstream
 #include <stdexcept> // std::invalid_argument
-
-#include <iostream>	// std::cout
 
 namespace scop {
 namespace mtl {
@@ -193,20 +193,41 @@ void	MtlParser::parseIllum() {
 }
 
 /**
- * @brief Parses a `map_Ka` line (ambient texture).
+ * @brief Parses a `map_Ka` line (texture filename).
  * 
- * @note The line should be in the format `map_Ka <path>`.
+ * @note - The line should be in the format `map_Ka <filename>`.
+ * @note - The texture file name is just the file name.
+ * @note - For now, the texture file should be a .ppm file.
 */
 void	MtlParser::parseTexture() {
 	if (!getWord())
 		throw base::parse_error("Expected texture path");
-	material_output.texture_path = token;
+
+	// Check file format.
+	std::size_t	extension_pos = token.rfind('.');
+	if (extension_pos == std::string::npos) {
+		throw base::parse_error(
+			"No extention found for texture file (must be .ppm)"
+		);
+	} else if (token.find("ppm", extension_pos) == std::string::npos) {
+		throw base::parse_error(
+			"Texture file must be a ppm file (.ppm)"
+		);
+	}
+
+	// Load image.
+	try {
+		scop::PpmLoader	loader(SCOP_TEXTURE_PATH + token);
+		material_output.ambient_texture.reset(new scop::Image(loader.load()));
+	} catch (const scop::ImageLoader::FailedToLoadImage& e) {
+		throw base::parse_error(e.what());
+	}
 }
 
 void	MtlParser::ignore() {
 	if (token != "#") {
 		// Line type contains a material component that is not supported.
-		std::cout << token << " is not supported by this renderer." << std::endl;
+		LOG(token << " is not supported by this renderer.");
 	}
 	return skipComment();
 }

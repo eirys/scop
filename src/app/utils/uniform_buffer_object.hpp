@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 20:12:41 by eli               #+#    #+#             */
-/*   Updated: 2023/05/27 13:37:00 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 15:18:37 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@ public:
 	};
 
 	struct Texture {
-		bool	enabled;
-		float	mix;
+		bool		enabled;
+		float		mix;
 	};
 
 	struct Light {	// TODO

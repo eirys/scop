@@ -1,0 +1,47 @@
+# Blender 3.4.1 MTL File: 'None'
+# www.blender.org
+
+newmtl mn_need_00_hair_mi
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+Pr 0.500000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd Ealyn/materials/Ealyn_v1_materials/textures/mn_need_00_head_cm.tga
+map_Pm Ealyn/materials/Ealyn_v1_materials/textures/mn_need_00_head_m.tga
+map_Ks Ealyn/materials/Ealyn_v1_materials/textures/mn_need_00_head_s.tga
+map_d Ealyn/materials/Ealyn_v1_materials/textures/mn_need_00_head_d.tga
+
+newmtl mn_need_00_head_mi
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+Pr 0.500000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd Ealyn/materials/Ealyn_v1_materials/textures/mn_need_00_head_d.tga
+map_Pm Ealyn/materials/Ealyn_v1_materials/textures/mn_need_00_head_m.tga
+map_Ks Ealyn/materials/Ealyn_v1_materials/textures/mn_need_00_head_s.tga
+map_d Ealyn/materials/Ealyn_v1_materials/textures/mn_need_00_head_d.tga
+
+newmtl mn_need_00_mi
+Ni 1.450000
+illum 2
+Pr 0.500000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd Ealyn/materials/Ealyn_v1_materials/textures/mn_need_00_d_loc_int.tga
+map_Pm Ealyn/materials/Ealyn_v1_materials/textures/mn_need_00_m.tga
+map_Ks Ealyn/materials/Ealyn_v1_materials/textures/mn_need_00_s_loc_int.tga
+map_Ke Ealyn/materials/Ealyn_v1_materials/textures/mn_need_00_e.tga
+map_d Ealyn/materials/Ealyn_v1_materials/textures/mn_need_00_d_loc_int.tga

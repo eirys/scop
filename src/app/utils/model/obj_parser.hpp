@@ -6,14 +6,14 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:02:06 by etran             #+#    #+#             */
-/*   Updated: 2023/05/27 01:22:46 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 01:07:56 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 // Std
-# include <string>
+# include <string> // std::string
 
 # include "model.hpp"
 # include "vertex.hpp"
@@ -23,6 +23,13 @@ namespace scop {
 class Image;
 
 namespace obj {
+
+// TODO:
+// - [ ] Add support for multiple objects in one file. (o <name>)
+// - [ ] Add support for multiple groups in one file. (g <name>)
+// - [ ] Add support for multiple mtllib in one file. (mtllib <name>)
+// - [ ] Add support for multiple materials in one file. (usemtl <name>)
+// - [ ] Add support for smoothing groups. (s <group>)
 
 /**
  * ObjParser for .obj files.
@@ -58,6 +65,9 @@ private:
 
 	Model				model_output;
 
+	std::string			mtl_path;
+	std::string			mtl_name;
+
 	/* ========================================================================= */
 	/*                               CONST MEMBERS                               */
 	/* ========================================================================= */
@@ -81,11 +91,11 @@ private:
 		"vn",
 		"vt",
 		"f",
-		"mtllib",	// TODO
-		"usemtl", 	// TODO
+		"mtllib",
+		"usemtl",
+		"s",
 		"o",		// TODO
-		"g",		// TODO
-		"s"			// TODO
+		"g"			// TODO
 	};
 
 	const ParseFunction		parseLineFun[nb_line_types] = {
@@ -94,9 +104,9 @@ private:
 		&ObjParser::parseNormal,
 		&ObjParser::parseTexture,
 		&ObjParser::parseFace,
-		&ObjParser::ignore,
-		&ObjParser::ignore,
-		&ObjParser::ignore,
+		&ObjParser::parseMtlPath,
+		&ObjParser::parseMtlName,
+		&ObjParser::parseSmoothShading,
 		&ObjParser::ignore,
 		&ObjParser::ignore
 	};
@@ -110,12 +120,15 @@ private:
 	void				parseTexture();
 	void				parseNormal();
 	void				parseFace();
+	void				parseMtlPath();
+	void				parseMtlName();
+	void				parseSmoothShading();
+
 	void				storeTriangles(const std::vector<Model::Index>& indices);
 	void				ignore() noexcept;
-
 	uint8_t				getFormat() const noexcept;
-
 	void				fixMissingIndices() noexcept;
+	void				checkMtl();
 
 }; // class ObjParser
 

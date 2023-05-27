@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 19:23:47 by eli               #+#    #+#             */
-/*   Updated: 2023/05/27 01:18:04 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 01:46:38 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include "vector.hpp"
 #include "vertex.hpp"
 #include "utils.hpp"
+#include "material.hpp"
 
 #include <algorithm>
 #include <set> // std::set
@@ -25,6 +26,30 @@ namespace obj {
 /* ========================================================================== */
 /*                                   PUBLIC                                   */
 /* ========================================================================== */
+
+Model::Model(Model&& x):
+vertex_coords(std::move(x.vertex_coords)),
+texture_coords(std::move(x.texture_coords)),
+normal_coords(std::move(x.normal_coords)),
+indices(std::move(x.indices)),
+triangles(std::move(x.triangles)),
+smooth_shading(x.smooth_shading) {
+	if (x.material.has_value()) {
+		material.emplace(std::move(x.material.value()));
+	}
+}
+
+Model::Model(const Model& x):
+vertex_coords(x.vertex_coords),
+texture_coords(x.texture_coords),
+normal_coords(x.normal_coords),
+indices(x.indices),
+triangles(x.triangles),
+smooth_shading(x.smooth_shading) {
+	if (x.material.has_value()) {
+		material.emplace(std::move(x.material.value()));
+	}
+}
 
 void	Model::addVertex(const Vect3& vertex) {
 	vertex_coords.emplace_back(vertex);
@@ -93,6 +118,14 @@ void	Model::setDefaultNormalCoords() {
 	return;
 }
 
+void	Model::setMaterial(scop::mtl::Material&& mtl) {
+	material.emplace(std::move(mtl));
+}
+
+void	Model::toggleSmoothShading() noexcept {
+	smooth_shading = true;
+}
+
 /* ========================================================================== */
 
 const std::vector<Vect3>&	Model::getVertexCoords() const noexcept {
@@ -113,6 +146,10 @@ const std::vector<Vect3>&	Model::getNormalCoords() const noexcept {
 
 const std::vector<Model::Index>&	Model::getIndices() const noexcept {
 	return indices;
+}
+
+const std::optional<mtl::Material>&	Model::getMaterial() const noexcept {
+	return material;
 }
 
 } // namespace obj

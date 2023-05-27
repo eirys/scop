@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 13:15:11 by etran             #+#    #+#             */
-/*   Updated: 2023/05/27 14:13:12 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 00:42:21 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,10 @@
 
 # include "material.hpp"
 # include "parser.hpp"
+
+# define SCOP_TEXTURE_PATH "assets/textures/"
+# define SCOP_MTL_PATH "assets/materials/"
+# define SCOP_TEXTURE_FILE_DEFAULT "assets/textures/hammy.ppm"
 
 namespace scop {
 namespace mtl {
@@ -130,7 +134,7 @@ private:
 	void				parseTr();
 	void				parseNs();
 	void				parseIllum();
-	void				parseTexture(); // Todo
+	void				parseTexture();
 
 	void				ignore();
 

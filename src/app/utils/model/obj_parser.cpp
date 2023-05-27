@@ -6,17 +6,19 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/27 01:18:04 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 01:53:31 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "obj_parser.hpp"
 #include "utils.hpp"	// LOG
+#include "mtl_parser.hpp"
+#include "ppm_loader.hpp"
 
-#include <fstream>		// ifstream
-#include <vector>		// vector
-#include <optional>		// optional
-#include <algorithm>	// count
+#include <fstream>		// std::ifstream
+#include <vector>		// std::vector
+#include <optional>		// std::optional
+#include <algorithm>	// std::count
 
 namespace scop {
 namespace obj {
@@ -50,8 +52,10 @@ Model	ObjParser::parseFile(const std::string& file_name) {
 	if (file.bad()) {
 		throw std::invalid_argument("Error while reading file " + file_name);
 	}
-	// Fix empty indices in face
+
+	// Make sure the model is valid
 	fixMissingIndices();
+	checkMtl();
 
 	return model_output;
 }
@@ -83,12 +87,14 @@ void	ObjParser::processLine() {
 	getWord();
 	for (std::size_t i = 0; i < nb_line_types; ++i) {
 		if (token == line_begin[i]) {
+			// Parse the line
 			skipWhitespace();
 			try {
 				(this->*parseLineFun[i])();
 			} catch (const std::out_of_range& oor) {
 				throw base::parse_error("value overflow");
 			}
+			// Verify that the line is finished or contains comments
 			if (current_pos != std::string::npos) {
 				if (line[current_pos] == '#') {
 					skipComment();
@@ -163,10 +169,10 @@ void	ObjParser::parseNormal() {
 
 /**
  * Format expected:
- * case 100: "	v1 v2 v3 {...}"
- * case 110: "	v1/vt1 v2/vt2 v3/vt3 {...}"
- * case 101: "	v1//vn1 v2//vn2 v3//vn3 {...}"
- * case 111: "	v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3 {...}"
+ * case 100: "v1 v2 v3 {...}"
+ * case 110: "v1/vt1 v2/vt2 v3/vt3 {...}"
+ * case 101: "v1//vn1 v2//vn2 v3//vn3 {...}"
+ * case 111: "v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3 {...}"
  *
  * Retrives at least one triangle.
 */
@@ -175,7 +181,6 @@ void	ObjParser::parseFace() {
 	std::vector<Model::Index>		indices;
 
 	// Parse all indices chunks
-	skipWhitespace();
 	while (getWord()) {
 		// Verify nb indices
 		size_t	nb_slashes = std::count(token.begin(), token.end(), '/');
@@ -221,9 +226,55 @@ void	ObjParser::parseFace() {
 		throw base::parse_error("expecting at least 3 vertices");
 	}
 
-	// Store triangles
+	// Store the new triangles
 	storeTriangles(indices);
 }
+
+/**
+ * @brief Retrieves the material library file name.
+ * 
+ * @note - Format expected: "mtllib <filename>"
+ * @note - The path is just the name of the file.
+ * @note - Only one material library file name is stored.
+*/
+void	ObjParser::parseMtlPath() {
+	if (!getWord()) {
+		throw base::parse_error("expecting material filename");
+	}
+	mtl_path = token;
+}
+
+/**
+ * @brief Retrieves the material name.
+ * 
+ * @note - Format expected: "usemtl <name>"
+ * @note - Only one material name is stored.
+*/
+void	ObjParser::parseMtlName() {
+	if (!getWord()) {
+		throw base::parse_error("expecting material name");
+	}
+	mtl_name = token;
+}
+
+/**
+ * @brief Parses smooth shading enable.
+ * 
+ * @note Format expected: "s <0 | 1 | off | on>"
+*/
+void	ObjParser::parseSmoothShading() {
+	if (!getWord()) {
+		throw base::parse_error("expecting smooth shading value");
+	}
+	// Verify that the smoothing group is valid
+	if (token == "1" || token == "on") {
+		model_output.toggleSmoothShading();
+	} else if (token != "0" && token != "off") {
+		throw base::parse_error("expecting 0, 1, off or on");
+	}
+}
+
+/* ========================================================================== */
 
 void	ObjParser::storeTriangles(
 	const std::vector<Model::Index>& indices
@@ -268,10 +319,12 @@ void	ObjParser::storeTriangles(
 }
 
 void	ObjParser::ignore() noexcept {
+	if (token != "#") {
+		// Line type contains a material component that is not supported.
+		LOG(token << " is not supported by this renderer.");
+	}
 	return skipComment();
 }
-
-/* ========================================================================== */
 
 uint8_t	ObjParser::getFormat() const noexcept {
 	std::size_t	first_slash = token.find(cs_slash);
@@ -289,7 +342,7 @@ uint8_t	ObjParser::getFormat() const noexcept {
 }
 
 /**
- * Check if there are missing indices,
+ * @brief Check if there are missing indices,
  * and add default ones.
 */
 void	ObjParser::fixMissingIndices() noexcept {
@@ -298,6 +351,30 @@ void	ObjParser::fixMissingIndices() noexcept {
 	}
 	if (model_output.getNormalCoords().empty()) {
 		model_output.setDefaultNormalCoords();
+	}
+}
+
+/**
+ * @brief Check if the model has a valid material.
+ * If not, load a default texture.
+*/
+void	ObjParser::checkMtl() {
+	if (!mtl_path.empty() && !mtl_name.empty()){
+		scop::mtl::MtlParser	mtl_parser;
+		model_output.setMaterial(mtl_parser.parseFile(SCOP_MTL_PATH + mtl_path));
+		if (mtl_name != model_output.getMaterial().value().name) {
+			throw std::invalid_argument("Unknown material: " + mtl_name);
+		}
+	} else if (mtl_path.empty()) {
+		throw std::invalid_argument("No library file specified for " + mtl_name);
+	} else if (mtl_name.empty()) {
+		throw std::invalid_argument("No material name specified");
+	} else {
+		// No material provided
+		scop::PpmLoader ppm_loader(SCOP_TEXTURE_FILE_DEFAULT);
+		mtl::Material	material{};
+		material.ambient_texture.reset(new scop::Image(ppm_loader.load()));
+		model_output.setMaterial(std::move(material));
 	}
 }
 

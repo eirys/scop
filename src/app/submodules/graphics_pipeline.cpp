@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 16:34:03 by etran             #+#    #+#             */
-/*   Updated: 2023/05/27 01:18:04 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 01:18:08 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,29 +36,17 @@ void	GraphicsPipeline::init(
 	const std::vector<uint32_t>& indices
 ) {
 	createInstance();
-	LOG("Passed instance ");
 	debug_module.init(vk_instance);
-	LOG("Passed debug module ");
 	device.init(window, vk_instance);
-	LOG("Passed device ");
 	render_target.init(device, window);
-	LOG("Passed render target ");
 	descriptor_set.initLayout(device);
-	LOG("Passed descriptor layout");
 	createGraphicsPipeline();
-	LOG("Passed graphics pipeline ");
 	command_buffer.initPool(device);
-	LOG("Passed command pool ");
 	texture_sampler.init(device, command_buffer.vk_command_pool, image);
-	LOG("Passed texture sampler ");
 	vertex_input.init(device, command_buffer.vk_command_pool, vertices, indices);
-	LOG("Passed vertex input ");
 	descriptor_set.initSets(device, texture_sampler);
-	LOG("Passed descriptor set ");
 	command_buffer.initBuffer(device);
-	LOG("Passed command buffer ");
 	createSyncObjects();
-	LOG("Passed sync objects");
 }
 
 void	GraphicsPipeline::destroy() {
