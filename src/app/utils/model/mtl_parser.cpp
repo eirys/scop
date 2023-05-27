@@ -6,13 +6,16 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 13:32:56 by etran             #+#    #+#             */
-/*   Updated: 2023/05/27 01:31:25 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 14:36:50 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "mtl_parser.hpp"
 
-#include <fstream> // ifstream
+#include <fstream> // std::ifstream
+#include <stdexcept> // std::invalid_argument
+
+#include <iostream>	// std::cout
 
 namespace scop {
 namespace mtl {
@@ -29,7 +32,7 @@ Material	MtlParser::parseFile(const std::string& file_name) {
 		throw std::invalid_argument("Could not open file");
 	}
 
-	for (std::size_t current_line = 0; file.good(); ++current_line) {
+	for (std::size_t current_line = 1; file.good(); ++current_line) {
 		std::getline(file, line);
 
 		try {
@@ -62,7 +65,7 @@ void	MtlParser::checkFile(const std::string& path) const {
 	const std::size_t	extension_pos = path.rfind('.');
 	if (extension_pos == std::string::npos) {
 		throw std::invalid_argument("File has no extension");
-	} else if (path.substr(extension_pos) != "mtl") {
+	} else if (path.substr(extension_pos) != ".mtl") {
 		throw std::invalid_argument("File extension is not .mtl");
 	}
 }
@@ -76,7 +79,7 @@ void	MtlParser::processLine() {
 	// Check line type.
 	getWord();
 	for (std::size_t i = 0; i < nb_line_size; ++i) {
-		if (line == line_begin[i]) {
+		if (token == line_begin[i]) {
 			skipWhitespace();
 			try {
 				(this->*parseLineFn[i])();
@@ -104,7 +107,10 @@ void	MtlParser::processLine() {
  * @note The line should be in the format `newmtl <name>`.
 */
 void	MtlParser::parseNewmtl() {
-	material_output.name = getWord();
+	if (!getWord()) {
+		throw base::parse_error("Expected material name");
+	}
+	material_output.name = token;
 }
 
 /**
@@ -135,48 +141,73 @@ void	MtlParser::parseKs() {
 }
 
 /**
- * @brief Parses transparency.
+ * @brief Parses a `Ke` line (emissive color).
  * 
- * @note The line should be in the format `d <float>`.
+ * @note The line should be in the format `Ke <r> <g> <b>`.
+*/
+void	MtlParser::parseKe() {
+	material_output.emissive_color = parseColors();
+}
+
+/**
+ * @brief Parses opacity.
+ * 
+ * @note The line should be in the format `Tr <float>`
+ * or `d <float>`.
+ * @note If `d` is used, the value is inverted.
 */
 void	MtlParser::parseTr() {
+	bool	is_d = token == "d";
 	if (!getWord())
 		throw base::parse_error("Expected transparency value");
-	if (checkNumberType(token) != TokenType::TOKEN_FLOAT)
-		throw base::parse_error("Expected float value");
-	material_output.transparency = std::stof(token);
+	checkNumberType(token);
+	float value = std::stof(token);
+	material_output.opacity = is_d ? value : 1.0f - value;
 }
 
 /**
  * @brief Parses a `Ns` line (shininess exponent).
  * 
- * @note The line should be in the format `Ns <int>`.
+ * @note The line should be in the format `Ns <num>`.
 */
 void	MtlParser::parseNs() {
 	if (!getWord())
 		throw base::parse_error("Expected transparency value");
-	if (checkNumberType(token) != TokenType::TOKEN_INT)
-		throw base::parse_error("Expected integer value");
-	material_output.shininess = std::stoul(token);
+	checkNumberType(token);
+	material_output.shininess = static_cast<std::size_t>(std::stof(token));
 }
 
 /**
  * @brief Parses a `illum` line (illumination model).
  * 
- * @note The line should be in the format `illum <int>`.
+ * @note The line should be in the format `illum <num>`.
 */
 void	MtlParser::parseIllum() {
 	if (!getWord())
 		throw base::parse_error("Expected transparency value");
-	if (checkNumberType(token) != TokenType::TOKEN_INT)
-		throw base::parse_error("Expected integer value");
-	const std::size_t	illum = std::stoul(token);
+	checkNumberType(token);
+	const std::size_t	illum = static_cast<std::size_t>(std::stof(token));
 	if (illum > 10)
 		throw base::parse_error("Illumination model out of range");
 	material_output.illum = static_cast<IlluminationModel>(illum);
 }
 
-void	MtlParser::ignore() noexcept {
+/**
+ * @brief Parses a `map_Ka` line (ambient texture).
+ * 
+ * @note The line should be in the format `map_Ka <path>`.
+*/
+void	MtlParser::parseTexture() {
+	if (!getWord())
+		throw base::parse_error("Expected texture path");
+	material_output.texture_path = token;
+}
+
+void	MtlParser::ignore() {
+	if (token != "#") {
+		// Line type contains a material component that is not supported.
+		std::cout << token << " is not supported by this renderer." << std::endl;
+	}
 	return skipComment();
 }
 

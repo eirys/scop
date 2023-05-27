@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 13:15:11 by etran             #+#    #+#             */
-/*   Updated: 2023/05/27 01:22:11 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 14:13:12 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,14 +55,14 @@ private:
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
 
-	Material			material_output;
+	Material			material_output{};
 
 	/* ========================================================================= */
 	/*                               CONST MEMBERS                               */
 	/* ========================================================================= */
 
 	static constexpr
-	const std::size_t	nb_line_size = 8;
+	const std::size_t	nb_line_size = 21;
 
 	const std::string	line_begin[nb_line_size] = {
 		"#",
@@ -70,9 +70,24 @@ private:
 		"Ka",
 		"Kd",
 		"Ks",
+		"Ke",
 		"Tr",
+		"d",
 		"Ns",
-		"illum"
+		"illum",
+		"map_Ka",
+
+		// Unused
+		"Ni",
+		"map_Kd",
+		"map_Ks",
+		"map_Ke",
+		"map_d",
+		"map_bump",
+		"bump",
+		"disp",
+		"decal",
+		"refl"
 	};
 
 	const ParseFunction	parseLineFn[nb_line_size] = {
@@ -81,9 +96,23 @@ private:
 		&MtlParser::parseKa,
 		&MtlParser::parseKd,
 		&MtlParser::parseKs,
+		&MtlParser::parseKe,
+		&MtlParser::parseTr,
 		&MtlParser::parseTr,
 		&MtlParser::parseNs,
-		&MtlParser::parseIllum
+		&MtlParser::parseIllum,
+		&MtlParser::parseTexture,
+
+		&MtlParser::ignore,
+		&MtlParser::ignore,
+		&MtlParser::ignore,
+		&MtlParser::ignore,
+		&MtlParser::ignore,
+		&MtlParser::ignore,
+		&MtlParser::ignore,
+		&MtlParser::ignore,
+		&MtlParser::ignore,
+		&MtlParser::ignore
 	};
 
 	/* ========================================================================= */
@@ -97,10 +126,13 @@ private:
 	void				parseKa();
 	void				parseKd();
 	void				parseKs();
+	void				parseKe();
 	void				parseTr();
 	void				parseNs();
 	void				parseIllum();
-	void				ignore() noexcept;
+	void				parseTexture(); // Todo
+
+	void				ignore();
 
 	scop::Vect3			parseColors();
 

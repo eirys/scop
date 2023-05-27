@@ -6,15 +6,16 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 13:54:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/27 01:18:04 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 14:37:29 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 // Std
-# include <cmath>
-# include <stdexcept>
+# include <cmath> // std::fma, std::sqrt
+# include <stdexcept> // std::out_of_range
+# include <ostream> // std::ostream
 
 namespace scop {
 
@@ -256,27 +257,41 @@ struct Vect2 {
 
 } // namespace scop
 
-namespace std {
+/* ========================================================================== */
+/*                                    OTHER                                   */
+/* ========================================================================== */
+
+/* HASH FUNCTIONS =========================================================== */
 
 template<>
-struct hash<scop::Vect3> {
-	inline size_t	operator()(const scop::Vect3& vect) const {
+struct std::hash<scop::Vect3> {
+	inline std::size_t	operator()(const scop::Vect3& vect) const {
 		return (
-			hash<float>()(vect.x) ^
-			hash<float>()(vect.y) ^
-			hash<float>()(vect.z)
+			std::hash<float>()(vect.x) ^
+			std::hash<float>()(vect.y) ^
+			std::hash<float>()(vect.z)
 		);
 	}
 };
 
 template<>
-struct hash<scop::Vect2> {
-	inline size_t	operator()(const scop::Vect2& vect) const {
+struct std::hash<scop::Vect2> {
+	inline std::size_t	operator()(const scop::Vect2& vect) const {
 		return (
-			hash<float>()(vect.x) ^
-			hash<float>()(vect.y)
+			std::hash<float>()(vect.x) ^
+			std::hash<float>()(vect.y)
 		);
 	}
 };
 
-} // namespace std
+/* IOSTREAM ================================================================= */
+
+inline std::ostream& operator<<(std::ostream& os, const scop::Vect3& vect) {
+	os << "Vect3(" << vect.x << ", " << vect.y << ", " << vect.z << ")";
+	return os;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const scop::Vect2& vect) {
+	os << "Vect2(" << vect.x << ", " << vect.y << ")";
+	return os;
+}

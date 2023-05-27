@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/26 15:25:04 by etran             #+#    #+#             */
-/*   Updated: 2023/05/18 22:46:21 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 11:31:27 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ struct Vertex {
 	scop::Vect3		pos;
 	scop::Vect3		color;
 	scop::Vect2		tex_coord;
-	// scop::Vect3		normal; TODO
+	scop::Vect3		normal;
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
@@ -60,8 +60,8 @@ struct Vertex {
 	/**
 	 * Expliciting to vulkan the vertex struct format.
 	*/
-	static std::array<VkVertexInputAttributeDescription, 3>	getAttributeDescriptions() {
-		std::array<VkVertexInputAttributeDescription, 3>	attribute_descriptions{};
+	static std::array<VkVertexInputAttributeDescription, 4>	getAttributeDescriptions() {
+		std::array<VkVertexInputAttributeDescription, 4>	attribute_descriptions{};
 
 		// `pos` attribute
 		attribute_descriptions[0].binding = 0;
@@ -81,13 +81,20 @@ struct Vertex {
 		attribute_descriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
 		attribute_descriptions[2].offset = offsetof(Vertex, tex_coord);
 
+		// `normal` attribute
+		attribute_descriptions[3].binding = 0;
+		attribute_descriptions[3].location = 3;
+		attribute_descriptions[3].format = VK_FORMAT_R32G32B32_SFLOAT;
+		attribute_descriptions[3].offset = offsetof(Vertex, normal);
+
 		return attribute_descriptions;
 	}
 
 	bool	operator==(const Vertex& rhs) const {
 		return (
 			pos == rhs.pos &&
-			tex_coord == rhs.tex_coord
+			tex_coord == rhs.tex_coord &&
+			normal == rhs.normal
 		);
 	}
 }; // struct Vertex
@@ -100,9 +107,10 @@ namespace std {
 	struct hash<scop::Vertex> {
 		size_t	operator()(const scop::Vertex& vertex) const {
 			return (
-				(hash<scop::Vect3>()(vertex.pos) ^
-				(hash<scop::Vect3>()(vertex.color) << 1)) >> 1 ^
-				(hash<scop::Vect2>()(vertex.tex_coord) << 1)
+				(hash<scop::Vect3>()(vertex.pos)) ^
+				(hash<scop::Vect3>()(vertex.color)) ^
+				(hash<scop::Vect2>()(vertex.tex_coord)) ^
+				(hash<scop::Vect3>()(vertex.normal))
 			);
 		}
 	};

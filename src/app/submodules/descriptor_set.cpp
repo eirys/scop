@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:56:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/23 02:02:39 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 13:37:20 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,6 +170,8 @@ void	DescriptorSet::createDescriptorSets(
 	ubo_info_fragment.offset = offsetof(UniformBufferObject, texture);
 	ubo_info_fragment.range = sizeof(UniformBufferObject::Texture);
 
+	// Ubo light // TODO
+
 	// Allow buffer udpate using descriptor write
 	std::array<VkWriteDescriptorSet, 3>	descriptor_writes{};
 	descriptor_writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -292,7 +294,16 @@ void	DescriptorSet::updateCamera(
 		// Rotate around z
 		scop::math::radians(App::rotation_angles[2]),
 		axis[static_cast<int>(RotationAxis::ROTATION_AXIS_Z)]
+	) * scop::scale(
+		// Scale object (zoom)
+		scop::Mat4(1.0f),
+		scop::Vect3(
+			scop::App::zoom_input,
+			scop::App::zoom_input,
+			scop::App::zoom_input
+		)
 	);
+
 
 	// Define camera transformation view
 	camera.view = scop::lookAt(
@@ -310,16 +321,6 @@ void	DescriptorSet::updateCamera(
 	);
 	// Invert y axis (because y axis is inverted in Vulkan)
 	camera.proj[5] *= -1;
-
-	// Define zoom factor
-	camera.zoom = scop::scale(
-		scop::Mat4(1.0f),
-		scop::Vect3(
-			scop::App::zoom_input,
-			scop::App::zoom_input,
-			scop::App::zoom_input
-		)
-	);
 
 	// Copy to uniform buffer
 	memcpy(

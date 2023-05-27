@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/27 01:18:04 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/27 11:54:16 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -238,7 +238,7 @@ void	App::loadModel(const std::string& path) {
 
 	const auto&	model_vertices = model.getVertexCoords();
 	const auto& model_textures = model.getTextureCoords();
-	// const auto& model_normals = model.getNormalCoords();
+	const auto& model_normals = model.getNormalCoords();
 	const auto& model_triangles = model.getTriangles();
 
 	// Retrieve unique vertices:
@@ -260,8 +260,7 @@ void	App::loadModel(const std::string& path) {
 			// 	vertex.color.z
 			// );
 
-			// generate normals from vertices
-			// vertex.normal = model_normals[index.normal];
+			vertex.normal = model_normals[index.normal];
 
 			if (unique_vertices.count(vertex) == 0) {
 				unique_vertices[vertex] = static_cast<uint32_t>(vertices.size());
