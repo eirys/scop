@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 22:43:34 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/29 00:38:30 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -366,18 +366,18 @@ void	ObjParser::checkMtl() {
 		if (mtl_name != model_output.getMaterial().name) {
 			throw std::invalid_argument("Unknown material: " + mtl_name);
 		} else if (
-			!(model_output.getMaterial().shininess == 0 &&
-			!model_output.getMaterial().specular_color) &&
-			!(model_output.getMaterial().shininess != 0 &&
-			!(!model_output.getMaterial().specular_color) &&
-			model_output.getMaterial().illum == scop::mtl::IlluminationModel::ILLUM_LAMBERT_PHONG)
+			!model_output.getMaterial().shininess &&
+			!model_output.getMaterial().specular_color &&
+			model_output.getMaterial().illum == scop::mtl::IlluminationModel::ILLUM_LAMBERT_PHONG
 		) {
 			throw std::invalid_argument("Specular component is incomplete");
 		}
-	} else if (mtl_path.empty()) {
+	} else if (mtl_path.empty() && !mtl_name.empty()) {
 		throw std::invalid_argument("No library file specified for " + mtl_name);
-	} else if (mtl_name.empty()) {
+	} else if (mtl_name.empty() && !mtl_path.empty()) {
 		throw std::invalid_argument("No material name specified");
+	} else {
+		model_output.setMaterial(scop::mtl::Material());
 	}
 }
 

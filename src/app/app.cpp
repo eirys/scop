@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/29 00:02:22 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/29 00:23:48 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,9 @@ std::size_t						App::selected_up_axis = 1;
 
 std::array<scop::Vect3, 4>		App::light_colors = {
 	scop::Vect3(1.0f, 1.0f, 1.0f), // white
-	scop::Vect3(1.0f, 0.0f, 0.3f), // magenta
-	scop::Vect3(0.0f, 1.0f, 0.7f), // cyan
-	scop::Vect3(0.9f, 0.8f, 0.0f) // yellowish
+	scop::Vect3(1.0f, 0.0f, 0.0f), // red
+	scop::Vect3(0.0f, 0.0f, 1.0f), // blue
+	scop::Vect3(0.0f, 1.0f, 0.0f) // green
 };
 std::size_t						App::selected_light_color = 0;
 std::array<scop::Vect3, 4>		App::light_positions = {

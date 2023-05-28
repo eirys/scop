@@ -9,6 +9,10 @@ You can press `escape` to close the window.
 **Texture enabling keys**:
 - `t`		changes texture (texture -> color -> grayscale)
 
+**Light selector**
+- `l`		changes light spot position
+- `k`		changes light spot color
+
 **Object moving keys**
 - `w`		forward
 - `s`		backward
@@ -50,4 +54,4 @@ https://www.loc.gov/preservation/digital/formats/fdd/fdd000508.shtml
 - Diffuse shading
 - Specular lighting
 - .mtl files parsing
-- Enhanced user experience, camera orientation
+- Enhanced user experience, camera orientation & spot selector

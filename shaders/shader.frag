@@ -83,5 +83,10 @@ void main() {
 		* light_attenuation
 		* specular_component;
 
-	out_color += output_color * vec4(diffuse_lighting + specular_lighting, 1.0);
+	out_color +=
+		output_color
+		* vec4(
+			clamp(diffuse_lighting + specular_lighting, vec3(0.0), vec3(1.0)),
+			1.0
+		);
 }

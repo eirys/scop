@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:56:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 23:54:39 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/29 00:08:18 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -388,7 +388,7 @@ void	DescriptorSet::updateTexture() {
 }
 
 /**
- * Todo
+ * Update the light part of the uniform buffer.
 */
 void	DescriptorSet::updateLight() {
 	struct {
@@ -406,7 +406,6 @@ void	DescriptorSet::updateLight() {
 		&light_info,
 		sizeof(light_info)
 	);
-
 }
 
 } // namespace graphics
