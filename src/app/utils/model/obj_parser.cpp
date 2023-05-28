@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 10:29:35 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 11:55:52 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ Model	ObjParser::parseFile(const std::string& file_name) {
 	fixMissingComponents();
 	checkMtl();
 
-	return model_output;
+	return std::move(model_output);
 }
 
 /* ========================================================================== */

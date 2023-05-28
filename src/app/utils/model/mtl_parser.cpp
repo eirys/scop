@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 13:32:56 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 00:47:01 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 11:58:02 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ Material	MtlParser::parseFile(const std::string& file_name) {
 	if (file.bad()) {
 		throw std::invalid_argument("Error while reading file " + file_name);
 	}
-	return material_output;
+	return std::move(material_output);
 }
 
 /* ========================================================================== */
@@ -65,7 +65,7 @@ void	MtlParser::checkFile(const std::string& path) const {
 	const std::size_t	extension_pos = path.rfind('.');
 	if (extension_pos == std::string::npos) {
 		throw std::invalid_argument("File has no extension");
-	} else if (path.substr(extension_pos) != ".mtl") {
+	} else if (path.find(".mtl", extension_pos) == std::string::npos) {
 		throw std::invalid_argument("File extension is not .mtl");
 	}
 }
@@ -209,7 +209,7 @@ void	MtlParser::parseTexture() {
 		throw base::parse_error(
 			"No extention found for texture file (must be .ppm)"
 		);
-	} else if (token.find("ppm", extension_pos) == std::string::npos) {
+	} else if (token.find(".ppm", extension_pos) == std::string::npos) {
 		throw base::parse_error(
 			"Texture file must be a ppm file (.ppm)"
 		);
@@ -218,7 +218,9 @@ void	MtlParser::parseTexture() {
 	// Load image.
 	try {
 		scop::PpmLoader	loader(SCOP_TEXTURE_PATH + token);
-		material_output.ambient_texture.reset(new scop::Image(loader.load()));
+		material_output.ambient_texture.reset(
+			new scop::Image(loader.load())
+		);
 	} catch (const scop::ImageLoader::FailedToLoadImage& e) {
 		throw base::parse_error(e.what());
 	}

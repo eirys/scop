@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 19:23:47 by eli               #+#    #+#             */
-/*   Updated: 2023/05/28 10:30:14 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 11:56:57 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,15 +32,6 @@ normal_coords(std::move(x.normal_coords)),
 indices(std::move(x.indices)),
 triangles(std::move(x.triangles)),
 material(std::move(x.material)),
-smooth_shading(x.smooth_shading) {}
-
-Model::Model(const Model& x):
-vertex_coords(x.vertex_coords),
-texture_coords(x.texture_coords),
-normal_coords(x.normal_coords),
-indices(x.indices),
-triangles(x.triangles),
-material(x.material),
 smooth_shading(x.smooth_shading) {}
 
 void	Model::addVertex(const Vect3& vertex) {

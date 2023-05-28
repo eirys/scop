@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 13:15:11 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 02:15:50 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 11:11:56 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,11 +86,8 @@ private:
 		"map_Ks",
 		"map_Ke",
 		"map_d",
-		"map_bump",
-		"bump",
-		"disp",
-		"decal",
-		"refl"
+		"map_Bump",
+		"map_Ns"
 	};
 
 	const ParseFunction	parseLineFn[nb_line_size] = {
@@ -106,9 +103,6 @@ private:
 		&MtlParser::parseIllum,
 		&MtlParser::parseTexture,
 
-		&MtlParser::ignore,
-		&MtlParser::ignore,
-		&MtlParser::ignore,
 		&MtlParser::ignore,
 		&MtlParser::ignore,
 		&MtlParser::ignore,

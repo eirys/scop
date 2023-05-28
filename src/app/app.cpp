@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/28 10:54:00 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 11:43:49 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -231,6 +231,7 @@ void	App::drawFrame() {
 void	App::loadModel(const std::string& path) {
 	scop::obj::ObjParser	parser;
 	scop::obj::Model	model = parser.parseFile(path.c_str());
+
 	std::unordered_map<scop::Vertex, uint32_t>	unique_vertices{};
 
 	const auto&	model_vertices = model.getVertexCoords();
