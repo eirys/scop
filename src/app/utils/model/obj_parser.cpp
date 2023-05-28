@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 01:53:31 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 02:20:15 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ Model	ObjParser::parseFile(const std::string& file_name) {
 	}
 
 	// Make sure the model is valid
-	fixMissingIndices();
+	fixMissingComponents();
 	checkMtl();
 
 	return model_output;
@@ -342,10 +342,10 @@ uint8_t	ObjParser::getFormat() const noexcept {
 }
 
 /**
- * @brief Check if there are missing indices,
+ * @brief Check if there are missing model components,
  * and add default ones.
 */
-void	ObjParser::fixMissingIndices() noexcept {
+void	ObjParser::fixMissingComponents() noexcept {
 	if (model_output.getTextureCoords().empty()) {
 		model_output.setDefaultTextureCoords();
 	}
@@ -370,11 +370,7 @@ void	ObjParser::checkMtl() {
 	} else if (mtl_name.empty()) {
 		throw std::invalid_argument("No material name specified");
 	} else {
-		// No material provided
-		scop::PpmLoader ppm_loader(SCOP_TEXTURE_FILE_DEFAULT);
-		mtl::Material	material{};
-		material.ambient_texture.reset(new scop::Image(ppm_loader.load()));
-		model_output.setMaterial(std::move(material));
+		model_output.setMaterial(scop::mtl::Material{});
 	}
 }
 

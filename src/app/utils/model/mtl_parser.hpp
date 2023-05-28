@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 13:15:11 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 00:42:21 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 02:15:50 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@
 
 # define SCOP_TEXTURE_PATH "assets/textures/"
 # define SCOP_MTL_PATH "assets/materials/"
-# define SCOP_TEXTURE_FILE_DEFAULT "assets/textures/hammy.ppm"
 
 namespace scop {
 namespace mtl {

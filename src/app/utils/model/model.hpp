@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 19:23:53 by eli               #+#    #+#             */
-/*   Updated: 2023/05/28 01:31:27 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 02:19:59 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 # include <optional> // std::optional
 
 # include "material.hpp"
+
+# define SCOP_TEXTURE_FILE_DEFAULT "assets/textures/hammy.ppm"
 
 namespace scop {
 class Image;
@@ -92,6 +94,7 @@ public:
 
 	void								setDefaultTextureCoords();
 	void								setDefaultNormalCoords();
+
 	void								setMaterial(mtl::Material&& material);
 	void								toggleSmoothShading() noexcept;
 

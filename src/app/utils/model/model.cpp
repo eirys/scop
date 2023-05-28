@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 19:23:47 by eli               #+#    #+#             */
-/*   Updated: 2023/05/28 01:46:38 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 02:20:42 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,7 @@
 #include "vertex.hpp"
 #include "utils.hpp"
 #include "material.hpp"
-
-#include <algorithm>
-#include <set> // std::set
+#include "ppm_loader.hpp"
 
 namespace scop {
 namespace obj {
@@ -120,6 +118,12 @@ void	Model::setDefaultNormalCoords() {
 
 void	Model::setMaterial(scop::mtl::Material&& mtl) {
 	material.emplace(std::move(mtl));
+	if (material->ambient_texture != nullptr) {
+		return;
+	} else {
+		scop::PpmLoader ppm_loader(SCOP_TEXTURE_FILE_DEFAULT);
+		material->ambient_texture.reset(new scop::Image(ppm_loader.load()));
+	}
 }
 
 void	Model::toggleSmoothShading() noexcept {

@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/28 01:27:10 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 02:09:55 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ App::App(const std::string& model_file): window(model_file) {
 }
 
 App::~App() {
-	graphics_pipeline.destroy();
+	// graphics_pipeline.destroy();
 }
 
 /* ========================================================================== */
@@ -273,7 +273,7 @@ void	App::loadModel(const std::string& path) {
 		vertex.pos -= barycenter;
 	}
 
-	// Set texture
+	// Set texture from model
 	image.reset(std::move(model.getMaterial().value().ambient_texture.get()));
 }
 

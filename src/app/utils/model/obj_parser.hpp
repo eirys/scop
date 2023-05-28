@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:02:06 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 01:07:56 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 02:13:04 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,7 @@ private:
 	void				storeTriangles(const std::vector<Model::Index>& indices);
 	void				ignore() noexcept;
 	uint8_t				getFormat() const noexcept;
-	void				fixMissingIndices() noexcept;
+	void				fixMissingComponents() noexcept;
 	void				checkMtl();
 
 }; // class ObjParser
