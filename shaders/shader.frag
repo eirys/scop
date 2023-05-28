@@ -13,12 +13,12 @@ layout(binding = 2) uniform Texture {
 	float	parameter;
 } texture_ubo;
 layout(binding = 3) uniform Light {
+	// vec3 light_color;
 	vec3 ambient_color;
 	vec3 position;
 	vec3 diffuse_color;
 	vec3 eye_position;
 	vec3 specular_color;
-	// vec3 light_color;
 	int shininess;
 } light_ubo;
 
