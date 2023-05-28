@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/28 12:38:03 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 22:09:57 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@
 # include "vertex.hpp"
 # include "image_handler.hpp"
 # include "graphics_pipeline.hpp"
+# include "uniform_buffer_object.hpp"
 
 # define SCOP_MOVE_SPEED		0.005f
 # define SCOP_ROTATION_SPEED	0.25f // deg
@@ -138,6 +139,7 @@ private:
 	std::vector<scop::Vertex>			vertices;
 	std::vector<uint32_t>				indices;
 	std::unique_ptr<scop::Image>		image;
+	UniformBufferObject::Light			light;
 
 	/* ========================================================================= */
 	/*                               STATIC MEMBERS                              */
@@ -156,6 +158,7 @@ private:
 	static scop::Vect3					movement;
 	static scop::Vect3					position;
 
+	static scop::Vect3					eye_pos;
 	static float						zoom_input;
 	static std::size_t					selected_up_axis;
 

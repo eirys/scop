@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 13:32:56 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 14:34:20 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 18:06:53 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 
 #include <fstream> // std::ifstream
 #include <stdexcept> // std::invalid_argument
+#include <algorithm> // std::clamp
 
 namespace scop {
 namespace mtl {
@@ -87,7 +88,7 @@ void	MtlParser::processLine() {
 			try {
 				(this->*parseLineFn[i])();
 			} catch (const std::out_of_range& oor) {
-				throw base::parse_error("Value overflow");
+				throw base::parse_error("value overflow");
 			}
 			if (current_pos != std::string::npos && line[current_pos] != '#') {
 				throw base::parse_error("unexpected token");
@@ -107,7 +108,7 @@ void	MtlParser::processLine() {
 */
 void	MtlParser::parseNewmtl() {
 	if (!getWord()) {
-		throw base::parse_error("Expected material name");
+		throw base::parse_error("expected material name");
 	}
 	material_output.name = token;
 }
@@ -158,7 +159,7 @@ void	MtlParser::parseKe() {
 void	MtlParser::parseTr() {
 	bool	is_d = token == "d";
 	if (!getWord())
-		throw base::parse_error("Expected transparency value");
+		throw base::parse_error("expected transparency value");
 	checkNumberType(token);
 	float value = std::stof(token);
 	material_output.opacity = is_d ? value : 1.0f - value;
@@ -171,9 +172,13 @@ void	MtlParser::parseTr() {
 */
 void	MtlParser::parseNs() {
 	if (!getWord())
-		throw base::parse_error("Expected transparency value");
+		throw base::parse_error("expected transparency value");
 	checkNumberType(token);
-	material_output.shininess = static_cast<std::size_t>(std::stof(token));
+	material_output.shininess = static_cast<uint16_t>(std::clamp(
+		static_cast<int>(std::stof(token)),
+		0,
+		1000
+	));
 }
 
 /**
@@ -183,11 +188,11 @@ void	MtlParser::parseNs() {
 */
 void	MtlParser::parseIllum() {
 	if (!getWord())
-		throw base::parse_error("Expected transparency value");
+		throw base::parse_error("expected transparency value");
 	checkNumberType(token);
 	const std::size_t	illum = static_cast<std::size_t>(std::stof(token));
 	if (illum > 10)
-		throw base::parse_error("Illumination model out of range");
+		throw base::parse_error("no such illumination model");
 	material_output.illum = static_cast<IlluminationModel>(illum);
 }
 
@@ -200,17 +205,17 @@ void	MtlParser::parseIllum() {
 */
 void	MtlParser::parseTexture() {
 	if (!getWord())
-		throw base::parse_error("Expected texture path");
+		throw base::parse_error("expected texture path");
 
 	// Check file format.
 	std::size_t	extension_pos = token.rfind('.');
 	if (extension_pos == std::string::npos) {
 		throw base::parse_error(
-			"No extention found for texture file (must be .ppm)"
+			"no extention found for texture file (must be .ppm)"
 		);
 	} else if (token.find(".ppm", extension_pos) == std::string::npos) {
 		throw base::parse_error(
-			"Texture file must be a ppm file (.ppm)"
+			"texture file must be a ppm file (.ppm)"
 		);
 	}
 
@@ -243,7 +248,7 @@ scop::Vect3	MtlParser::parseColors() {
 
 	for (std::size_t i = 0; i < 3; ++i) {
 		if (!getWord())
-			throw base::parse_error("Expected 3 values");
+			throw base::parse_error("expected 3 values");
 		checkNumberType(token);
 		rgb[i] = std::stof(token);
 		skipWhitespace();

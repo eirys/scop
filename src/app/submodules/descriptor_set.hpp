@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:39:20 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 12:03:51 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 18:02:01 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 
 # include "device.hpp"
 # include "texture_sampler.hpp"
+# include "uniform_buffer_object.hpp"
 
 namespace scop {
 namespace graphics {
@@ -48,7 +49,11 @@ public:
 	/* ========================================================================= */
 
 	void					initLayout(Device& device);
-	void					initSets(Device& device, TextureSampler& texture_sampler);
+	void					initSets(
+		Device& device, 
+		TextureSampler& texture_sampler,
+		const UniformBufferObject::Light& light
+	);
 	void					destroy(Device& device);
 	void					updateUniformBuffer(VkExtent2D extent);
 
@@ -83,9 +88,13 @@ private:
 		uint32_t fif
 	);
 	void					createUniformBuffers(Device& device);
-	void					initUniformBuffer() noexcept;
+	void					initUniformBuffer(
+		const UniformBufferObject::Light& light
+	) noexcept;
+
 	void					updateCamera(VkExtent2D extent);
 	void					updateTexture();
+	void					updateLight();
 
 }; // class DescriptorSet
 

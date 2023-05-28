@@ -6,14 +6,13 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 16:34:03 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 11:12:11 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 17:23:12 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "graphics_pipeline.hpp"
 #include "window.hpp"
 #include "utils.hpp"
-
 #include "image_handler.hpp"
 
 #include <iostream> // std::cerr std::endl
@@ -34,6 +33,7 @@ const std::vector<const char*>	GraphicsPipeline::validation_layers = {
 void	GraphicsPipeline::init(
 	scop::Window& window,
 	const scop::Image& image,
+	const UniformBufferObject::Light& light,
 	const std::vector<Vertex>& vertices,
 	const std::vector<uint32_t>& indices
 ) {
@@ -46,7 +46,7 @@ void	GraphicsPipeline::init(
 	command_buffer.initPool(device);
 	texture_sampler.init(device, command_buffer.vk_command_pool, image);
 	vertex_input.init(device, command_buffer.vk_command_pool, vertices, indices);
-	descriptor_set.initSets(device, texture_sampler);
+	descriptor_set.initSets(device, texture_sampler, light);
 	command_buffer.initBuffer(device);
 	createSyncObjects();
 }

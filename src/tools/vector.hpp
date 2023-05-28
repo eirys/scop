@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 13:54:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/27 14:37:29 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 21:34:48 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,10 @@ struct Vect3 {
 	}
 
 	/* OPERATORS =============================================================== */
+
+	bool	operator!() const noexcept {
+		return !x && !y && !z;
+	}
 
 	Vect3	operator-() const noexcept {
 		return Vect3(-x, -y, -z);
@@ -198,6 +202,10 @@ struct Vect2 {
 	}
 
 	/* OPERATORS =============================================================== */
+
+	bool	operator!() const noexcept {
+		return !x && !y;
+	}
 
 	Vect2	operator-() const noexcept {
 		return Vect2{ -x, -y };

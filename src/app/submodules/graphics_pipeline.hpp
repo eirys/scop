@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 16:27:44 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 10:42:28 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 17:19:28 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ public:
 	void						init(
 		scop::Window& window,
 		const scop::Image& image,
+		const UniformBufferObject::Light& light,
 		const std::vector<Vertex>& vertices,
 		const std::vector<uint32_t>& indices
 	);
@@ -99,8 +100,8 @@ private:
 	/*                               CONST MEMBERS                               */
 	/* ========================================================================= */
 
-	const char*						vertex_shader_bin = "shaders/vert.spv";
-	const char*						fragment_shader_bin = "shaders/frag.spv";
+	static constexpr const char*	vertex_shader_bin = "shaders/vert.spv";
+	static constexpr const char*	fragment_shader_bin = "shaders/frag.spv";
 
 	/* ========================================================================= */
 	/*                               CLASS MEMBERS                               */

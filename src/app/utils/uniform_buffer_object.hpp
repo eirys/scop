@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 20:12:41 by eli               #+#    #+#             */
-/*   Updated: 2023/05/28 12:10:23 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 22:08:29 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,13 @@ public:
 		float		mix;
 	};
 
-	struct Light {	// TODO
-		scop::Vect3	pos;
-		float		intensity;
+	struct Light {
+		scop::Vect3	ambient_color;
+		scop::Vect3	light_pos;
+		scop::Vect3	diffuse_color;
+		scop::Vect3	eye_position;
+		scop::Vect3	specular_color;
+		uint16_t	shininess;
 	};
 
 	/* ========================================================================= */
@@ -56,6 +60,7 @@ public:
 
 	alignas(__ALIGNMENT) Camera		camera;
 	alignas(__ALIGNMENT) Texture	texture;
+	alignas(__ALIGNMENT) Light		light;
 
 };
 

@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 13:27:15 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 11:56:47 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 21:17:41 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ namespace scop {
 namespace mtl {
 
 enum IlluminationModel {
-	ILLUM_REGULAR = 0,
+	ILLUM_NONE = 0,
 	ILLUM_LAMBERTIAN = 1,
 	ILLUM_LAMBERT_PHONG = 2,
 	// ILLUM_OREN_NAYAR = 3,
@@ -64,14 +64,31 @@ struct Material {
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
 
-	std::string			name;				// newmtl
-	scop::Vect3			ambient_color;		// Ka
-	scop::Vect3			diffuse_color;		// Kd
-	scop::Vect3			specular_color;		// Ks
-	scop::Vect3			emissive_color;		// Ke
-	float				opacity;			// d or Tr
-	std::size_t			shininess;			// Ns
-	IlluminationModel	illum;
+	// newmtl (material name)
+	std::string			name;
+
+	// Ka (ambient color)
+	scop::Vect3			ambient_color = scop::Vect3(0.01f, 0.01f, 0.01f);
+
+	// Kd (diffuse color)
+	scop::Vect3			diffuse_color = scop::Vect3(1.0f, 1.0f, 0.7f);
+
+	// Ks (specular color)
+	scop::Vect3			specular_color{};
+
+	// Ke (emissive coefficient)
+	scop::Vect3			emissive_color{};
+
+	// d or Tr (object opacity)
+	float				opacity = 1.0f;
+
+	// Ns (object shininess)
+	uint16_t			shininess = 0;
+
+	// illum (illumination model)
+	IlluminationModel	illum = IlluminationModel::ILLUM_LAMBERTIAN;
+
+	// map_Ka (ambient texture)
 	ImagePtr			ambient_texture{};	// map_Ka
 
 }; // class Material
@@ -79,14 +96,17 @@ struct Material {
 } // namespace mtl
 } // namespace scop
 
-inline std::ostream& operator<<(std::ostream& o, const scop::mtl::Material& mat) {
+inline std::ostream& operator<<(
+	std::ostream& o,
+	const scop::mtl::Material& mat
+) {
 	o	<< "Material: " << mat.name << '\n'
 		<< "  Ambient color: " << mat.ambient_color << '\n'
 		<< "  Diffuse color: " << mat.diffuse_color << '\n'
 		<< "  Specular color: " << mat.specular_color << '\n'
 		<< "  Emissive color: " << mat.emissive_color << '\n'
 		<< "  Opacity: " << mat.opacity << '\n'
-		<< "  Shininess: " << mat.shininess << '\n'
+		<< "  Shininess: " << static_cast<int>(mat.shininess) << '\n'
 		<< "  Illumination model: " << static_cast<int>(mat.illum) << '\n'
 		<< "  Ambient texture: " << mat.ambient_texture.get() << '\n';
 	return o;

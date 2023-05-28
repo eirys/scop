@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/28 12:40:44 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 22:10:52 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ std::map<ObjectDirection, bool>	App::keys_pressed_directions = populateDirection
 scop::Vect3						App::movement = scop::Vect3(0.0f, 0.0f, 0.0f);
 scop::Vect3						App::position = scop::Vect3(0.0f, 0.0f, 0.0f);
 
+scop::Vect3						App::eye_pos = scop::Vect3(1.0f, 1.0f, 3.0f);
 float							App::zoom_input = 1.0f;
 std::size_t						App::selected_up_axis = 1;
 
@@ -39,7 +40,7 @@ std::size_t						App::selected_up_axis = 1;
 
 App::App(const std::string& model_file): window(model_file) {
 	loadModel(model_file);
-	graphics_pipeline.init(window, *image, vertices, indices);
+	graphics_pipeline.init(window, *image, light, vertices, indices);
 }
 
 App::~App() {
@@ -277,6 +278,15 @@ void	App::loadModel(const std::string& path) {
 		std::move(*model.getMaterial().ambient_texture)
 	));
 	model.getMaterial().ambient_texture.release();
+
+	light = UniformBufferObject::Light{
+		model.getMaterial().ambient_color,
+		scop::Vect3(1.0, 1.5, 2.0), // TODO: remove hardcoded value
+		model.getMaterial().diffuse_color,
+		App::eye_pos * App::zoom_input,
+		model.getMaterial().specular_color,
+		model.getMaterial().shininess
+	};
 }
 
 /* ========================================================================== */

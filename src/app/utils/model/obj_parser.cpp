@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 14:34:41 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 22:43:34 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include "utils.hpp"	// LOG
 #include "mtl_parser.hpp"
 #include "ppm_loader.hpp"
+#include "material.hpp"
 
 #include <fstream>		// std::ifstream
 #include <vector>		// std::vector
@@ -361,8 +362,17 @@ void	ObjParser::checkMtl() {
 	if (!mtl_path.empty() && !mtl_name.empty()){
 		scop::mtl::MtlParser	mtl_parser;
 		model_output.setMaterial(mtl_parser.parseFile(SCOP_MTL_PATH + mtl_path));
+
 		if (mtl_name != model_output.getMaterial().name) {
 			throw std::invalid_argument("Unknown material: " + mtl_name);
+		} else if (
+			!(model_output.getMaterial().shininess == 0 &&
+			!model_output.getMaterial().specular_color) &&
+			!(model_output.getMaterial().shininess != 0 &&
+			!(!model_output.getMaterial().specular_color) &&
+			model_output.getMaterial().illum == scop::mtl::IlluminationModel::ILLUM_LAMBERT_PHONG)
+		) {
+			throw std::invalid_argument("Specular component is incomplete");
 		}
 	} else if (mtl_path.empty()) {
 		throw std::invalid_argument("No library file specified for " + mtl_name);
