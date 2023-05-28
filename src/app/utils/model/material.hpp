@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 13:27:15 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 02:07:23 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 10:20:26 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ struct Material {
 
 	Material() = default;
 	Material(Material&& other) = default;
+	Material&	operator=(Material&& other) = default;
 	~Material() = default;
 
 	Material&	operator=(const Material& other) = delete;

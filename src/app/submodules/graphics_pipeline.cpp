@@ -6,13 +6,15 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 16:34:03 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 01:18:08 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 10:54:05 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "graphics_pipeline.hpp"
 #include "window.hpp"
 #include "utils.hpp"
+
+#include "image_handler.hpp"
 
 #include <iostream> // std::cerr std::endl
 #include <cstring> // std::strcmp

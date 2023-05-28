@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 16:27:44 by etran             #+#    #+#             */
-/*   Updated: 2023/05/27 01:19:12 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 10:42:28 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ public:
 	/* ========================================================================= */
 
 	void						init(
-	scop::Window& window, 
+		scop::Window& window,
 		const scop::Image& image,
 		const std::vector<Vertex>& vertices,
 		const std::vector<uint32_t>& indices

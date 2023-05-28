@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 19:23:47 by eli               #+#    #+#             */
-/*   Updated: 2023/05/28 02:20:42 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 10:30:14 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,8 @@ texture_coords(std::move(x.texture_coords)),
 normal_coords(std::move(x.normal_coords)),
 indices(std::move(x.indices)),
 triangles(std::move(x.triangles)),
-smooth_shading(x.smooth_shading) {
-	if (x.material.has_value()) {
-		material.emplace(std::move(x.material.value()));
-	}
-}
+material(std::move(x.material)),
+smooth_shading(x.smooth_shading) {}
 
 Model::Model(const Model& x):
 vertex_coords(x.vertex_coords),
@@ -43,11 +40,8 @@ texture_coords(x.texture_coords),
 normal_coords(x.normal_coords),
 indices(x.indices),
 triangles(x.triangles),
-smooth_shading(x.smooth_shading) {
-	if (x.material.has_value()) {
-		material.emplace(std::move(x.material.value()));
-	}
-}
+material(x.material),
+smooth_shading(x.smooth_shading) {}
 
 void	Model::addVertex(const Vect3& vertex) {
 	vertex_coords.emplace_back(vertex);
@@ -117,12 +111,12 @@ void	Model::setDefaultNormalCoords() {
 }
 
 void	Model::setMaterial(scop::mtl::Material&& mtl) {
-	material.emplace(std::move(mtl));
-	if (material->ambient_texture != nullptr) {
+	material = std::move(mtl);
+	if (material.ambient_texture != nullptr) {
 		return;
 	} else {
 		scop::PpmLoader ppm_loader(SCOP_TEXTURE_FILE_DEFAULT);
-		material->ambient_texture.reset(new scop::Image(ppm_loader.load()));
+		material.ambient_texture.reset(new scop::Image(ppm_loader.load()));
 	}
 }
 
@@ -152,7 +146,11 @@ const std::vector<Model::Index>&	Model::getIndices() const noexcept {
 	return indices;
 }
 
-const std::optional<mtl::Material>&	Model::getMaterial() const noexcept {
+const mtl::Material&	Model::getMaterial() const noexcept {
+	return material;
+}
+
+mtl::Material&	Model::getMaterial() noexcept {
 	return material;
 }
 

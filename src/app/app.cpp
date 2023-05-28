@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/28 02:09:55 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 10:54:00 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ App::App(const std::string& model_file): window(model_file) {
 }
 
 App::~App() {
-	// graphics_pipeline.destroy();
+	graphics_pipeline.destroy();
 }
 
 /* ========================================================================== */
@@ -273,41 +273,12 @@ void	App::loadModel(const std::string& path) {
 		vertex.pos -= barycenter;
 	}
 
-	// Set texture from model
-	image.reset(std::move(model.getMaterial().value().ambient_texture.get()));
+	// Pass ownership of texture image from model to app
+	image.reset(new scop::Image(
+		std::move(*model.getMaterial().ambient_texture)
+	));
+	model.getMaterial().ambient_texture.release();
 }
-
-
-// // TODO: remove and update..
-// /**
-//  * @brief	Creates texture loader object. If no path is provided, default
-//  * 			texture is loaded.
-//  *
-//  * @todo	Handle other image formats
-// */
-// void	App::loadTexture(const std::string& path) {
-// 	std::unique_ptr<scop::ImageLoader>	image_loader;
-// 	std::string	file;
-
-// 	// Only handle ppm files for now
-// 	if (path.empty()) {
-// 		file = SCOP_TEXTURE_FILE_DEFAULT;
-// 	} else {
-// 		std::size_t	extension_pos = path.rfind('.');
-// 		if (extension_pos == std::string::npos) {
-// 			throw std::invalid_argument(
-// 				"No extention found for texture file (must be .ppm)"
-// 			);
-// 		} else if (path.find("ppm", extension_pos) == std::string::npos) {
-// 			throw std::invalid_argument(
-// 				"Texture file must be a ppm file (.ppm)"
-// 			);
-// 		}
-// 		file = path;
-// 	}
-// 	image_loader.reset(new PpmLoader(file));
-// 	image = std::make_unique<scop::Image>(image_loader->load());
-// }
 
 /* ========================================================================== */
 /*                                    OTHER                                   */

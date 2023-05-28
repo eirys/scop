@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 15:06:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 02:20:15 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 10:29:35 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -362,15 +362,13 @@ void	ObjParser::checkMtl() {
 	if (!mtl_path.empty() && !mtl_name.empty()){
 		scop::mtl::MtlParser	mtl_parser;
 		model_output.setMaterial(mtl_parser.parseFile(SCOP_MTL_PATH + mtl_path));
-		if (mtl_name != model_output.getMaterial().value().name) {
+		if (mtl_name != model_output.getMaterial().name) {
 			throw std::invalid_argument("Unknown material: " + mtl_name);
 		}
 	} else if (mtl_path.empty()) {
 		throw std::invalid_argument("No library file specified for " + mtl_name);
 	} else if (mtl_name.empty()) {
 		throw std::invalid_argument("No material name specified");
-	} else {
-		model_output.setMaterial(scop::mtl::Material{});
 	}
 }
 
