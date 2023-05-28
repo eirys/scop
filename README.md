@@ -2,13 +2,12 @@
 A simple graphics `.obj` renderer, made with Vulkan.
 
 ## Usage
-`./scop filepath {texturepath}`
+`./scop filepath`
 
 You can press `escape` to close the window.
 
 **Texture enabling keys**:
-- `t`	toggles/untoggles texture
-- `l`	toggle/untoggle light (*Todo*)
+- `t`		changes texture (texture -> color -> grayscale)
 
 **Object moving keys**
 - `w`		forward
@@ -19,15 +18,15 @@ You can press `escape` to close the window.
 - `space`	upward
 
 **Rotation keys**:
-- `1`	around X axis of the object (`7` to rotate counter clockwise)
-- `2`	around Y axis of the object (`8` to rotate counter clockwise)
-- `3`	around Z axis of the object (`9` to rotate counter clockwise)
+- `1`		around X axis of the object (`7` to rotate counter clockwise)
+- `2`		around Y axis of the object (`8` to rotate counter clockwise)
+- `3`		around Z axis of the object (`9` to rotate counter clockwise)
 
 **Reset model edits**
-- `r`	reset model
+- `r`		reset model
 
 **Camera orientation keys**
-- `tab`	camera orientation: +90°, 0° or -90°
+- `tab`		camera orientation: +90°, 0° or -90°
 
 **Zoom scroll**
 - `up/down`	zoom in/out
@@ -55,3 +54,11 @@ https://www.loc.gov/preservation/digital/formats/fdd/fdd000507.shtml
 
 **Wavefront mtl format:**
 https://www.loc.gov/preservation/digital/formats/fdd/fdd000508.shtml
+
+
+### Bonus implemented
+- Zoom
+- Diffuse shading
+- Specular lighting
+- .mtl files parsing
+- Enhanced user experience
