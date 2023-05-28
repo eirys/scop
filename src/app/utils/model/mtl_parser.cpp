@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 13:32:56 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 11:58:02 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 14:34:20 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,9 @@ void	MtlParser::processLine() {
 
 	// Check line type.
 	getWord();
+	if (token[0] == '#') {
+		return;
+	}
 	for (std::size_t i = 0; i < nb_line_size; ++i) {
 		if (token == line_begin[i]) {
 			skipWhitespace();
@@ -86,12 +89,8 @@ void	MtlParser::processLine() {
 			} catch (const std::out_of_range& oor) {
 				throw base::parse_error("Value overflow");
 			}
-			if (current_pos != std::string::npos) {
-				if (line[current_pos] == '#') {
-					skipComment();
-				} else {
-					throw base::parse_error("unexpected token");
-				}
+			if (current_pos != std::string::npos && line[current_pos] != '#') {
+				throw base::parse_error("unexpected token");
 			}
 			return;
 		}

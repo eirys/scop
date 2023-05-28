@@ -37,16 +37,6 @@ You can press `escape` to close the window.
 **Basic cube**
 ![Basic cube, with texture](./resource/basic_cube.png)
 
-**Color toggled**
-![Basic cube, with color](./resource/basic_cube_color.png)
-
-**Rotation toggled**
-![Basic cube, with texture and rotating](./resource/basic_cube_rot.png)
-
-**Color toggled while rotating**
-![Basic cube, with color transition](./resource/basic_cube_rot_trans.png)
-
-
 ## Awesome resources
 
 **Wavefront .obj format:**
@@ -55,10 +45,9 @@ https://www.loc.gov/preservation/digital/formats/fdd/fdd000507.shtml
 **Wavefront mtl format:**
 https://www.loc.gov/preservation/digital/formats/fdd/fdd000508.shtml
 
-
 ### Bonus implemented
 - Zoom
 - Diffuse shading
 - Specular lighting
 - .mtl files parsing
-- Enhanced user experience
+- Enhanced user experience, camera orientation

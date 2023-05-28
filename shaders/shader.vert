@@ -7,7 +7,7 @@ layout(location = 3) in vec3 in_normal;
 
 layout(location = 0) out vec3 frag_color;
 layout(location = 1) out vec2 frag_tex_coord;
-layout(location = 2) out vec3 lighting;
+layout(location = 2) out vec4 lighting;
 
 layout(binding = 0) uniform Camera {
 	mat4 model;
@@ -16,9 +16,9 @@ layout(binding = 0) uniform Camera {
 } camera_ubo;
 
 // Light properties
-const vec3 _ambient_component = vec3(0.005, 0.005, 0.005);
-const vec3 _light_point = vec3(-1.0, 1.5, -2.0);
-const vec4 _light_color = vec4(1.0, 1.0, 0.8, 1.0); // yellowish, w is intensity
+const float _ambient_component = 0.01;
+const vec3 _light_point = vec3(1.0, 1.5, 2.0);
+const vec4 _light_color = vec4(1.0, 1.0, 0.7, 1.0); // yellowish, w is intensity
 
 void	main() {
 	// Transform to world space
@@ -39,12 +39,12 @@ void	main() {
 	vec3 diffuse_component = (
 		vec3(_light_color.xyz * _light_color.w)
 		* light_attenuation
-		* dot(normal, normalize(light_vector))
+		* max(dot(normal, normalize(light_vector)), 0.0)
 	);
 
 	gl_Position = camera_ubo.proj * camera_ubo.view * vec4(pos_world, 1.0);
 
 	frag_color = in_color;
 	frag_tex_coord = in_tex_coord;
-	lighting = _ambient_component + diffuse_component;
+	lighting = vec4(diffuse_component, _ambient_component);
 }

@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:56:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 12:40:06 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 14:45:20 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -294,20 +294,12 @@ void	DescriptorSet::updateCamera(
 		// Rotate around z
 		scop::math::radians(App::rotation_angles[2]),
 		axis[static_cast<int>(RotationAxis::ROTATION_AXIS_Z)]
-	) * scop::scale(
-		// Scale object (zoom)
-		scop::Mat4(1.0f),
-		scop::Vect3(
-			scop::App::zoom_input,
-			scop::App::zoom_input,
-			scop::App::zoom_input
-		)
 	);
-
 
 	// Define camera transformation view
 	camera.view = scop::lookAt(
-		scop::Vect3(1.0f, 1.0f, 2.0f),
+		scop::Vect3(1.0f, 1.0f, 3.0f)
+		* scop::App::zoom_input,
 		scop::Vect3(0.0f, 0.0f, 0.0f),
 		axis[App::selected_up_axis]
 	);
