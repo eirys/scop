@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/28 11:43:49 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 12:40:44 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@
 
 namespace scop {
 
-bool							App::texture_enabled = true;
-std::optional<App::time_point>	App::texture_enabled_start;
+TextureState					App::texture_state = TextureState::TEXTURE_ENABLED;
+std::optional<App::time_point>	App::texture_transition_start;
 
 std::map<RotationInput, bool>	App::keys_pressed_rotations = populateRotationKeys();
 std::array<float, 3>			App::rotation_angles = { 0.0f, 0.0f, 0.0f };
@@ -62,8 +62,10 @@ void	App::run() {
  * On toggle, changes the texture of the model.
 */
 void	App::toggleTexture() noexcept {
-	texture_enabled = !texture_enabled;
-	texture_enabled_start.emplace(
+	texture_state = static_cast<TextureState>(
+		(static_cast<int>(texture_state) + 1) % 3
+	);
+	texture_transition_start.emplace(
 		std::chrono::high_resolution_clock::now()
 	);
 }
@@ -249,16 +251,12 @@ void	App::loadModel(const std::string& path) {
 				model_textures[index.texture].x,
 				1.0f - model_textures[index.texture].y
 			};
-			//TODO Remove
-			vertex.color = { 0.5f, 0.5f, 0.5f };
-
-			// math::generateVibrantColor(
-			// 	vertex.color.x,
-			// 	vertex.color.y,
-			// 	vertex.color.z
-			// );
-
 			vertex.normal = model_normals[index.normal];
+			math::generateVibrantColor(
+				vertex.color.x,
+				vertex.color.y,
+				vertex.color.z
+			);
 
 			if (unique_vertices.count(vertex) == 0) {
 				unique_vertices[vertex] = static_cast<uint32_t>(vertices.size());

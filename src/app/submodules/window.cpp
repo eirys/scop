@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:42 by eli               #+#    #+#             */
-/*   Updated: 2023/05/23 01:47:54 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 12:01:02 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,9 +205,6 @@ Window::Window(const std::string& model_name) {
 
 	// create a window pointer
 	const std::string	window_title = title + model_name;
-
-	// int count;
-	// GLFWmonitor** monitors = glfwGetMonitors(&count);
 
 	window = glfwCreateWindow(
 		width,

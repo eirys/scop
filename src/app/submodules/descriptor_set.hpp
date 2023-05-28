@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:39:20 by etran             #+#    #+#             */
-/*   Updated: 2023/05/21 11:07:48 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 12:03:51 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,9 @@
 # endif
 
 # include <GLFW/glfw3.h>
+
+// Std
+# include <chrono> // std::chrono
 
 # include "device.hpp"
 # include "texture_sampler.hpp"

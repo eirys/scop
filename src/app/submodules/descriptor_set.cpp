@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:56:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/27 13:37:20 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 12:40:06 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -242,7 +242,7 @@ void	DescriptorSet::createUniformBuffers(Device& device) {
 void	DescriptorSet::initUniformBuffer() noexcept {
 	UniformBufferObject	ubo{};
 
-	ubo.texture.enabled = scop::App::texture_enabled;
+	ubo.texture.state = static_cast<int>(App::texture_state);
 	ubo.texture.mix = -1.0f;
 
 	memcpy(uniform_buffers_mapped, &ubo, sizeof(UniformBufferObject));
@@ -335,7 +335,7 @@ void	DescriptorSet::updateCamera(
 */
 void	DescriptorSet::updateTexture() {
 	// Only udpate if it was recently toggled
-	if (!App::texture_enabled_start.has_value()) {
+	if (!App::texture_transition_start.has_value()) {
 		return;
 	}
 	UniformBufferObject::Texture	texture;
@@ -343,20 +343,20 @@ void	DescriptorSet::updateTexture() {
 
 	// Transition from 0 to 1 in /*transition_duration*/ ms	float
 	float	time = std::chrono::duration<float, std::chrono::milliseconds::period>(
-		current_time - App::texture_enabled_start.value()
+		current_time - App::texture_transition_start.value()
 	).count() / App::transition_duration;
 
-	texture.enabled = App::texture_enabled;
-	texture.mix = App::texture_enabled ? time : 1.0f - time;
+	texture.state = static_cast<int>(App::texture_state);
+	texture.mix = time;
 	memcpy(
 		(char*)uniform_buffers_mapped + offsetof(UniformBufferObject, texture),
 		&texture,
 		sizeof(UniformBufferObject::Texture)
 	);
 
-	// Reset texture_enabled_start if time is up
+	// Reset texture_transition_start if time is up
 	if (time >= 1.0f) {
-		App::texture_enabled_start.reset();
+		App::texture_transition_start.reset();
 	}
 }
 

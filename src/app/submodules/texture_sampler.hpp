@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:18:58 by etran             #+#    #+#             */
-/*   Updated: 2023/05/16 17:29:51 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 12:00:46 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,6 @@
 # endif
 
 # include <GLFW/glfw3.h>
-
-# include <chrono>
 
 namespace scop {
 class Image;

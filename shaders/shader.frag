@@ -2,26 +2,36 @@
 
 layout(location = 0) in vec3 frag_color;
 layout(location = 1) in vec2 frag_tex_coord;
+layout(location = 2) in vec3 frag_grayscale;
 
 layout(location = 0) out vec4 out_color;
 
 // Reference to combined image sampler descriptor
 layout(binding = 1) uniform sampler2D tex_sampler;
 layout(binding = 2) uniform Texture {
-	bool	enabled;
+	int		state;
 	float	mix;
 } texture_ubo;
 
 void main() {
 	vec4	light_pos = vec4(0.0, 10.0, 10.0, 1.0);
-	vec4	tex_color = texture(tex_sampler, frag_tex_coord);
-	vec4	input_color = vec4(frag_color, 1.0);
+	vec4	input_color; // Current color
+	vec4	output_color; // Next color
+	
+	if (texture_ubo.state == 0) { // From texture to color
+		input_color = texture(tex_sampler, frag_tex_coord);
+		output_color = vec4(frag_color, 1.0);
+	} else if (texture_ubo.state == 1) { // From color to grayscale
+		input_color = vec4(frag_color, 1.0);
+		output_color = vec4(frag_grayscale, 1.0);
+	} else { // From grayscale to texture
+		input_color = vec4(frag_grayscale, 1.0);
+		output_color = texture(tex_sampler, frag_tex_coord);
+	}
 
 	if (texture_ubo.mix != -1.0 && texture_ubo.mix <= 1.0) {
-		out_color = mix(input_color, tex_color, texture_ubo.mix);
-	} else if (texture_ubo.enabled) {
-		out_color = tex_color;
+		out_color = mix(input_color, output_color, texture_ubo.mix);
 	} else {
-		out_color = input_color;
+		out_color = output_color;
 	}
 }

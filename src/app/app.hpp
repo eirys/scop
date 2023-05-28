@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/28 01:27:44 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 12:38:03 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@
 # include "image_handler.hpp"
 # include "graphics_pipeline.hpp"
 
-# define SCOP_MOVE_SPEED				0.005f
-# define SCOP_ROTATION_SPEED			0.25f // deg
+# define SCOP_MOVE_SPEED		0.005f
+# define SCOP_ROTATION_SPEED	0.25f // deg
 
 namespace scop {
 
@@ -64,6 +64,12 @@ enum ZoomInput {
 	ZOOM_IN,
 	ZOOM_OUT,
 	ZOOM_NONE
+};
+
+enum TextureState {
+	TEXTURE_GRAYSCALE = 1,
+	TEXTURE_COLOR = 2,
+	TEXTURE_ENABLED = 0
 };
 
 /**
@@ -137,8 +143,8 @@ private:
 	/*                               STATIC MEMBERS                              */
 	/* ========================================================================= */
 
-	static bool							texture_enabled;
-	static std::optional<time_point>	texture_enabled_start;
+	static TextureState					texture_state;
+	static std::optional<time_point>	texture_transition_start;
 
 	static
 	std::map<RotationInput, bool>		keys_pressed_rotations;
