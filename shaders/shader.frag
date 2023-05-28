@@ -13,16 +13,16 @@ layout(binding = 2) uniform Texture {
 	float	parameter;
 } texture_ubo;
 layout(binding = 3) uniform Light {
-	// vec3 light_color;
 	vec3 ambient_color;
-	vec3 position;
+	vec3 spot_position;
+	vec3 spot_color;
 	vec3 diffuse_color;
 	vec3 eye_position;
 	vec3 specular_color;
 	int shininess;
 } light_ubo;
 
-const vec3 _light_color = vec3(1.0, 1.0, 0.8);
+// const vec3 _light_color = vec3(1.0, 1.0, 0.8);
 const vec4 _gray_scale = vec4(0.7, 0.7, 0.7, 1.0);
 
 void main() {
@@ -56,7 +56,7 @@ void main() {
  	out_color = output_color * vec4(light_ubo.ambient_color, 1.0);
 
 	// Vertex to light vector
-	vec3 light_vector = light_ubo.position - pos_world;
+	vec3 light_vector = light_ubo.spot_position - pos_world;
 	// Atenuation due to distance
 	float light_attenuation = 1.0f / dot(light_vector, light_vector);
 	light_vector = light_vector * sqrt(light_attenuation);
@@ -67,7 +67,7 @@ void main() {
 	// Amount of diffuse light
 	float diffuse_component = max(dot(normal_world, light_vector), 0.0);
 	vec3 diffuse_lighting =
-		_light_color
+		light_ubo.spot_color
 		* light_ubo.diffuse_color
 		* light_attenuation
 		* diffuse_component;
@@ -78,7 +78,7 @@ void main() {
 		0.0
 	);
 	vec3 specular_lighting =
-		_light_color
+		light_ubo.spot_color
 		* light_ubo.specular_color
 		* light_attenuation
 		* specular_component;

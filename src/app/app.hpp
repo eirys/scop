@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/28 22:09:57 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 23:37:42 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,6 +121,8 @@ public:
 	) noexcept;
 	static void							toggleZoom(ZoomInput input) noexcept;
 	static void							changeUpAxis() noexcept;
+	static void							toggleLightColor() noexcept;
+	static void							toggleLightPos() noexcept;
 
 private:
 	/* ========================================================================= */
@@ -162,6 +164,11 @@ private:
 	static float						zoom_input;
 	static std::size_t					selected_up_axis;
 
+	static std::array<scop::Vect3, 4>	light_colors;
+	static std::size_t					selected_light_color;
+	static std::array<scop::Vect3, 4>	light_positions;
+	static std::size_t					selected_light_pos;
+
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
 	/* ========================================================================= */
@@ -175,7 +182,7 @@ private:
 /*                                    OTHER                                   */
 /* ========================================================================== */
 
-std::map<ObjectDirection, bool>	populateDirectionKeys();
-std::map<RotationInput, bool>	populateRotationKeys();
+std::map<ObjectDirection, bool>			populateDirectionKeys();
+std::map<RotationInput, bool>			populateRotationKeys();
 
 } // namespace scop

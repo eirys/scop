@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:56:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 22:19:33 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 23:54:39 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ void	DescriptorSet::destroy(
 void	DescriptorSet::updateUniformBuffer(VkExtent2D extent) {
 	updateCamera(extent);
 	updateTexture();
+	updateLight();
 }
 
 /* ========================================================================== */
@@ -283,6 +284,8 @@ void	DescriptorSet::initUniformBuffer(
 
 /**
  * Update the camera part of the uniform buffer.
+ * 
+ * TODO: Only update when needed.
 */
 void	DescriptorSet::updateCamera(
 	VkExtent2D extent
@@ -388,7 +391,22 @@ void	DescriptorSet::updateTexture() {
  * Todo
 */
 void	DescriptorSet::updateLight() {
-	return;
+	struct {
+		scop::Vect3	position;
+		scop::Vect3	color;
+	} light_info = {
+		App::light_positions[App::selected_light_pos],
+		App::light_colors[App::selected_light_color]
+	};
+	
+	memcpy(
+		(char*)uniform_buffers_mapped + 
+		offsetof(UniformBufferObject, light) +
+		offsetof(UniformBufferObject::Light, light_pos),
+		&light_info,
+		sizeof(light_info)
+	);
+
 }
 
 } // namespace graphics

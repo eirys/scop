@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/26 15:25:04 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 15:45:16 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 23:52:33 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ struct Vertex {
 	scop::Vect3		color;
 	scop::Vect2		tex_coord;
 	scop::Vect3		normal;
-	uint16_t		shininess;
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
@@ -61,8 +60,8 @@ struct Vertex {
 	/**
 	 * Expliciting to vulkan the vertex struct format.
 	*/
-	static std::array<VkVertexInputAttributeDescription, 5>	getAttributeDescriptions() {
-		std::array<VkVertexInputAttributeDescription, 5>	attribute_descriptions{};
+	static std::array<VkVertexInputAttributeDescription, 4>	getAttributeDescriptions() {
+		std::array<VkVertexInputAttributeDescription, 4>	attribute_descriptions{};
 
 		// `pos` attribute
 		attribute_descriptions[0].binding = 0;
@@ -88,12 +87,6 @@ struct Vertex {
 		attribute_descriptions[3].format = VK_FORMAT_R32G32B32_SFLOAT;
 		attribute_descriptions[3].offset = offsetof(Vertex, normal);
 
-		// `shininess` attribute
-		attribute_descriptions[4].binding = 0;
-		attribute_descriptions[4].location = 4;
-		attribute_descriptions[4].format = VK_FORMAT_R16_UINT;
-		attribute_descriptions[4].offset = offsetof(Vertex, shininess);
-
 		return attribute_descriptions;
 	}
 
@@ -101,8 +94,7 @@ struct Vertex {
 		return (
 			pos == rhs.pos &&
 			tex_coord == rhs.tex_coord &&
-			normal == rhs.normal &&
-			shininess == rhs.shininess
+			normal == rhs.normal
 		);
 	}
 }; // struct Vertex
@@ -116,8 +108,7 @@ struct std::hash<scop::Vertex> {
 			(std::hash<scop::Vect3>()(vertex.pos)) ^
 			(std::hash<scop::Vect3>()(vertex.color)) ^
 			(std::hash<scop::Vect2>()(vertex.tex_coord)) ^
-			(std::hash<scop::Vect3>()(vertex.normal)) ^
-			(std::hash<uint16_t>()(vertex.shininess))
+			(std::hash<scop::Vect3>()(vertex.normal))
 		);
 	}
 };

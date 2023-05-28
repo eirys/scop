@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/28 22:10:52 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/29 00:02:22 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,21 @@ scop::Vect3						App::position = scop::Vect3(0.0f, 0.0f, 0.0f);
 scop::Vect3						App::eye_pos = scop::Vect3(1.0f, 1.0f, 3.0f);
 float							App::zoom_input = 1.0f;
 std::size_t						App::selected_up_axis = 1;
+
+std::array<scop::Vect3, 4>		App::light_colors = {
+	scop::Vect3(1.0f, 1.0f, 1.0f), // white
+	scop::Vect3(1.0f, 0.0f, 0.3f), // magenta
+	scop::Vect3(0.0f, 1.0f, 0.7f), // cyan
+	scop::Vect3(0.9f, 0.8f, 0.0f) // yellowish
+};
+std::size_t						App::selected_light_color = 0;
+std::array<scop::Vect3, 4>		App::light_positions = {
+	scop::Vect3(1.0f, 1.5f, 2.0f),
+	scop::Vect3(2.0f, 1.0f, 0.5f),
+	scop::Vect3(-1.0f, 1.4f, 1.75f),
+	scop::Vect3(0.0f, -1.0f, 0.0f)
+};
+std::size_t						App::selected_light_pos = 0;
 
 /* ========================================================================== */
 /*                                   PUBLIC                                   */
@@ -223,6 +238,14 @@ void	App::changeUpAxis() noexcept {
 	selected_up_axis = (selected_up_axis + 1) % 3;
 }
 
+void	App::toggleLightColor() noexcept {
+	selected_light_color = (selected_light_color + 1) % 4;
+}
+
+void	App::toggleLightPos() noexcept {
+	selected_light_pos = (selected_light_pos + 1) % 4;
+}
+
 /* ========================================================================== */
 /*                                   PRIVATE                                  */
 /* ========================================================================== */
@@ -281,7 +304,8 @@ void	App::loadModel(const std::string& path) {
 
 	light = UniformBufferObject::Light{
 		model.getMaterial().ambient_color,
-		scop::Vect3(1.0, 1.5, 2.0), // TODO: remove hardcoded value
+		App::light_positions[0],
+		App::light_colors[0],
 		model.getMaterial().diffuse_color,
 		App::eye_pos * App::zoom_input,
 		model.getMaterial().specular_color,

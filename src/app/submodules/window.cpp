@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:42 by eli               #+#    #+#             */
-/*   Updated: 2023/05/28 12:01:02 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/28 23:44:38 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,14 @@ static void	keyCallback(
 			// Camera orientation
 			case GLFW_KEY_TAB:
 				return App::changeUpAxis();
+
+			// Light position
+			case GLFW_KEY_L:
+				return App::toggleLightPos();
+
+			// Light color
+			case GLFW_KEY_K:
+				return App::toggleLightColor();
 
 			// Rotation
 			case GLFW_KEY_1:
