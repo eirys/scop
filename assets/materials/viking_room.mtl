@@ -1,0 +1,8 @@
+newmtl Texture1
+Ka 0.2 0.2 0.2
+Kd 0.3 0.3 0.3
+Ks 0.8 0.8 0.5
+d 1.0
+Ns 5
+illum 2
+map_Ka viking_room.ppm
