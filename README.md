@@ -41,6 +41,12 @@ You can press `escape` to close the window.
 **Basic cube**
 ![Basic cube, with texture](./resource/basic_cube.png)
 
+**Cube rotated with red spotlight**
+![Basic cube, with no texture, rotated, red light](./resource/cube_spot.png)
+
+**Teapot with colored faces**
+![Teapot with colored faces, rotated, white light](./resource/teapot_spot_color.png)
+
 ## Awesome resources
 
 **Wavefront .obj format:**
