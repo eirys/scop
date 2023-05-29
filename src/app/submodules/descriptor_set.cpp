@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:56:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/29 00:08:18 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/29 10:42:45 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -392,8 +392,8 @@ void	DescriptorSet::updateTexture() {
 */
 void	DescriptorSet::updateLight() {
 	struct {
-		scop::Vect3	position;
-		scop::Vect3	color;
+		alignas(16) scop::Vect3	position;
+		alignas(16) scop::Vect3	color;
 	} light_info = {
 		App::light_positions[App::selected_light_pos],
 		App::light_colors[App::selected_light_color]

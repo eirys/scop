@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/29 00:23:48 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/29 10:39:11 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,14 +37,14 @@ std::size_t						App::selected_up_axis = 1;
 std::array<scop::Vect3, 4>		App::light_colors = {
 	scop::Vect3(1.0f, 1.0f, 1.0f), // white
 	scop::Vect3(1.0f, 0.0f, 0.0f), // red
-	scop::Vect3(0.0f, 0.0f, 1.0f), // blue
-	scop::Vect3(0.0f, 1.0f, 0.0f) // green
+	scop::Vect3(0.0f, 1.0f, 0.0f), // green
+	scop::Vect3(0.0f, 0.0f, 1.0f) // blue
 };
 std::size_t						App::selected_light_color = 0;
 std::array<scop::Vect3, 4>		App::light_positions = {
 	scop::Vect3(1.0f, 1.5f, 2.0f),
 	scop::Vect3(2.0f, 1.0f, 0.5f),
-	scop::Vect3(-1.0f, 1.4f, 1.75f),
+	scop::Vect3(-1.0f, -1.8f, 1.75f),
 	scop::Vect3(0.0f, -1.0f, 0.0f)
 };
 std::size_t						App::selected_light_pos = 0;
@@ -53,8 +53,9 @@ std::size_t						App::selected_light_pos = 0;
 /*                                   PUBLIC                                   */
 /* ========================================================================== */
 
-App::App(const std::string& model_file): window(model_file) {
+App::App(const std::string& model_file) {
 	loadModel(model_file);
+	window.init(model_file);
 	graphics_pipeline.init(window, *image, light, vertices, indices);
 }
 
@@ -255,6 +256,8 @@ void	App::drawFrame() {
 }
 
 void	App::loadModel(const std::string& path) {
+	LOG("Loading model...");
+
 	scop::obj::ObjParser	parser;
 	scop::obj::Model	model = parser.parseFile(path.c_str());
 
@@ -297,11 +300,12 @@ void	App::loadModel(const std::string& path) {
 	}
 
 	// Pass ownership of texture image from model to app
-	image.reset(new scop::Image(
-		std::move(*model.getMaterial().ambient_texture)
-	));
+	image.reset(
+		new scop::Image(std::move(*model.getMaterial().ambient_texture))
+	);
 	model.getMaterial().ambient_texture.release();
 
+	// Load light
 	light = UniformBufferObject::Light{
 		model.getMaterial().ambient_color,
 		App::light_positions[0],

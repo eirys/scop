@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:36 by eli               #+#    #+#             */
-/*   Updated: 2023/05/16 16:49:31 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/29 09:41:54 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,14 +45,14 @@ public:
 	/*                                  METHODS                                  */
 	/* ========================================================================= */
 
-	Window(const std::string& model_name);
+	Window();
 	~Window();
 
-	Window() = delete;
 	Window(const Window& x) = delete;
 	Window(Window&& x) = delete;
 	Window& operator=(const Window& rhs) = delete;
 
+	void							init(const std::string& model_name);
 	void							pause() const;
 	void							await() const;
 	bool							alive() const;

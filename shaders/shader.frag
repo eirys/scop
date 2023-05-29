@@ -22,7 +22,6 @@ layout(binding = 3) uniform Light {
 	int shininess;
 } light_ubo;
 
-// const vec3 _light_color = vec3(1.0, 1.0, 0.8);
 const vec4 _gray_scale = vec4(0.7, 0.7, 0.7, 1.0);
 
 void main() {
@@ -67,8 +66,7 @@ void main() {
 	// Amount of diffuse light
 	float diffuse_component = max(dot(normal_world, light_vector), 0.0);
 	vec3 diffuse_lighting =
-		light_ubo.spot_color
-		* light_ubo.diffuse_color
+		light_ubo.diffuse_color
 		* light_attenuation
 		* diffuse_component;
 
@@ -78,15 +76,15 @@ void main() {
 		0.0
 	);
 	vec3 specular_lighting =
-		light_ubo.spot_color
-		* light_ubo.specular_color
+		light_ubo.specular_color
 		* light_attenuation
 		* specular_component;
 
-	out_color +=
-		output_color
-		* vec4(
-			clamp(diffuse_lighting + specular_lighting, vec3(0.0), vec3(1.0)),
-			1.0
-		);
+	out_color += output_color * vec4(
+		clamp(
+			light_ubo.spot_color * (diffuse_lighting + specular_lighting),
+			vec3(0.0),
+			vec3(1.0)
+		), 1.0
+	);
 }

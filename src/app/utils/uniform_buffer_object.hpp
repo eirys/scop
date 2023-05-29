@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 20:12:41 by eli               #+#    #+#             */
-/*   Updated: 2023/05/28 23:41:12 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/29 10:42:28 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,12 +36,12 @@ public:
 	};
 
 	struct Light {
-		scop::Vect3	ambient_color;
-		scop::Vect3	light_pos;
-		scop::Vect3 light_color;
-		scop::Vect3	diffuse_color;
-		scop::Vect3	eye_position;
-		scop::Vect3	specular_color;
+		alignas(16) scop::Vect3	ambient_color;
+		alignas(16) scop::Vect3	light_pos;
+		alignas(16) scop::Vect3 light_color;
+		alignas(16) scop::Vect3	diffuse_color;
+		alignas(16) scop::Vect3	eye_position;
+		alignas(16) scop::Vect3	specular_color;
 		uint16_t	shininess;
 	};
 
