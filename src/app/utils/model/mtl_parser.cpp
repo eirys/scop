@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 13:32:56 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 18:06:53 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/29 10:56:49 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,8 +174,8 @@ void	MtlParser::parseNs() {
 	if (!getWord())
 		throw base::parse_error("expected transparency value");
 	checkNumberType(token);
-	material_output.shininess = static_cast<uint16_t>(std::clamp(
-		static_cast<int>(std::stof(token)),
+	material_output.shininess = static_cast<int32_t>(std::clamp(
+		static_cast<int32_t>(std::stof(token)),
 		0,
 		1000
 	));

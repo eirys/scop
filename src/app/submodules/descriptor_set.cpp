@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:56:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/29 10:42:45 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/29 10:53:53 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -275,7 +275,7 @@ void	DescriptorSet::initUniformBuffer(
 ) noexcept {
 	UniformBufferObject	ubo{};
 
-	ubo.texture.state = static_cast<int>(App::texture_state);
+	ubo.texture.state = static_cast<int32_t>(App::texture_state);
 	ubo.texture.mix = -1.0f;
 	ubo.light = light;
 
@@ -373,7 +373,7 @@ void	DescriptorSet::updateTexture() {
 		current_time - App::texture_transition_start.value()
 	).count() / App::transition_duration;
 
-	texture.state = static_cast<int>(App::texture_state);
+	texture.state = static_cast<int32_t>(App::texture_state);
 	texture.mix = time;
 	memcpy(
 		(char*)uniform_buffers_mapped + offsetof(UniformBufferObject, texture),
@@ -392,8 +392,8 @@ void	DescriptorSet::updateTexture() {
 */
 void	DescriptorSet::updateLight() {
 	struct {
-		alignas(16) scop::Vect3	position;
-		alignas(16) scop::Vect3	color;
+		alignas(__ALIGNMENT_VEC3) scop::Vect3	position;
+		alignas(__ALIGNMENT_VEC3) scop::Vect3	color;
 	} light_info = {
 		App::light_positions[App::selected_light_pos],
 		App::light_colors[App::selected_light_color]

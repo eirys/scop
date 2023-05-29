@@ -6,13 +6,16 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 20:12:41 by eli               #+#    #+#             */
-/*   Updated: 2023/05/29 10:42:28 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/29 10:53:34 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-# define __ALIGNMENT 64
+# define __ALIGNMENT_MAT4 16
+# define __ALIGNMENT_VEC3 16
+# define __ALIGNMENT_SCAL 4
+# define __ALIGNMENT_BUFF 64
 
 # include "matrix.hpp"
 
@@ -25,24 +28,24 @@ public:
 	/* ========================================================================= */
 
 	struct Camera {
-		scop::Mat4	model;
-		scop::Mat4	view;
-		scop::Mat4	proj;
+		alignas(__ALIGNMENT_MAT4) scop::Mat4	model;
+		alignas(__ALIGNMENT_MAT4) scop::Mat4	view;
+		alignas(__ALIGNMENT_MAT4) scop::Mat4	proj;
 	};
 
 	struct Texture {
-		int			state;
-		float		mix;
+		alignas(__ALIGNMENT_SCAL) int32_t		state;
+		alignas(__ALIGNMENT_SCAL) float			mix;
 	};
 
 	struct Light {
-		alignas(16) scop::Vect3	ambient_color;
-		alignas(16) scop::Vect3	light_pos;
-		alignas(16) scop::Vect3 light_color;
-		alignas(16) scop::Vect3	diffuse_color;
-		alignas(16) scop::Vect3	eye_position;
-		alignas(16) scop::Vect3	specular_color;
-		uint16_t	shininess;
+		alignas(__ALIGNMENT_VEC3) scop::Vect3	ambient_color;
+		alignas(__ALIGNMENT_VEC3) scop::Vect3	light_pos;
+		alignas(__ALIGNMENT_VEC3) scop::Vect3	light_color;
+		alignas(__ALIGNMENT_VEC3) scop::Vect3	diffuse_color;
+		alignas(__ALIGNMENT_VEC3) scop::Vect3	eye_position;
+		alignas(__ALIGNMENT_VEC3) scop::Vect3	specular_color;
+		alignas(__ALIGNMENT_SCAL) int32_t		shininess;
 	};
 
 	/* ========================================================================= */
@@ -59,9 +62,9 @@ public:
 	/*                               CLASS MEMBERS                               */
 	/* ========================================================================= */
 
-	alignas(__ALIGNMENT) Camera		camera;
-	alignas(__ALIGNMENT) Texture	texture;
-	alignas(__ALIGNMENT) Light		light;
+	alignas(__ALIGNMENT_BUFF) Camera		camera;
+	alignas(__ALIGNMENT_BUFF) Texture		texture;
+	alignas(__ALIGNMENT_BUFF) Light			light;
 
 };
 

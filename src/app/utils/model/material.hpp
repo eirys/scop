@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 13:27:15 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 21:17:41 by etran            ###   ########.fr       */
+/*   Updated: 2023/05/29 10:54:42 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ struct Material {
 	float				opacity = 1.0f;
 
 	// Ns (object shininess)
-	uint16_t			shininess = 0;
+	int32_t				shininess = 0;
 
 	// illum (illumination model)
 	IlluminationModel	illum = IlluminationModel::ILLUM_LAMBERTIAN;
