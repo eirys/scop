@@ -47,6 +47,13 @@ You can press `escape` to close the window.
 **Teapot with colored faces**
 ![Teapot with colored faces, rotated, white light](./resource/teapot_spot_color.png)
 
+### Bonus implemented
+- Zoom
+- Diffuse shading
+- Specular lighting
+- .mtl files parsing
+- Enhanced user experience, camera orientation & spot selector
+
 ## Awesome resources
 
 **Wavefront .obj format:**
@@ -54,10 +61,3 @@ https://www.loc.gov/preservation/digital/formats/fdd/fdd000507.shtml
 
 **Wavefront mtl format:**
 https://www.loc.gov/preservation/digital/formats/fdd/fdd000508.shtml
-
-### Bonus implemented
-- Zoom
-- Diffuse shading
-- Specular lighting
-- .mtl files parsing
-- Enhanced user experience, camera orientation & spot selector
