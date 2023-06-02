@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/05/28 23:37:42 by etran            ###   ########.fr       */
+/*   Updated: 2023/06/02 17:07:47 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@
 # include "matrix.hpp"
 # include "vertex.hpp"
 # include "image_handler.hpp"
-# include "graphics_pipeline.hpp"
+# include "engine.hpp"
 # include "uniform_buffer_object.hpp"
 
 # define SCOP_MOVE_SPEED		0.005f
@@ -136,7 +136,7 @@ private:
 	/* ========================================================================= */
 
 	scop::Window						window;
-	scop::graphics::GraphicsPipeline	graphics_pipeline; // TODO: rename
+	scop::graphics::Engine				engine;
 
 	std::vector<scop::Vertex>			vertices;
 	std::vector<uint32_t>				indices;

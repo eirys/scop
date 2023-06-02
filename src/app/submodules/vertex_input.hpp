@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:43:53 by etran             #+#    #+#             */
-/*   Updated: 2023/05/16 17:35:22 by etran            ###   ########.fr       */
+/*   Updated: 2023/06/02 17:06:48 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,12 +26,12 @@
 
 namespace scop {
 namespace graphics {
-class GraphicsPipeline;
+class Engine;
 class Device;
 
 class VertexInput {
 public:
-	friend GraphicsPipeline;
+	friend Engine;
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */

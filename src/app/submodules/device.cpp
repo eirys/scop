@@ -6,11 +6,11 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/16 01:00:19 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 16:44:10 by etran            ###   ########.fr       */
+/*   Updated: 2023/06/02 17:07:01 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "graphics_pipeline.hpp"
+#include "engine.hpp"
 #include "device.hpp"
 #include "window.hpp"
 #include "utils.hpp"
@@ -234,11 +234,11 @@ void	Device::createLogicalDevice() {
 	create_info.pEnabledFeatures = &device_features;
 
 	// Validation layers
-	if (GraphicsPipeline::enable_validation_layers) {
+	if (Engine::enable_validation_layers) {
 		create_info.enabledLayerCount = static_cast<uint32_t>(
-			GraphicsPipeline::validation_layers.size()
+			Engine::validation_layers.size()
 		);
-		create_info.ppEnabledLayerNames = GraphicsPipeline::validation_layers.data();
+		create_info.ppEnabledLayerNames = Engine::validation_layers.data();
 	} else {
 		create_info.enabledLayerCount = 0;
 	}

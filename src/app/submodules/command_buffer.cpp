@@ -6,12 +6,12 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/16 12:47:19 by etran             #+#    #+#             */
-/*   Updated: 2023/05/17 01:13:29 by etran            ###   ########.fr       */
+/*   Updated: 2023/06/02 17:07:01 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "command_buffer.hpp"
-#include "graphics_pipeline.hpp"
+#include "engine.hpp"
 #include "device.hpp"
 
 namespace scop {
@@ -61,7 +61,7 @@ void	CommandBuffer::createCommandBuffers(Device& device) {
 	alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	alloc_info.commandPool = vk_command_pool;
 	alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	alloc_info.commandBufferCount = static_cast<uint32_t>(GraphicsPipeline::max_frames_in_flight);
+	alloc_info.commandBufferCount = static_cast<uint32_t>(Engine::max_frames_in_flight);
 
 	if (vkAllocateCommandBuffers(device.logical_device, &alloc_info, &command_buffers) != VK_SUCCESS) {
 		throw std::runtime_error("failed to allocate command buffers");

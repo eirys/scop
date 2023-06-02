@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:56:05 by etran             #+#    #+#             */
-/*   Updated: 2023/05/29 10:53:53 by etran            ###   ########.fr       */
+/*   Updated: 2023/06/02 17:06:48 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	DescriptorSet::initSets(
 	const UniformBufferObject::Light& light
 ) {
 	uint32_t	frames_in_flight = static_cast<uint32_t>(
-		GraphicsPipeline::max_frames_in_flight
+		Engine::max_frames_in_flight
 	);
 	createUniformBuffers(device);
 	createDescriptorPool(device, frames_in_flight);

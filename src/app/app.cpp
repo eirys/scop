@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/05/29 10:51:02 by etran            ###   ########.fr       */
+/*   Updated: 2023/06/02 17:07:01 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,11 +56,11 @@ std::size_t						App::selected_light_pos = 0;
 App::App(const std::string& model_file) {
 	loadModel(model_file);
 	window.init(model_file);
-	graphics_pipeline.init(window, *image, light, vertices, indices);
+	engine.init(window, *image, light, vertices, indices);
 }
 
 App::~App() {
-	graphics_pipeline.destroy();
+	engine.destroy();
 }
 
 /* ========================================================================== */
@@ -70,7 +70,7 @@ void	App::run() {
 		window.await();
 		drawFrame();
 	}
-	graphics_pipeline.idle();
+	engine.idle();
 }
 
 /* ========================================================================== */
@@ -252,7 +252,7 @@ void	App::toggleLightPos() noexcept {
 /* ========================================================================== */
 
 void	App::drawFrame() {
-	graphics_pipeline.render(window, indices.size());
+	engine.render(window, indices.size());
 }
 
 void	App::loadModel(const std::string& path) {

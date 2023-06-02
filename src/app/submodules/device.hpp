@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/16 00:55:41 by etran             #+#    #+#             */
-/*   Updated: 2023/05/18 14:06:34 by etran            ###   ########.fr       */
+/*   Updated: 2023/06/02 17:06:48 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ class Window;
 
 namespace graphics {
 struct QueueFamilyIndices;
-class GraphicsPipeline;
+class Engine;
 class RenderTarget;
 class RenderTargetResources;
 class DescriptorSet;
@@ -35,7 +35,7 @@ class VertexInput;
 
 class Device {
 public:
-	friend GraphicsPipeline;
+	friend Engine;
 	friend RenderTarget;
 	friend RenderTargetResources;
 	friend DescriptorSet;

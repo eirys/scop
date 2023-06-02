@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   graphics_pipeline.hpp                              :+:      :+:    :+:   */
+/*   engine.hpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 16:27:44 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 17:19:28 by etran            ###   ########.fr       */
+/*   Updated: 2023/06/02 17:06:48 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ struct QueueFamilyIndices {
 	}
 };
 
-class GraphicsPipeline {
+class Engine {
 public:
 	/* ========================================================================= */
 	/*                               CONST MEMBERS                               */
@@ -62,12 +62,12 @@ public:
 	/*                                  METHODS                                  */
 	/* ========================================================================= */
 
-	GraphicsPipeline() = default;
-	GraphicsPipeline(GraphicsPipeline&& other) = default;
-	~GraphicsPipeline() = default;
+	Engine() = default;
+	Engine(Engine&& other) = default;
+	~Engine() = default;
 
-	GraphicsPipeline(const GraphicsPipeline& other) = delete;
-	GraphicsPipeline& operator=(const GraphicsPipeline& other) = delete;
+	Engine(const Engine& other) = delete;
+	Engine& operator=(const Engine& other) = delete;
 
 	/* ========================================================================= */
 
@@ -122,7 +122,7 @@ private:
 	VkFence							in_flight_fences;
 
 	VkPipelineLayout				pipeline_layout;
-	VkPipeline						graphics_pipeline;
+	VkPipeline						engine;
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */
@@ -145,7 +145,7 @@ private:
 		uint32_t image_index
 	);
 
-}; // class GraphicsPipeline
+}; // class Engine
 
 /* ========================================================================== */
 /*                                    UTILS                                   */

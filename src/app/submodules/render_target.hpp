@@ -29,7 +29,7 @@ namespace scop {
 class Window;
 	
 namespace graphics {
-class GraphicsPipeline;
+class Engine;
 
 struct SwapChainSupportDetails {
 	VkSurfaceCapabilitiesKHR		capabilities;
@@ -40,7 +40,7 @@ struct SwapChainSupportDetails {
 class RenderTarget {
 public:
 
-	friend GraphicsPipeline;
+	friend Engine;
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */

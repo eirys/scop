@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   graphics_pipeline.cpp                              :+:      :+:    :+:   */
+/*   engine.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 16:34:03 by etran             #+#    #+#             */
-/*   Updated: 2023/05/28 17:23:12 by etran            ###   ########.fr       */
+/*   Updated: 2023/06/02 17:06:48 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "graphics_pipeline.hpp"
+#include "engine.hpp"
 #include "window.hpp"
 #include "utils.hpp"
 #include "image_handler.hpp"
@@ -22,7 +22,7 @@
 namespace scop {
 namespace graphics {
 
-const std::vector<const char*>	GraphicsPipeline::validation_layers = {
+const std::vector<const char*>	Engine::validation_layers = {
 	"VK_LAYER_KHRONOS_validation"
 };
 
@@ -30,7 +30,7 @@ const std::vector<const char*>	GraphicsPipeline::validation_layers = {
 /*                                   PUBLIC                                   */
 /* ========================================================================== */
 
-void	GraphicsPipeline::init(
+void	Engine::init(
 	scop::Window& window,
 	const scop::Image& image,
 	const UniformBufferObject::Light& light,
@@ -51,13 +51,13 @@ void	GraphicsPipeline::init(
 	createSyncObjects();
 }
 
-void	GraphicsPipeline::destroy() {
+void	Engine::destroy() {
 	render_target.destroy(device);
 
 	texture_sampler.destroy(device);
 
 	// Remove graphics pipeline
-	vkDestroyPipeline(device.logical_device, graphics_pipeline, nullptr);
+	vkDestroyPipeline(device.logical_device, engine, nullptr);
 	vkDestroyPipelineLayout(device.logical_device, pipeline_layout, nullptr);
 
 	descriptor_set.destroy(device);
@@ -78,11 +78,11 @@ void	GraphicsPipeline::destroy() {
 
 /* ========================================================================== */
 
-void	GraphicsPipeline::idle() {
+void	Engine::idle() {
 	device.idle();
 }
 
-void	GraphicsPipeline::render(
+void	Engine::render(
 	scop::Window& window,
 	std::size_t indices_size
 ) {
@@ -183,7 +183,7 @@ void	GraphicsPipeline::render(
 /**
  * Create a Vulkan instance
 */
-void	GraphicsPipeline::createInstance() {
+void	Engine::createInstance() {
 	// Check if validation layers are available
 	if (enable_validation_layers && !checkValidationLayerSupport())
 		throw std::runtime_error("validation layers requested but not availalbe");
@@ -224,7 +224,7 @@ void	GraphicsPipeline::createInstance() {
 		throw std::runtime_error("failed to create vk_instance");
 }
 
-void	GraphicsPipeline::createGraphicsPipeline() {
+void	Engine::createGraphicsPipeline() {
 	std::vector<char>	vert_shader_code = scop::utils::readFile(vertex_shader_bin);
 	std::vector<char>	frag_shader_code = scop::utils::readFile(fragment_shader_bin);
 
@@ -387,7 +387,7 @@ void	GraphicsPipeline::createGraphicsPipeline() {
 	pipeline_info.basePipelineIndex = -1;
 
 	if (vkCreateGraphicsPipelines(device.logical_device, VK_NULL_HANDLE, 1, &pipeline_info,
-	nullptr, &graphics_pipeline) != VK_SUCCESS) {
+	nullptr, &engine) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create graphics pipeline");
 	}
 
@@ -398,7 +398,7 @@ void	GraphicsPipeline::createGraphicsPipeline() {
 /**
  * Create semaphores and fences
 */
-void	GraphicsPipeline::createSyncObjects() {
+void	Engine::createSyncObjects() {
 	VkSemaphoreCreateInfo	semaphore_info{};
 	semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
@@ -418,7 +418,7 @@ void	GraphicsPipeline::createSyncObjects() {
 /**
  * Check if all required extensions are available for validation layers
 */
-bool	GraphicsPipeline::checkValidationLayerSupport() {
+bool	Engine::checkValidationLayerSupport() {
 	uint32_t	layer_count;
 	vkEnumerateInstanceLayerProperties(&layer_count, nullptr);
 
@@ -442,7 +442,7 @@ bool	GraphicsPipeline::checkValidationLayerSupport() {
 /**
  *  Retrieve list of extensions if validation layers enabled
  */
-std::vector<const char*>	GraphicsPipeline::getRequiredExtensions() {
+std::vector<const char*>	Engine::getRequiredExtensions() {
 	uint32_t		glfw_extension_count = 0;
 	const char**	glfw_extensions;
 	glfw_extensions = glfwGetRequiredInstanceExtensions(&glfw_extension_count);
@@ -458,7 +458,7 @@ std::vector<const char*>	GraphicsPipeline::getRequiredExtensions() {
 /**
  * Create a shader module, from a GLSL shader file, that will be used in the pipeline
 */
-VkShaderModule	GraphicsPipeline::createShaderModule(const std::vector<char>& code) {
+VkShaderModule	Engine::createShaderModule(const std::vector<char>& code) {
 	// Create a shader module from code
 	VkShaderModuleCreateInfo	create_info{};
 
@@ -476,7 +476,7 @@ VkShaderModule	GraphicsPipeline::createShaderModule(const std::vector<char>& cod
 /**
  *  Write commands to command buffer to be subimtted to queue.
  */
-void	GraphicsPipeline::recordCommandBuffer(
+void	Engine::recordCommandBuffer(
 	std::size_t indices_size,
 	VkCommandBuffer command_buffer,
 	uint32_t image_index
@@ -508,7 +508,7 @@ void	GraphicsPipeline::recordCommandBuffer(
 
 	// Begin rp and bind pipeline
 	vkCmdBeginRenderPass(command_buffer, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
-	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphics_pipeline);
+	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, engine);
 
 	// Set viewport and scissors
 	VkViewport	viewport{};

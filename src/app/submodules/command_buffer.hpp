@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/16 12:44:56 by etran             #+#    #+#             */
-/*   Updated: 2023/05/17 01:13:49 by etran            ###   ########.fr       */
+/*   Updated: 2023/06/02 17:06:48 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,13 @@
 namespace scop {
 namespace graphics {
 
-class GraphicsPipeline;
+class Engine;
 class Device;
 
 class CommandBuffer {
 public:
 
-	friend GraphicsPipeline;
+	friend Engine;
 
 	/* ========================================================================= */
 	/*                                  METHODS                                  */

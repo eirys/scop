@@ -12,7 +12,7 @@
 
 #include "render_target.hpp"
 #include "device.hpp"
-#include "graphics_pipeline.hpp"
+#include "engine.hpp"
 #include "window.hpp"
 
 #include <algorithm> // std::min, std::max

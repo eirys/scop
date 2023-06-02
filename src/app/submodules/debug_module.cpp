@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/16 15:07:01 by etran             #+#    #+#             */
-/*   Updated: 2023/05/16 16:22:36 by etran            ###   ########.fr       */
+/*   Updated: 2023/06/02 17:07:01 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include <iostream> // std::cerr
 
 #include "window.hpp"
-#include "graphics_pipeline.hpp"
+#include "engine.hpp"
 #include "device.hpp"
 #include "render_target.hpp"
 #include "texture_sampler.hpp"
@@ -37,7 +37,7 @@ namespace graphics {
 void	DebugModule::init(
 	VkInstance vk_instance
 ) {
-	if (!GraphicsPipeline::enable_validation_layers) return;
+	if (!Engine::enable_validation_layers) return;
 
 	VkDebugUtilsMessengerCreateInfoEXT	create_info{};
 	populate(create_info);
@@ -50,7 +50,7 @@ void	DebugModule::init(
 void	DebugModule::destroy(
 	VkInstance vk_instance
 ) {
-	if (!GraphicsPipeline::enable_validation_layers) return;
+	if (!Engine::enable_validation_layers) return;
 	DestroyDebugUtilsMessengerEXT(vk_instance, debug_messenger, nullptr);
 }
 
