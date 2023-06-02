@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 14:11:57 by eli               #+#    #+#             */
-/*   Updated: 2023/05/27 01:18:04 by etran            ###   ########.fr       */
+/*   Updated: 2023/06/02 18:17:07 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ struct Mat4 {
 }; // struct Mat4
 
 Mat4	lookAt(const Vect3& eye, const Vect3& center, const Vect3& up) noexcept;
+Mat4	lookAtDir(const Vect3& eye, const Vect3& dir, const Vect3& up) noexcept;
 Mat4	perspective(float fov, float aspect_ratio, float near, float far) noexcept;
 Mat4	rotate(const Mat4& mat, float angle, const Vect3& axis) noexcept;
 Mat4	scale(const Mat4& mat, const Vect3& scale) noexcept;

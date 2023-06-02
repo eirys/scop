@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/10 18:21:34 by eli               #+#    #+#             */
-/*   Updated: 2023/06/02 17:07:47 by etran            ###   ########.fr       */
+/*   Updated: 2023/06/02 19:15:33 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@
 # include "engine.hpp"
 # include "uniform_buffer_object.hpp"
 
+# define SCOP_MOUSE_SENSITIVITY	0.25f
 # define SCOP_MOVE_SPEED		0.005f
 # define SCOP_ROTATION_SPEED	0.25f // deg
 
@@ -74,7 +75,7 @@ enum TextureState {
 };
 
 /**
- * Core engine.
+ * Main class.
 */
 class App {
 public:
@@ -120,7 +121,10 @@ public:
 		ObjectDirection direction
 	) noexcept;
 	static void							toggleZoom(ZoomInput input) noexcept;
-	static void							changeUpAxis() noexcept;
+	static void							updateCameraDir(
+		float x,
+		float y
+	) noexcept;
 	static void							toggleLightColor() noexcept;
 	static void							toggleLightPos() noexcept;
 
@@ -161,8 +165,8 @@ private:
 	static scop::Vect3					position;
 
 	static scop::Vect3					eye_pos;
+	static scop::Vect3					eye_dir;
 	static float						zoom_input;
-	static std::size_t					selected_up_axis;
 
 	static std::array<scop::Vect3, 4>	light_colors;
 	static std::size_t					selected_light_color;

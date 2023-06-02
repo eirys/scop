@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 20:56:05 by etran             #+#    #+#             */
-/*   Updated: 2023/06/02 17:06:48 by etran            ###   ########.fr       */
+/*   Updated: 2023/06/02 19:33:15 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -292,12 +292,6 @@ void	DescriptorSet::updateCamera(
 ) {
 	UniformBufferObject::Camera	camera{};
 
-	static const std::array<scop::Vect3, 3>	axis = {
-		scop::Vect3(1.0f, 0.0f, 0.0f),
-		scop::Vect3(0.0f, 1.0f, 0.0f),
-		scop::Vect3(0.0f, 0.0f, 1.0f)
-	};
-
 	// Add translation (object movement)
 	App::position += App::movement;
 
@@ -321,22 +315,22 @@ void	DescriptorSet::updateCamera(
 				),
 				// Rotate around x
 				scop::math::radians(App::rotation_angles[0]),
-				axis[static_cast<int>(RotationAxis::ROTATION_AXIS_X)]
+				Vect3(1.0f, 0.0f, 0.0f)
 			),
 			// Rotate around y
 			scop::math::radians(App::rotation_angles[1]),
-			axis[static_cast<int>(RotationAxis::ROTATION_AXIS_Y)]
+			Vect3(0.0f, 1.0f, 0.0f)
 		),
 		// Rotate around z
 		scop::math::radians(App::rotation_angles[2]),
-		axis[static_cast<int>(RotationAxis::ROTATION_AXIS_Z)]
+		Vect3(0.0f, 0.0f, 1.0f)
 	);
 
 	// Define camera transformation view
-	camera.view = scop::lookAt(
+	camera.view = scop::lookAtDir(
 		scop::App::eye_pos * scop::App::zoom_input,
-		scop::Vect3(0.0f, 0.0f, 0.0f),
-		axis[App::selected_up_axis]
+		scop::App::eye_dir,
+		scop::Vect3(0.0f, 1.0f, 0.0f)
 	);
 
 	// Define persp. projection transformation

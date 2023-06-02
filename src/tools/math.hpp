@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/17 18:03:49 by etran             #+#    #+#             */
-/*   Updated: 2023/05/19 23:11:49 by etran            ###   ########.fr       */
+/*   Updated: 2023/06/02 19:10:18 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,13 @@ namespace math {
 */
 inline float	radians(float degrees) noexcept {
 	return degrees * M_PI / 180;
+}
+
+/**
+ * @brief Converts radians to degrees.
+*/
+inline float	dregrees(float radians) noexcept {
+	return radians * 180 / M_PI;
 }
 
 /**

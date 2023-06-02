@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 11:12:12 by eli               #+#    #+#             */
-/*   Updated: 2023/06/02 17:07:01 by etran            ###   ########.fr       */
+/*   Updated: 2023/06/02 19:14:08 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,10 @@ scop::Vect3						App::movement = scop::Vect3(0.0f, 0.0f, 0.0f);
 scop::Vect3						App::position = scop::Vect3(0.0f, 0.0f, 0.0f);
 
 scop::Vect3						App::eye_pos = scop::Vect3(1.0f, 1.0f, 3.0f);
+scop::Vect3						App::eye_dir = scop::normalize(
+	scop::Vect3(0.0f, 0.0f, 0.0f) - App::eye_pos
+);
 float							App::zoom_input = 1.0f;
-std::size_t						App::selected_up_axis = 1;
 
 std::array<scop::Vect3, 4>		App::light_colors = {
 	scop::Vect3(1.0f, 1.0f, 1.0f), // white
@@ -235,8 +237,28 @@ void	App::toggleZoom(ZoomInput zoom) noexcept {
 	}
 }
 
-void	App::changeUpAxis() noexcept {
-	selected_up_axis = (selected_up_axis + 1) % 3;
+void	App::updateCameraDir(float x, float y) noexcept {
+	static float last_x = x;
+	static float last_y = y;
+
+	// Retrieve values from current eye_dir
+	static float yaw = math::dregrees(std::atan2(eye_dir.z, eye_dir.x));
+	static float pitch = math::dregrees(std::asin(eye_dir.y));
+
+	yaw += (x - last_x) * SCOP_MOUSE_SENSITIVITY;
+	pitch = std::clamp(
+		pitch + (last_y - y) * SCOP_MOUSE_SENSITIVITY,
+		-89.f,
+		89.f
+	);
+
+	last_x = x;
+	last_y = y;
+
+	eye_dir.x = std::cos(math::radians(yaw)) * std::cos(math::radians(pitch));
+	eye_dir.y = std::sin(math::radians(pitch));
+	eye_dir.z = std::sin(math::radians(yaw)) * std::cos(math::radians(pitch));
+	eye_dir = scop::normalize(eye_dir);
 }
 
 void	App::toggleLightColor() noexcept {
