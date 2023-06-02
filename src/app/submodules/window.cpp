@@ -6,7 +6,7 @@
 /*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/06 12:28:42 by eli               #+#    #+#             */
-/*   Updated: 2023/06/02 19:13:31 by etran            ###   ########.fr       */
+/*   Updated: 2023/06/02 23:58:31 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -198,7 +198,6 @@ static void	scrollCallback(
 	}
 }
 
-// Camera orientation
 static void cursorPositionCallback(
 	GLFWwindow* window,
 	double xpos,

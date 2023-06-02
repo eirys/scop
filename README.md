@@ -5,6 +5,7 @@ A simple graphics `.obj` renderer, made with Vulkan.
 `./scop filepath`
 
 You can press `escape` to close the window.
+Use the `mouse` to guide the camera.
 
 **Texture enabling keys**:
 - `t`		changes texture (texture -> color -> grayscale)
@@ -21,16 +22,13 @@ You can press `escape` to close the window.
 - `ctrl`	downward
 - `space`	upward
 
-**Rotation keys**:
+**Object rotation keys**:
 - `1`		around X axis of the object (`7` to rotate counter clockwise)
 - `2`		around Y axis of the object (`8` to rotate counter clockwise)
 - `3`		around Z axis of the object (`9` to rotate counter clockwise)
 
 **Reset model edits**
 - `r`		reset model
-
-**Camera orientation keys**
-- `tab`		camera orientation: +90°, 0° or -90°
 
 **Zoom scroll**
 - `up/down`	zoom in/out
